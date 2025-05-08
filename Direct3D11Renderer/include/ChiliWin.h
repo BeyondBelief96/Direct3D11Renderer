@@ -20,6 +20,9 @@
 #pragma once
 
 // target Windows 7 or later
+#ifndef _AMD64_
+#define _AMD64_ // Define the target architecture as AMD64 (x64)
+#endif
 #define _WIN32_WINNT 0x0601
 #include <sdkddkver.h>
 // The following #defines disable a bunch of unused windows stuff. If you 
@@ -39,7 +42,7 @@
 #define NOCTLMGR
 #define NODRAWTEXT
 #define NOKERNEL
-#define NONLS
+//#define NONLS
 #define NOMEMMGR
 #define NOMETAFILE
 #define NOMINMAX

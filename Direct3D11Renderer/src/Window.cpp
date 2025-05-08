@@ -1,6 +1,7 @@
 #pragma once
 #include "Window.h"
 #include <sstream>
+#include "resource.h"
 
 // WindowClass
 Window::WindowClass Window::WindowClass::wndClass;
@@ -14,12 +15,12 @@ Window::WindowClass::WindowClass() noexcept : hInst(GetModuleHandle(nullptr))
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = GetInstance();
-	wc.hIcon = nullptr;
+	wc.hIcon = static_cast<HICON>(LoadImage(hInst, MAKEINTRESOURCE( IDI_ICON1 ), IMAGE_ICON, 32, 32, 0));
 	wc.hCursor = nullptr;
 	wc.hbrBackground = nullptr;
 	wc.lpszMenuName = nullptr;
 	wc.lpszClassName = GetName();
-	wc.hIconSm = nullptr;
+	wc.hIconSm = static_cast<HICON>(LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, 0));
 	RegisterClassEx(&wc);
 }
 
@@ -39,7 +40,8 @@ HINSTANCE Window::WindowClass::GetInstance() noexcept
 	return wndClass.hInst;
 }
 
-Window::Window(int width, int height, const WCHAR* name) noexcept
+// Window
+Window::Window(int width, int height, const WCHAR* name)
 	: width(width), height(height), hwnd(nullptr)
 {
 	RECT wr;
@@ -47,7 +49,11 @@ Window::Window(int width, int height, const WCHAR* name) noexcept
 	wr.right = width + wr.left;
 	wr.top = 100;
 	wr.bottom = height + wr.top;
-	AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE);
+	if (FAILED((int)AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE)))
+	{
+		throw WND_LAST_EXCEPT();
+	};
+
 	hwnd = CreateWindow(
 		WindowClass::GetName(),
 		name,
@@ -61,6 +67,11 @@ Window::Window(int width, int height, const WCHAR* name) noexcept
 		WindowClass::GetInstance(),
 		this
 	);
+
+	if (hwnd == nullptr)
+	{
+		throw WND_LAST_EXCEPT();
+	}
 
 	ShowWindow(hwnd, SW_SHOW);
 }
@@ -131,10 +142,11 @@ const char* Window::Exception::GetType() const noexcept
 
 std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
 {
-	char* pMsgBuf = nullptr;
-	DWORD nMsgLen = FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-		FORMAT_MESSAGE_FROM_SYSTEM | 
+	// For Unicode builds, we should use FormatMessageW
+	wchar_t* pMsgBuf = nullptr;
+	DWORD nMsgLen = FormatMessageW(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM |
 		FORMAT_MESSAGE_IGNORE_INSERTS,
 		nullptr,
 		hr,
@@ -142,14 +154,24 @@ std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
 		reinterpret_cast<LPWSTR>(&pMsgBuf),
 		0, nullptr);
 
-	if(nMsgLen == 0)
+	if (nMsgLen == 0)
 	{
 		return "Unidentified error code";
 	}
 
-	std::string errorString = pMsgBuf;
+	std::wstring wideErrorString = pMsgBuf;
 	LocalFree(pMsgBuf);
-	return errorString;
+
+	std::string narrowStr;
+	int requiredSize = WideCharToMultiByte(CP_UTF8, 0, wideErrorString.c_str(), -1, nullptr, 0, nullptr, nullptr);
+	if (requiredSize > 0)
+	{
+		narrowStr.resize(requiredSize);
+		WideCharToMultiByte(CP_UTF8, 0, wideErrorString.c_str(), -1, &narrowStr[0], requiredSize, nullptr, nullptr);
+		narrowStr.resize(requiredSize - 1);
+	}
+
+	return narrowStr;
 }
 
 std::string Window::Exception::GetErrorString(HRESULT hr) noexcept

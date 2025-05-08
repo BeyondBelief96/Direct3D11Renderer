@@ -1,6 +1,7 @@
 #pragma once
 #include "ChiliWin.h"
 #include "D3Exception.h"
+
 class Window
 {
 public:
@@ -33,7 +34,7 @@ private:
 		HINSTANCE hInst;
 	};
 public:
-	Window(int width, int height, const WCHAR* name) noexcept;
+	Window(int width, int height, const WCHAR* name);
 	~Window();
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
@@ -47,5 +48,6 @@ private:
 	HWND hwnd;
 };
 
-// error exception helper macro
-#define CHWND_EXCEPT ( hr ) Window::Exception(__LINE__, __FILE__, hr)
+// Error handling macros
+#define WND_EXCEPT(hr) Window::Exception(__LINE__, __FILE__, hr)
+#define WND_LAST_EXCEPT() Window::Exception(__LINE__, __FILE__, GetLastError())

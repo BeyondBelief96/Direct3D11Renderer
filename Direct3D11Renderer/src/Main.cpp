@@ -1,7 +1,6 @@
-#include <Windows.h>
-#include <string>
 #include "Window.h"
-#include "D3Exception.h"
+#include "D3Utilities.h"
+
 
 int WINAPI wWinMain(
     _In_ HINSTANCE hInstance,
@@ -30,15 +29,20 @@ int WINAPI wWinMain(
     }
     catch (const D3Exception& e)
     {
-		MessageBox(nullptr, (LPCWSTR)e.what(), (LPCWSTR)e.GetType(), MB_OK | MB_ICONEXCLAMATION);
+        std::wstring whatMsg = StringToWString(e.what());
+        std::wstring typeMsg = StringToWString(e.GetType());
+        MessageBox(nullptr, whatMsg.c_str(), typeMsg.c_str(), MB_OK | MB_ICONEXCLAMATION);
     }
     catch (const std::exception& e)
     {
-		MessageBox(nullptr, (LPCWSTR)e.what(), L"Standard Exception", MB_OK | MB_ICONEXCLAMATION);
-	}
-	catch (...)
-	{
-		MessageBox(nullptr, L"Unknown Exception", L"Error", MB_OK | MB_ICONEXCLAMATION);
+        std::wstring whatMsg = StringToWString(e.what());
+        MessageBox(nullptr, whatMsg.c_str(), L"Standard Exception", MB_OK | MB_ICONEXCLAMATION);
     }
+    catch (...)
+    {
+        MessageBox(nullptr, L"No details available", L"Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
+    }
+
+    return -1;
 	
 }

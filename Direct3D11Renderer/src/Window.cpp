@@ -1,5 +1,6 @@
 #pragma once
 #include "Window.h"
+#include <sstream>
 
 // WindowClass
 Window::WindowClass Window::WindowClass::wndClass;
@@ -105,4 +106,58 @@ LRESULT Window::HandleMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	}
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+Window::Exception::Exception(int line, const char* file, HRESULT hr) noexcept
+	: D3Exception(line, file), hr(hr)
+{
+}
+
+const char* Window::Exception::what() const noexcept
+{
+	std::ostringstream oss;
+	oss << GetType() << std::endl
+		<< "[Error Code] " << GetErrorString(hr) << std::endl
+		<< "[Description] " << TranslateErrorCode(hr) << std::endl
+		<< GetOriginString() << std::endl;
+	whatBuffer = oss.str();
+	return whatBuffer.c_str();
+}
+
+const char* Window::Exception::GetType() const noexcept
+{
+	return "D3DEngine Window Exception";
+}
+
+std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
+{
+	char* pMsgBuf = nullptr;
+	DWORD nMsgLen = FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+		FORMAT_MESSAGE_FROM_SYSTEM | 
+		FORMAT_MESSAGE_IGNORE_INSERTS,
+		nullptr,
+		hr,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		reinterpret_cast<LPWSTR>(&pMsgBuf),
+		0, nullptr);
+
+	if(nMsgLen == 0)
+	{
+		return "Unidentified error code";
+	}
+
+	std::string errorString = pMsgBuf;
+	LocalFree(pMsgBuf);
+	return errorString;
+}
+
+std::string Window::Exception::GetErrorString(HRESULT hr) noexcept
+{
+	return TranslateErrorCode(hr);
+}
+
+HRESULT Window::Exception::GetErrorCode() const noexcept
+{
+	return hr;
 }

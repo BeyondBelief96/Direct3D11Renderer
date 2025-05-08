@@ -1,8 +1,21 @@
 #pragma once
 #include "ChiliWin.h"
-
+#include "D3Exception.h"
 class Window
 {
+public:
+	class Exception : public D3Exception
+	{
+	public:
+		Exception(int line, const char* file, HRESULT hr) noexcept;
+		const char* what() const noexcept override;
+		const char* GetType() const noexcept override;
+		static std::string TranslateErrorCode(HRESULT hr) noexcept;
+		static std::string GetErrorString(HRESULT hr) noexcept;
+		HRESULT GetErrorCode() const noexcept;
+	private:
+		HRESULT hr;
+	};
 private:
 	// Singleton WindowClass
 	class WindowClass
@@ -33,3 +46,6 @@ private:
 	int height;
 	HWND hwnd;
 };
+
+// error exception helper macro
+#define CHWND_EXCEPT ( hr ) Window::Exception(__LINE__, __FILE__, hr)

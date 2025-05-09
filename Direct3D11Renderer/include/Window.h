@@ -2,6 +2,7 @@
 #include "ChiliWin.h"
 #include "D3Exception.h"
 #include "Keyboard.h"
+#include "Mouse.h"
 
 class Window
 {
@@ -39,8 +40,10 @@ public:
 	~Window();
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
+	void SetTitle(const WCHAR* title);
 
 	Keyboard kbd;
+	Mouse mouse;
 private:
 	static LRESULT CALLBACK HandleMsgSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	static LRESULT CALLBACK HandleMsgThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;

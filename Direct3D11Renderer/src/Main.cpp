@@ -1,5 +1,6 @@
 #include "Window.h"
 #include "D3Utilities.h"
+#include <sstream>
 
 
 int WINAPI wWinMain(
@@ -18,9 +19,15 @@ int WINAPI wWinMain(
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
-            if (wnd.kbd.KeyIsPressed(VK_MENU))
+            if (!wnd.mouse.IsEmpty())
             {
-				MessageBox(nullptr, L"Space key pressed", L"Key Pressed", MB_OK);
+                const auto e = wnd.mouse.Read();
+                if (e.GetType() == Mouse::Event::Type::Move)
+                {
+                    std::ostringstream oss;
+					oss << "Mouse moved to: (" << e.GetPosX() << ", " << e.GetPosY() << ")";
+					wnd.SetTitle(StringToWString(oss.str()).c_str());
+                }
             }
         }
 

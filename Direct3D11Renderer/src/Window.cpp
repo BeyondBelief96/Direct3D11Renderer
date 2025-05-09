@@ -90,6 +90,24 @@ void Window::SetTitle(const WCHAR* title)
 	}
 }
 
+std::optional<int> Window::ProcessMessages()
+{
+	MSG msg;
+
+	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	{
+		if (msg.message == WM_QUIT)
+		{
+			return msg.wParam;
+		}
+
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	return std::optional<int> {};
+}
+
 LRESULT Window::HandleMsgSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	if (msg == WM_NCCREATE)

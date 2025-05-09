@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "Application.h"
 #include "D3Utilities.h"
 #include <sstream>
 
@@ -11,32 +11,8 @@ int WINAPI wWinMain(
 {
     try
     {
-        Window wnd(800, 600, L"D3DEngine");
-
-        MSG msg;
-        BOOL gResult;
-        while ((gResult = GetMessage(&msg, nullptr, 0, 0)) > 0)
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-            if (!wnd.mouse.IsEmpty())
-            {
-                const auto e = wnd.mouse.Read();
-                if (e.GetType() == Mouse::Event::Type::Move)
-                {
-                    std::ostringstream oss;
-					oss << "Mouse moved to: (" << e.GetPosX() << ", " << e.GetPosY() << ")";
-					wnd.SetTitle(StringToWString(oss.str()).c_str());
-                }
-            }
-        }
-
-        if (gResult == -1)
-        {
-            return -1;
-        }
-
-        return static_cast<int>(msg.wParam);
+        Application app{};
+        return app.Run();
     }
     catch (const D3Exception& e)
     {

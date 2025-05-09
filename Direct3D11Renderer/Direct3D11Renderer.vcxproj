@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\D3Exception.cpp" />
     <ClCompile Include="src\Keyboard.cpp" />
     <ClCompile Include="src\Main.cpp" />
@@ -148,6 +149,7 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\ChiliWin.h" />
     <ClInclude Include="include\D3Exception.h" />
     <ClInclude Include="include\D3Utilities.h" />

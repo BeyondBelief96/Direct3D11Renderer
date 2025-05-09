@@ -3,6 +3,7 @@
 #include "D3Exception.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include <optional>
 
 class Window
 {
@@ -41,6 +42,7 @@ public:
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 	void SetTitle(const WCHAR* title);
+	static std::optional<int> ProcessMessages();
 
 	Keyboard kbd;
 	Mouse mouse;

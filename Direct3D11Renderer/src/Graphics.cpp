@@ -5,23 +5,6 @@
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
 
-// Graphics exception checking/throwing macros (some with dxgi infos)
-#define GFX_EXCEPT_NOINFO(hr) HrException(__LINE__, __FILE__, (hr))
-#define GFX_THROW_NOINFO(hrcall) if(FAILED(hr = (hrcall))) throw GFX_EXCEPT_NOINFO(hr)
-
-#ifdef _DEBUG
-#define GFX_EXCEPT(hr) HrException(__LINE__, __FILE__, (hr), infoManager.GetMessages())
-#define GFX_THROW_INFO(hrcall) infoManager.Set(); if(FAILED(hr = (hrcall))) throw GFX_EXCEPT(hr)
-#define GFX_DEVICE_REMOVED_EXCEPT(hr) DeviceRemovedException(__LINE__, __FILE__, (hr), infoManager.GetMessages())
-#define GFX_THROW_INFO_ONLY(call) infoManager.Set(); call; {auto v = infoManager.GetMessages(); if(!v.empty()) {throw InfoException(__LINE__, __FILE__, v);}}
-#else
-#define GFX_EXCEPT(hr) HrException(__LINE__, __FILE__, (hr))
-#define GFX_THROW_INFO(hrcall) GFX_THROW_NOINFO(hrcall)
-#define GFX_DEVICE_REMOVED_EXCEPT(hr) DeviceRemovedException(__LINE__, __FILE__, (hr))
-#define GFX_THROW_INFO_ONLY(call) call
-#endif
-
-
 Graphics::Graphics(HWND hwnd)
 {
     DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
@@ -96,4 +79,135 @@ void Graphics::ClearBuffer(float red, float green, float blue) noexcept
 {
     const float color[] = { red, green, blue, 1.0f };
     pContext->ClearRenderTargetView(pTarget.Get(), color);
+}
+
+void Graphics::DrawTestTriangle()
+{
+    struct Vertex
+    {
+        struct
+        {
+            float x;
+            float y;
+        } pos;
+
+        struct
+        {
+            unsigned char r;
+            unsigned char g;
+            unsigned char b;
+            unsigned char a;
+        } color;
+
+    };
+
+    const Vertex vertices[] =
+    {
+        { 0.0f,0.5f,255,0,0,0 },
+        { 0.5f,-0.5f,0,255,0,0 },
+        { -0.5f,-0.5f,0,0,255,0 },
+        { -0.3f,0.3f,0,255,0,0 },
+        { 0.3f,0.3f,0,0,255,0 },
+        { 0.0f,-0.8f,255,0,0,0 },
+    };
+
+	// Creating hresult and blob for shader compilation
+    HRESULT hr;
+    Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
+
+	// Create vertex buffer
+    Microsoft::WRL::ComPtr<ID3D11Buffer> pVertexBuffer;
+    D3D11_BUFFER_DESC bufferDesc{};
+    bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+    bufferDesc.CPUAccessFlags = 0u;
+    bufferDesc.MiscFlags = 0u;
+    bufferDesc.ByteWidth = sizeof(vertices);
+    bufferDesc.StructureByteStride = sizeof(Vertex);
+    D3D11_SUBRESOURCE_DATA bufferData{};
+    bufferData.pSysMem = vertices;
+    GFX_THROW_INFO(pDevice->CreateBuffer(&bufferDesc, &bufferData, &pVertexBuffer));
+
+    // Bind Vertex buffer to pipeline
+    const UINT stride = sizeof(Vertex);
+    const UINT offset = 0u;
+    pContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset);
+
+	// Create index buffer
+    const unsigned short indices[] =
+    {
+        0,1,2,
+        0,2,3,
+        0,4,1,
+        2,1,5,
+    };
+
+	Microsoft::WRL::ComPtr<ID3D11Buffer> pIndexBuffer;
+	D3D11_BUFFER_DESC indexBufferDesc{};
+	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	indexBufferDesc.CPUAccessFlags = 0u;
+	indexBufferDesc.MiscFlags = 0u;
+	indexBufferDesc.ByteWidth = sizeof(indices);
+	indexBufferDesc.StructureByteStride = sizeof(unsigned short);
+	D3D11_SUBRESOURCE_DATA indexBufferData{};
+	indexBufferData.pSysMem = indices;
+	GFX_THROW_INFO(pDevice->CreateBuffer(&indexBufferDesc, &indexBufferData, &pIndexBuffer));
+
+	// Bind index buffer to pipeline
+	pContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
+
+	// Setup input layout
+	Microsoft::WRL::ComPtr<ID3D11InputLayout> pInputLayout;
+	D3D11_INPUT_ELEMENT_DESC layout[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 8u, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	// Set primitive topology
+	pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// Create pixel shader
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
+	GFX_THROW_INFO(D3DReadFileToBlob(L"PixelShader.cso", &pBlob));
+	GFX_THROW_INFO(pDevice->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPixelShader));
+
+	// Bind pixel shader to pipeline
+	pContext->PSSetShader(pPixelShader.Get(), nullptr, 0u);
+
+    // Create vertex shader
+    Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
+
+    GFX_THROW_INFO(D3DReadFileToBlob(L"VertexShader.cso", &pBlob));
+    GFX_THROW_INFO(pDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertexShader));
+
+    //Bind vertex shader to pipeline
+    pContext->VSSetShader(pVertexShader.Get(), nullptr, 0u);
+
+	// Create input layout (Rearranged load order of shaders since we need the vertex shader to create the input layout)
+    GFX_THROW_INFO(pDevice->CreateInputLayout(
+        layout,
+        (UINT)std::size(layout),
+        pBlob->GetBufferPointer(),
+        pBlob->GetBufferSize(),
+        &pInputLayout));
+
+	// Bind input layout to pipeline
+	pContext->IASetInputLayout(pInputLayout.Get());
+
+	// Bind render target view to pipeline
+    pContext->OMSetRenderTargets(1u, pTarget.GetAddressOf(), nullptr);
+
+    // Configure viewport
+    D3D11_VIEWPORT vp;
+    vp.Width = 800.0f;
+    vp.Height = 600.0f;
+	vp.MinDepth = 0.0f;
+	vp.MaxDepth = 1.0f;
+	vp.TopLeftX = 0.0f;
+	vp.TopLeftY = 0.0f;
+    pContext->RSSetViewports(1u, &vp);
+
+    GFX_THROW_INFO_ONLY(pContext->DrawIndexed((UINT)std::size(indices), 0u, 0u));
 }

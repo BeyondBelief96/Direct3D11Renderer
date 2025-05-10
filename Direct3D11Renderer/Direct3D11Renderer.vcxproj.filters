@@ -42,6 +42,12 @@
     <ClCompile Include="src\D3Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DxgiInfoManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsExceptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ChiliWin.h">
@@ -74,6 +80,12 @@
     <ClInclude Include="include\D3Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\DxgiInfoManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsExceptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Direct3D11Renderer.rc">
@@ -86,8 +98,7 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="include\DXTrace.inl">
-      <Filter>Header Files</Filter>
-    </None>
+    <FxCompile Include="shaders\VertexShader.hlsl" />
+    <FxCompile Include="shaders\PixelShader.hlsl" />
   </ItemGroup>
 </Project>

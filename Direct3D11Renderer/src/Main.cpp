@@ -1,5 +1,5 @@
 #include "Application.h"
-#include "D3Utilities.h"
+#include "D3Utils.h"
 #include <sstream>
 
 
@@ -16,13 +16,13 @@ int WINAPI wWinMain(
     }
     catch (const D3Exception& e)
     {
-        std::wstring whatMsg = StringToWString(e.what());
-        std::wstring typeMsg = StringToWString(e.GetType());
+        std::wstring whatMsg = D3Utils::StringToWString(e.what());
+        std::wstring typeMsg = D3Utils::StringToWString(e.GetType());
         MessageBox(nullptr, whatMsg.c_str(), typeMsg.c_str(), MB_OK | MB_ICONEXCLAMATION);
     }
     catch (const std::exception& e)
     {
-        std::wstring whatMsg = StringToWString(e.what());
+        std::wstring whatMsg = D3Utils::StringToWString(e.what());
         MessageBox(nullptr, whatMsg.c_str(), L"Standard Exception", MB_OK | MB_ICONEXCLAMATION);
     }
     catch (...)

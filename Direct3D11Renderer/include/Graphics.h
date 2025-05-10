@@ -7,11 +7,7 @@
 class Graphics
 {
 public:
-	class Exception : public D3Exception
-	{
-		using D3Exception::D3Exception;
-	};
-	class HrException : public Exception
+	class HrException : public D3Exception
 	{
 	public:
 		HrException(int line, const char* file, HRESULT hr) noexcept;
@@ -22,7 +18,6 @@ public:
 		std::string GetErrorDescription() const noexcept;
 	private:
 		HRESULT hr;
-		std::string info;
 	};
 	class DeviceRemovedException : public HrException
 	{

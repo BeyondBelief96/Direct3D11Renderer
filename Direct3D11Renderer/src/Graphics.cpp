@@ -3,7 +3,7 @@
 #include <sstream>
 #pragma comment(lib, "d3d11.lib")
 
-// graphics exception checking/throwing macros (some with dxgi infos)
+// graphics exception checking/throwing macros 
 #define GFX_THROW_FAILED(hrcall) if(FAILED(hr = (hrcall))) throw Graphics::HrException(__LINE__,__FILE__,hr)
 #define GFX_THROW_REMOVED_EXCEPT(hrcall) if(FAILED(hr = (hrcall))) throw Graphics::DeviceRemovedException(__LINE__,__FILE__,hr)
 
@@ -99,10 +99,10 @@ void Graphics::ClearBuffer(float red, float green, float blue) noexcept
 	pContext->ClearRenderTargetView(pTarget, color);
 }
 
+/* Exception Handling */
 Graphics::HrException::HrException(int line, const char* file, HRESULT hr) noexcept
 	:
-	Exception(line, file),
-	hr(hr)
+	D3Exception(line, file),hr(hr)
 {
 }
 
@@ -132,17 +132,33 @@ HRESULT Graphics::HrException::GetErrorCode() const noexcept
 
 std::string Graphics::HrException::GetErrorString() const noexcept
 {
-	return std::string{};
-	//const WCHAR* err = DXGetErrorString(hr);
-	//return D3Utils::WcharToNarrow(err);
+	std::ostringstream oss;
+	oss << "HRESULT: 0x" << std::hex << std::uppercase << hr;
+	return oss.str();
 }
 
 std::string Graphics::HrException::GetErrorDescription() const noexcept
 {
-	return std::string{};
-	/*WCHAR buf[512] = {}; 
-	DXGetErrorDescription(hr, buf, sizeof(buf) / sizeof(WCHAR)); 
-	return D3Utils::WcharToNarrow(buf);*/
+	wchar_t* pMsgBuf = nullptr;
+	DWORD nMsgLen = FormatMessageW(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM |
+		FORMAT_MESSAGE_IGNORE_INSERTS,
+		nullptr,
+		hr,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		reinterpret_cast<LPWSTR>(&pMsgBuf),
+		0, nullptr);
+
+	if (nMsgLen == 0)
+	{
+		return "Unidentified error code";
+	}
+
+	std::wstring wideErrorString = pMsgBuf;
+	LocalFree(pMsgBuf);
+
+	return D3Utils::WstringToNarrow(wideErrorString);
 }
 
 const char* Graphics::DeviceRemovedException::GetType() const noexcept

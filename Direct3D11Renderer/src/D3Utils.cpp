@@ -13,7 +13,7 @@ std::string D3Utils::WstringToNarrow(const std::wstring& wideStr) noexcept
 	{
 		narrowStr.resize(requiredSize);
 		WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, &narrowStr[0], requiredSize, nullptr, nullptr);
-		narrowStr.resize(requiredSize - 1); // Remove the null terminator
+		narrowStr.resize(requiredSize - 1); 
 	}
 
 	return narrowStr;
@@ -28,7 +28,7 @@ std::string D3Utils::WcharToNarrow(const WCHAR* wideStr) noexcept
 
 	std::string strTo(size_needed, 0);
 	WideCharToMultiByte(CP_UTF8, 0, wideStr, -1, &strTo[0], size_needed, nullptr, nullptr);
-	strTo.resize(size_needed - 1); // Remove null terminator
+	strTo.resize(size_needed - 1);
 	return strTo;
 }
 

@@ -257,7 +257,6 @@ LRESULT Window::HandleMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 
 std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
 {
-	// For Unicode builds, we should use FormatMessageW
 	wchar_t* pMsgBuf = nullptr;
 	DWORD nMsgLen = FormatMessageW(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |

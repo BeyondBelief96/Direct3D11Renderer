@@ -1,5 +1,5 @@
 #include "DxgiInfoManager.h"
-#include "GraphicsExceptions.h"
+#include "Exceptions/GraphicsExceptions.h" 
 #include "D3Utils.h"
 #include <memory>
 #include <dxgidebug.h>
@@ -15,7 +15,7 @@ DxgiInfoManager::DxgiInfoManager()
     const auto hModDxgiDebug = LoadLibraryEx(L"dxgidebug.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
     if (hModDxgiDebug == nullptr)
     {
-        throw HrException(__LINE__, __FILE__, HRESULT_FROM_WIN32(GetLastError()));
+        throw GraphicsHrException(__LINE__, __FILE__, HRESULT_FROM_WIN32(GetLastError()));
     }
 
     // Get address of DXGIGetDebugInterface in dll
@@ -24,14 +24,14 @@ DxgiInfoManager::DxgiInfoManager()
         );
     if (DxgiGetDebugInterface == nullptr)
     {
-        throw HrException(__LINE__, __FILE__, HRESULT_FROM_WIN32(GetLastError()));
+        throw GraphicsHrException(__LINE__, __FILE__, HRESULT_FROM_WIN32(GetLastError()));
     }
 
     HRESULT hr;
     hr = DxgiGetDebugInterface(__uuidof(IDXGIInfoQueue), &pDxgiInfoQueue);
     if (FAILED(hr))
     {
-        throw HrException(__LINE__, __FILE__, hr);
+        throw GraphicsHrException(__LINE__, __FILE__, hr);
     }
 }
 

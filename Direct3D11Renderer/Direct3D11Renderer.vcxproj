@@ -143,11 +143,13 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\D3Timer.cpp" />
-    <ClCompile Include="src\D3Exception.cpp" />
+    <ClCompile Include="src\Exceptions\D3Exception.cpp" />
     <ClCompile Include="src\D3Utils.cpp" />
     <ClCompile Include="src\DxgiInfoManager.cpp" />
+    <ClCompile Include="src\Exceptions\HrException.cpp" />
+    <ClCompile Include="src\Exceptions\WindowExceptions.cpp" />
     <ClCompile Include="src\Graphics.cpp" />
-    <ClCompile Include="src\GraphicsExceptions.cpp" />
+    <ClCompile Include="src\Exceptions\GraphicsExceptions.cpp" />
     <ClCompile Include="src\Keyboard.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Mouse.cpp" />
@@ -157,11 +159,13 @@
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\D3Timer.h" />
     <ClInclude Include="include\ChiliWin.h" />
-    <ClInclude Include="include\D3Exception.h" />
+    <ClInclude Include="include\Exceptions\D3Exception.h" />
     <ClInclude Include="include\D3Utils.h" />
     <ClInclude Include="include\DxgiInfoManager.h" />
+    <ClInclude Include="include\Exceptions\HrException.h" />
+    <ClInclude Include="include\Exceptions\WindowExceptions.h" />
     <ClInclude Include="include\Graphics.h" />
-    <ClInclude Include="include\GraphicsExceptions.h" />
+    <ClInclude Include="include\Exceptions\GraphicsExceptions.h" />
     <ClInclude Include="include\Keyboard.h" />
     <ClInclude Include="include\Mouse.h" />
     <ClInclude Include="include\resource.h" />
@@ -181,6 +185,8 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="shaders\VertexShader.hlsl">
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>

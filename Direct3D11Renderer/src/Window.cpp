@@ -1,5 +1,6 @@
 #pragma once
 #include "Window.h"
+#include "Exceptions/WindowExceptions.h"
 #include <sstream>
 #include "resource.h"
 
@@ -253,77 +254,4 @@ LRESULT Window::HandleMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);
-}
-
-std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
-{
-	wchar_t* pMsgBuf = nullptr;
-	DWORD nMsgLen = FormatMessageW(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		FORMAT_MESSAGE_FROM_SYSTEM |
-		FORMAT_MESSAGE_IGNORE_INSERTS,
-		nullptr,
-		hr,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		reinterpret_cast<LPWSTR>(&pMsgBuf),
-		0, nullptr);
-
-	if (nMsgLen == 0)
-	{
-		return "Unidentified error code";
-	}
-
-	std::wstring wideErrorString = pMsgBuf;
-	LocalFree(pMsgBuf);
-
-	std::string narrowStr;
-	int requiredSize = WideCharToMultiByte(CP_UTF8, 0, wideErrorString.c_str(), -1, nullptr, 0, nullptr, nullptr);
-	if (requiredSize > 0)
-	{
-		narrowStr.resize(requiredSize);
-		WideCharToMultiByte(CP_UTF8, 0, wideErrorString.c_str(), -1, &narrowStr[0], requiredSize, nullptr, nullptr);
-		narrowStr.resize(requiredSize - 1);
-	}
-
-	return narrowStr;
-}
-
-Window::HrException::HrException(int line, const char* file, HRESULT hr) noexcept
-	:
-	Exception(line, file),
-	hr(hr)
-{
-}
-
-const char* Window::HrException::what() const noexcept
-{
-	std::ostringstream oss;
-	oss << GetType() << std::endl
-		<< "[Error Code] 0x" << std::hex << std::uppercase << GetErrorCode()
-		<< std::dec << " (" << (unsigned long)GetErrorCode() << ")" << std::endl
-		<< "[Description] " << GetErrorDescription() << std::endl
-		<< GetOriginString();
-	whatBuffer = oss.str();
-	return whatBuffer.c_str();
-}
-
-const char* Window::HrException::GetType() const noexcept
-{
-	return "Chili Window Exception";
-}
-
-HRESULT Window::HrException::GetErrorCode() const noexcept
-{
-	return hr;
-}
-
-std::string Window::HrException::GetErrorDescription() const noexcept
-{
-	return Exception::TranslateErrorCode(hr);
-}
-
-
-const char* Window::NoGfxException::GetType() const noexcept
-{
-	return "D3Engine Window Exception [No Graphics]";
 }

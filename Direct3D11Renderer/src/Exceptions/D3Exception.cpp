@@ -1,4 +1,4 @@
-#include "D3Exception.h"
+#include "Exceptions/D3Exception.h"
 #include <sstream>
 
 D3Exception::D3Exception(int line, const char* file) noexcept

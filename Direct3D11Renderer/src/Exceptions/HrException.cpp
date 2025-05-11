@@ -1,16 +1,48 @@
-#include "GraphicsExceptions.h"
-#include "Window.h"
+#include "Exceptions/HrException.h"
 #include <sstream>
 
+std::string HrHelper::TranslateErrorCode(HRESULT hr) noexcept
+{
+    wchar_t* pMsgBuf = nullptr;
+    DWORD nMsgLen = FormatMessageW(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        nullptr,
+        hr,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        reinterpret_cast<LPWSTR>(&pMsgBuf),
+        0, nullptr);
+
+    if (nMsgLen == 0)
+    {
+        return "Unidentified error code";
+    }
+
+    std::wstring wideErrorString = pMsgBuf;
+    LocalFree(pMsgBuf);
+
+    std::string narrowStr;
+    int requiredSize = WideCharToMultiByte(CP_UTF8, 0, wideErrorString.c_str(), -1, nullptr, 0, nullptr, nullptr);
+    if (requiredSize > 0)
+    {
+        narrowStr.resize(requiredSize);
+        WideCharToMultiByte(CP_UTF8, 0, wideErrorString.c_str(), -1, &narrowStr[0], requiredSize, nullptr, nullptr);
+        narrowStr.resize(requiredSize - 1);
+    }
+
+    return narrowStr;
+}
+
 HrException::HrException(int line, const char* file, HRESULT hr, const char* functionCall) noexcept
-    : GraphicsException(line, file),
+    : D3Exception(line, file),
     hr(hr),
     functionCall(functionCall ? functionCall : "")
 {
 }
 
 HrException::HrException(int line, const char* file, HRESULT hr, std::vector<std::string> infoMsgs, const char* functionCall) noexcept
-    : GraphicsException(line, file),
+    : D3Exception(line, file),
     hr(hr),
     functionCall(functionCall ? functionCall : "")
 {
@@ -52,11 +84,6 @@ const char* HrException::what() const noexcept
     return whatBuffer.c_str();
 }
 
-const char* HrException::GetType() const noexcept
-{
-    return "D3DEngine Graphics Exception";
-}
-
 HRESULT HrException::GetErrorCode() const noexcept
 {
     return hr;
@@ -71,7 +98,7 @@ std::string HrException::GetErrorString() const noexcept
 
 std::string HrException::GetErrorDescription() const noexcept
 {
-    return Window::Exception::TranslateErrorCode(hr);
+    return HrHelper::TranslateErrorCode(hr);
 }
 
 std::string HrException::GetFunctionCall() const noexcept
@@ -80,47 +107,6 @@ std::string HrException::GetFunctionCall() const noexcept
 }
 
 std::string HrException::GetErrorInfo() const noexcept
-{
-    return info;
-}
-
-const char* DeviceRemovedException::GetType() const noexcept
-{
-    return "D3DEngine Graphics Device Removed Exception";
-}
-
-InfoException::InfoException(int line, const char* file, std::vector<std::string> infoMsgs) noexcept
-    : GraphicsException(line, file)
-{
-    // Join all info messages with newlines into single string
-    for (const auto& m : infoMsgs)
-    {
-        info += m;
-        info += "\n";
-    }
-    // Remove final newline if exists
-    if (!info.empty())
-    {
-        info.pop_back();
-    }
-}
-
-const char* InfoException::what() const noexcept
-{
-    std::ostringstream oss;
-    oss << GetType() << std::endl
-        << "\n[Error Info]\n" << GetErrorInfo() << std::endl
-        << GetOriginString();
-    whatBuffer = oss.str();
-    return whatBuffer.c_str();
-}
-
-const char* InfoException::GetType() const noexcept
-{
-    return "D3DEngine Graphics Info Exception";
-}
-
-std::string InfoException::GetErrorInfo() const noexcept
 {
     return info;
 }

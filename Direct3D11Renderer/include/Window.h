@@ -1,6 +1,5 @@
 #pragma once
 #include "ChiliWin.h"
-#include "D3Exception.h"
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
@@ -10,29 +9,7 @@
 class Window
 {
 public:
-	class Exception : public D3Exception
-	{
-		using D3Exception::D3Exception;
-	public:
-		static std::string TranslateErrorCode(HRESULT hr) noexcept;
-	};
-	class HrException : public Exception
-	{
-	public:
-		HrException(int line, const char* file, HRESULT hr) noexcept;
-		const char* what() const noexcept override;
-		const char* GetType() const noexcept override;
-		HRESULT GetErrorCode() const noexcept;
-		std::string GetErrorDescription() const noexcept;
-	private:
-		HRESULT hr;
-	};
-	class NoGfxException : public Exception
-	{
-	public:
-		using Exception::Exception;
-		const char* GetType() const noexcept override;
-	};
+	
 private:
 	// Singleton WindowClass
 	class WindowClass
@@ -70,8 +47,3 @@ private:
 	HWND hwnd;
 	std::unique_ptr<Graphics> pGraphics;
 };
-
-// Error handling macros
-#define WND_EXCEPT( hr ) Window::HrException( __LINE__,__FILE__,(hr) )
-#define WND_LAST_EXCEPT() Window::HrException( __LINE__,__FILE__,GetLastError() )
-#define WND_NOGFX_EXCEPT() Window::NoGfxException( __LINE__,__FILE__ )

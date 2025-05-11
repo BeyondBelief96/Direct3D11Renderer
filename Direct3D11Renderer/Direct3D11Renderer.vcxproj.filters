@@ -21,7 +21,7 @@
     <ClCompile Include="src\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\D3Exception.cpp">
+    <ClCompile Include="src\Exceptions\D3Exception.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Keyboard.cpp">
@@ -45,7 +45,13 @@
     <ClCompile Include="src\DxgiInfoManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsExceptions.cpp">
+    <ClCompile Include="src\Exceptions\GraphicsExceptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Exceptions\WindowExceptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Exceptions\HrException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,7 +62,7 @@
     <ClInclude Include="include\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\D3Exception.h">
+    <ClInclude Include="include\Exceptions\D3Exception.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\resource.h">
@@ -83,7 +89,13 @@
     <ClInclude Include="include\DxgiInfoManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\GraphicsExceptions.h">
+    <ClInclude Include="include\Exceptions\GraphicsExceptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Exceptions\WindowExceptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Exceptions\HrException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

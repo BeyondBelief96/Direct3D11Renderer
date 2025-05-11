@@ -1,6 +1,9 @@
 #pragma once
 #include "Window.h"
 #include "D3Timer.h"
+#include "Renderable/Box.h"
+#include <vector>
+#include <memory>
 
 class Application
 {
@@ -12,4 +15,5 @@ private:
 
 	Window wnd;
 	D3Timer timer;
+	std::vector<std::unique_ptr<Box>> boxes;
 };

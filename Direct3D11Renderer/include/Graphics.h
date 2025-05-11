@@ -4,11 +4,10 @@
 #include <d3d11.h>
 #include <vector>
 #include <wrl.h>
+#include <DirectXMath.h>
 #ifdef _DEBUG
 #include "DxgiInfoManager.h"
 #endif
-
-
 
 class Graphics
 {
@@ -18,12 +17,20 @@ public:
     Graphics(const Graphics&) = delete;
     Graphics& operator=(const Graphics& rhs) = delete;
 
-
     void EndFrame();
     void ClearBuffer(float red, float green, float blue) noexcept;
-    void DrawTestTriangle(float angle, float mouseX, float z);
+    void DrawIndexed(UINT count) noexcept(!_DEBUG);
+    DirectX::XMMATRIX GetProjection() const noexcept;
+    void SetProjection(DirectX::FXMMATRIX proj) noexcept;
+
+	ID3D11DeviceContext* const GetContext() noexcept;
+    ID3D11Device* const GetDevice() noexcept;
+#ifdef _DEBUG
+	DxgiInfoManager& GetInfoManager() noexcept;
+#endif
 
 private:
+    DirectX::XMMATRIX projection;
 #ifdef _DEBUG
     DxgiInfoManager infoManager;
 #endif

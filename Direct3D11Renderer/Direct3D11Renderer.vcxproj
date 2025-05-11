@@ -142,6 +142,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Bindable\Bindable.cpp" />
+    <ClCompile Include="src\Bindable\IndexBuffer.cpp" />
+    <ClCompile Include="src\Bindable\InputLayout.cpp" />
+    <ClCompile Include="src\Bindable\PixelShader.cpp" />
+    <ClCompile Include="src\Bindable\Topology.cpp" />
+    <ClCompile Include="src\Bindable\TransformConstantBuffer.cpp" />
+    <ClCompile Include="src\Bindable\VertexBuffer.cpp" />
+    <ClCompile Include="src\Bindable\VertexShader.cpp" />
     <ClCompile Include="src\D3Timer.cpp" />
     <ClCompile Include="src\Exceptions\D3Exception.cpp" />
     <ClCompile Include="src\D3Utils.cpp" />
@@ -153,10 +161,22 @@
     <ClCompile Include="src\Keyboard.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Mouse.cpp" />
+    <ClCompile Include="src\Renderable\Box.cpp" />
+    <ClCompile Include="src\Renderable\Renderable.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\Bindable\Bindable.h" />
+    <ClInclude Include="include\Bindable\BindableBase.h" />
+    <ClInclude Include="include\Bindable\ConstantBuffer.h" />
+    <ClInclude Include="include\Bindable\IndexBuffer.h" />
+    <ClInclude Include="include\Bindable\InputLayout.h" />
+    <ClInclude Include="include\Bindable\PixelShader.h" />
+    <ClInclude Include="include\Bindable\Topology.h" />
+    <ClInclude Include="include\Bindable\TransformConstantBuffer.h" />
+    <ClInclude Include="include\Bindable\VertexBuffer.h" />
+    <ClInclude Include="include\Bindable\VertexShader.h" />
     <ClInclude Include="include\D3Timer.h" />
     <ClInclude Include="include\ChiliWin.h" />
     <ClInclude Include="include\Exceptions\D3Exception.h" />
@@ -168,6 +188,8 @@
     <ClInclude Include="include\Exceptions\GraphicsExceptions.h" />
     <ClInclude Include="include\Keyboard.h" />
     <ClInclude Include="include\Mouse.h" />
+    <ClInclude Include="include\Renderable\Box.h" />
+    <ClInclude Include="include\Renderable\Renderable.h" />
     <ClInclude Include="include\resource.h" />
     <ClInclude Include="include\Window.h" />
   </ItemGroup>

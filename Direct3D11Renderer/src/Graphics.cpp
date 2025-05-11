@@ -9,7 +9,7 @@
 
 namespace DX = DirectX;
 
-Graphics::Graphics(HWND hwnd)
+Graphics::Graphics(HWND hwnd) : projection(DX::XMMatrixIdentity())
 {
     DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
     swapChainDesc.BufferDesc.Width = 0;

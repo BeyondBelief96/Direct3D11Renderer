@@ -2,6 +2,7 @@
 #include "Renderable/Cube.h"
 #include "Renderable/Sphere.h"
 #include "Renderable/Pyramid.h"
+#include "Renderable/Plane.h"
 
 
 Application::Application() : wnd(800, 600, L"D3DEngine")
@@ -37,6 +38,17 @@ Application::Application() : wnd(800, 600, L"D3DEngine")
                 1.0f + (float)j * 0.3f,  // Varying radius
                 heights[j],              // Varying height
                 sides[j]                 // Varying number of sides
+            ));
+        }
+
+        // Create planes with different tessellations
+        if (i < 10) {
+            renderables.push_back(std::make_unique<Plane>(
+                wnd.Gfx(), rng, adist, ddist, odist, rdist,
+                2.0f + (float)i * 0.2f,   // Width
+                2.0f + (float)i * 0.1f,   // Height
+                1 + i,                    // Divisions X
+                1 + i                     // Divisions Y
             ));
         }
     }

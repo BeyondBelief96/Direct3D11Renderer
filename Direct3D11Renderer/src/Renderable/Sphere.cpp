@@ -50,11 +50,19 @@ Sphere::Sphere(Graphics& gfx, std::mt19937& rng, std::uniform_real_distribution<
 
     // Generate some random colors for the sphere
     std::uniform_real_distribution<float> cdist(0.0f, 1.0f);
-    PixelShaderConstants cb;
-    for (int i = 0; i < 8; i++)
+    const PixelShaderConstants cb =
     {
-        cb.face_colors[i] = { cdist(rng), cdist(rng), cdist(rng), 1.0f };
-    }
+        {
+            { 1.0f,1.0f,1.0f },
+            { 1.0f,0.0f,0.0f },
+            { 0.0f,1.0f,0.0f },
+            { 1.0f,1.0f,0.0f },
+            { 0.0f,0.0f,1.0f },
+            { 1.0f,0.0f,1.0f },
+            { 0.0f,1.0f,1.0f },
+            { 0.0f,0.0f,0.0f },
+        }
+    };
 
 	// Add the pixel shader constant buffer
     AddUniqueBindable(std::make_unique<PixelConstantBuffer<PixelShaderConstants>>(gfx, cb));

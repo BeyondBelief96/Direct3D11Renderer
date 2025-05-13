@@ -3,6 +3,7 @@
 #include "GeometryMesh.h"
 #include <cmath>
 #include <vector>
+#include <array>
 
 constexpr float PI = 3.14159265f;
 class GeometryFactory
@@ -285,6 +286,106 @@ public:
 
         return GeometryMesh<VertexType>(std::move(vertices), std::move(indices));
     }
+
+    template<typename VertexType>
+    static GeometryMesh<VertexType> CreatePlane(float width = 2.0f, float height = 2.0f, int divisionsX = 1, int divisionsY = 1)
+    {
+        namespace dx = DirectX;
+
+        // Ensure minimum divisions
+        divisionsX = std::max(1, divisionsX);
+        divisionsY = std::max(1, divisionsY);
+
+        // Calculate the number of vertices in each dimension
+        const int verticesX = divisionsX + 1;
+        const int verticesY = divisionsY + 1;
+
+        // Create vertex array
+        std::vector<VertexType> vertices(verticesX * verticesY);
+
+        // Calculate dimensions and division sizes
+        const float halfWidth = width / 2.0f;
+        const float halfHeight = height / 2.0f;
+        const float divisionSizeX = width / static_cast<float>(divisionsX);
+        const float divisionSizeY = height / static_cast<float>(divisionsY);
+
+        // Generate vertices starting from bottom-left
+        const auto bottomLeft = dx::XMVectorSet(-halfWidth, -halfHeight, 0.0f, 0.0f);
+
+        int vertexIndex = 0;
+        for (int y = 0; y < verticesY; y++)
+        {
+            const float yPos = static_cast<float>(y) * divisionSizeY;
+
+            for (int x = 0; x < verticesX; x++, vertexIndex++)
+            {
+                const auto vertexPos = dx::XMVectorAdd(
+                    bottomLeft,
+                    dx::XMVectorSet(static_cast<float>(x) * divisionSizeX, yPos, 0.0f, 0.0f)
+                );
+
+                // Set position
+                dx::XMStoreFloat3(&vertices[vertexIndex].position, vertexPos);
+
+                // Add normal if vertex type supports it
+                if constexpr (has_normal_member<VertexType>::value) {
+                    vertices[vertexIndex].normal = { 0.0f, 0.0f, 1.0f }; // Normal points in +Z direction
+                }
+
+                // Add texture coordinates if vertex type supports it
+                if constexpr (has_texcoord_member<VertexType>::value) {
+                    float u = static_cast<float>(x) / divisionsX;
+                    float v = static_cast<float>(y) / divisionsY;
+                    vertices[vertexIndex].texCoord = { u, v };
+                }
+            }
+        }
+
+        // Generate indices
+        std::vector<unsigned short> indices;
+        indices.reserve(divisionsX * divisionsY * 6); // 2 triangles per quad, 3 vertices per triangle
+
+        // Helper lambda to convert x,y coordinates to vertex index
+        const auto vxy2i = [verticesX](size_t x, size_t y) -> unsigned short {
+            return static_cast<unsigned short>(y * verticesX + x);
+            };
+
+        // Generate quads
+        for (size_t y = 0; y < divisionsY; y++)
+        {
+            for (size_t x = 0; x < divisionsX; x++)
+            {
+                // Get the four corner indices of this quad
+                const std::array<unsigned short, 4> indexArray = {
+                    vxy2i(x, y),         // Bottom-left
+                    vxy2i(x + 1, y),     // Bottom-right
+                    vxy2i(x, y + 1),     // Top-left
+                    vxy2i(x + 1, y + 1)  // Top-right
+                };
+
+                // First triangle (bottom-left, top-left, bottom-right)
+                indices.push_back(indexArray[0]); // Bottom-left
+                indices.push_back(indexArray[2]); // Top-left
+                indices.push_back(indexArray[1]); // Bottom-right
+
+                // Second triangle (bottom-right, top-left, top-right)
+                indices.push_back(indexArray[1]); // Bottom-right
+                indices.push_back(indexArray[2]); // Top-left
+                indices.push_back(indexArray[3]); // Top-right
+            }
+        }
+
+        return GeometryMesh<VertexType>(std::move(vertices), std::move(indices));
+    }
+
+    // Helper type traits to check for vertex members
+    template <typename T, typename = void>
+    struct has_texcoord_member : std::false_type {};
+
+    template <typename T>
+    struct has_texcoord_member<T,
+        std::void_t<decltype(std::declval<T>().texCoord)>>
+        : std::true_type {};
 
     // Helper to check if a vertex type has a normal member
     template <typename T, typename = void>

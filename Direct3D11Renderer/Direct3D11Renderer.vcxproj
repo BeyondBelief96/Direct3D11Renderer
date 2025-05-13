@@ -164,6 +164,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Mouse.cpp" />
     <ClCompile Include="src\Renderable\Cube.cpp" />
+    <ClCompile Include="src\Renderable\Plane.cpp" />
     <ClCompile Include="src\Renderable\Pyramid.cpp" />
     <ClCompile Include="src\Renderable\Renderable.cpp" />
     <ClCompile Include="src\Renderable\Sphere.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="include\Keyboard.h" />
     <ClInclude Include="include\Mouse.h" />
     <ClInclude Include="include\Renderable\Cube.h" />
+    <ClInclude Include="include\Renderable\Plane.h" />
     <ClInclude Include="include\Renderable\Pyramid.h" />
     <ClInclude Include="include\Renderable\Renderable.h" />
     <ClInclude Include="include\Renderable\Sphere.h" />

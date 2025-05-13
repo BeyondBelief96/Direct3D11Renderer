@@ -1,4 +1,7 @@
 #include "Application.h"
+#include "Renderable/Cube.h"
+#include "Renderable/Sphere.h"
+#include "Renderable/Pyramid.h"
 
 
 Application::Application() : wnd(800, 600, L"D3DEngine")
@@ -9,13 +12,34 @@ Application::Application() : wnd(800, 600, L"D3DEngine")
 	std::uniform_real_distribution<float> odist(0.0f, 3.1415f * 0.3f);
 	std::uniform_real_distribution<float> rdist(6.0f, 20.0f);
 	std::uniform_real_distribution<float> bdist(0.4f, 3.0f);
-	for (auto i = 0; i < 500; i++)
-	{
-		cubes.push_back(std::make_unique<Cube>(
-			wnd.Gfx(), rng, adist,
-			ddist, odist, rdist, bdist
-		));
-	}
+	std::uniform_real_distribution<float> sdist(0.8f, 1.5f);
+    // Create a mix of geometry types
+    for (int i = 0; i < 20; i++)
+    {
+        // Create boxes
+        renderables.push_back(std::make_unique<Cube>(
+            wnd.Gfx(), rng, adist, ddist, odist, rdist, bdist
+        ));
+
+        // Create spheres
+        renderables.push_back(std::make_unique<Sphere>(
+            wnd.Gfx(), rng, adist, ddist, odist, rdist, 1.0f, 12
+        ));
+
+        // Create pyramids with various sides
+        const int sides[] = { 3, 4, 5, 6 };
+        const float heights[] = { 2.0f, 2.5f, 3.0f, 3.5f };
+
+        for (int j = 0; j < 4; j++)
+        {
+            renderables.push_back(std::make_unique<Pyramid>(
+                wnd.Gfx(), rng, adist, ddist, odist, rdist,
+                1.0f + (float)j * 0.3f,  // Varying radius
+                heights[j],              // Varying height
+                sides[j]                 // Varying number of sides
+            ));
+        }
+    }
 	wnd.Gfx().SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
 }
 
@@ -36,7 +60,7 @@ void Application::ProcessFrame()
 {
 	auto dt = timer.Mark();
 	wnd.Gfx().ClearBuffer(0.07f, 0.0f, 0.12f);
-	for (auto& box : cubes)
+	for (auto& box : renderables)
 	{
 		box->Update(dt);
 		box->Render(wnd.Gfx());

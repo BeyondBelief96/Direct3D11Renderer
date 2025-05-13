@@ -1,5 +1,6 @@
 #include "Renderable/Box.h"
 #include "Bindable/BindableBase.h"
+#include "Bindable/BindableCache.h"
 #include <memory>
 
 Box::Box(Graphics& gfx,
@@ -20,6 +21,13 @@ Box::Box(Graphics& gfx,
 	theta(adist(rng)),
 	phi(adist(rng))
 {
+	// Vertex Shader - shared
+	auto vs = AddSharedBindable<VertexShader>(gfx, "box_vs", L"VertexShader.cso");
+	auto pvsbc = vs->GetByteCode();
+
+	// Pixel Shader - shared
+	AddSharedBindable<PixelShader>(gfx, "box_ps", L"PixelShader.cso");
+
 	struct Vertex
 	{
 		struct
@@ -40,14 +48,11 @@ Box::Box(Graphics& gfx,
 		{ -1.0f,1.0f,1.0f },
 		{ 1.0f,1.0f,1.0f },
 	};
-	AddBindable(std::make_unique<VertexBuffer>(gfx, vertices));
+	
+	// Vertex Buffer - shared
+	AddSharedBindable<VertexBuffer>(gfx, "box_vb", vertices);
 
-	auto pvs = std::make_unique<VertexShader>(gfx, L"VertexShader.cso");
-	auto pvsbc = pvs->GetByteCode();
-	AddBindable(std::move(pvs));
-
-	AddBindable(std::make_unique<PixelShader>(gfx, L"PixelShader.cso"));
-
+	// Index buffer - shared
 	const std::vector<unsigned short> indices =
 	{
 		0,2,1, 2,3,1,
@@ -57,17 +62,19 @@ Box::Box(Graphics& gfx,
 		0,4,2, 2,4,6,
 		0,1,4, 1,5,4
 	};
-	AddBindable(std::make_unique<IndexBuffer>(gfx, indices));
+	AddSharedBindable<IndexBuffer>(gfx, "box_ib", indices);
 
+	// Input Layout - shared
+	const std::vector<D3D11_INPUT_ELEMENT_DESC> layout =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+	AddSharedBindable<InputLayout>(gfx, "box_input", layout, pvsbc);
+
+	// Color buffer - shared (all boxes use same colors)
 	struct ConstantBuffer2
 	{
-		struct
-		{
-			float r;
-			float g;
-			float b;
-			float a;
-		} face_colors[6];
+		struct { float r, g, b, a; } face_colors[6];
 	};
 	const ConstantBuffer2 cb2 =
 	{
@@ -80,17 +87,13 @@ Box::Box(Graphics& gfx,
 			{ 0.0f,1.0f,1.0f },
 		}
 	};
-	AddBindable(std::make_unique<PixelConstantBuffer<ConstantBuffer2>>(gfx, cb2));
+	AddSharedBindable<PixelConstantBuffer<ConstantBuffer2>>(gfx, "box_color", cb2);
 
-	const std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
-	{
-		{ "Position",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 },
-	};
-	AddBindable(std::make_unique<InputLayout>(gfx, ied, pvsbc));
+	// Topology - shared
+	AddSharedBindable<Topology>(gfx, "triangle_list", D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	AddBindable(std::make_unique<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-
-	AddBindable(std::make_unique<TransformConstantBuffer>(gfx, *this));
+	// Transform buffer - unique per box
+	AddUniqueBindable(std::make_unique<TransformConstantBuffer>(gfx, *this));
 }
 
 

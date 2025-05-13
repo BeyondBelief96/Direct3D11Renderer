@@ -143,6 +143,7 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Bindable\Bindable.cpp" />
+    <ClCompile Include="src\Bindable\BindableKey.cpp" />
     <ClCompile Include="src\Bindable\IndexBuffer.cpp" />
     <ClCompile Include="src\Bindable\InputLayout.cpp" />
     <ClCompile Include="src\Bindable\PixelShader.cpp" />
@@ -151,6 +152,7 @@
     <ClCompile Include="src\Bindable\VertexBuffer.cpp" />
     <ClCompile Include="src\Bindable\VertexShader.cpp" />
     <ClCompile Include="src\D3Timer.cpp" />
+    <ClCompile Include="src\Exceptions\BindableLookupException.cpp" />
     <ClCompile Include="src\Exceptions\D3Exception.cpp" />
     <ClCompile Include="src\D3Utils.cpp" />
     <ClCompile Include="src\DxgiInfoManager.cpp" />
@@ -169,6 +171,8 @@
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\Bindable\Bindable.h" />
     <ClInclude Include="include\Bindable\BindableBase.h" />
+    <ClInclude Include="include\Bindable\BindableCache.h" />
+    <ClInclude Include="include\Bindable\BindableKey.h" />
     <ClInclude Include="include\Bindable\ConstantBuffer.h" />
     <ClInclude Include="include\Bindable\IndexBuffer.h" />
     <ClInclude Include="include\Bindable\InputLayout.h" />
@@ -179,6 +183,7 @@
     <ClInclude Include="include\Bindable\VertexShader.h" />
     <ClInclude Include="include\D3Timer.h" />
     <ClInclude Include="include\ChiliWin.h" />
+    <ClInclude Include="include\Exceptions\BindableLookupException.h" />
     <ClInclude Include="include\Exceptions\D3Exception.h" />
     <ClInclude Include="include\D3Utils.h" />
     <ClInclude Include="include\DxgiInfoManager.h" />

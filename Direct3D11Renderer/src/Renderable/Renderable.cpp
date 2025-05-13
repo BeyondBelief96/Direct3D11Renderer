@@ -5,14 +5,22 @@
 
 void Renderable::Render(Graphics& gfx) const noexcept(!_DEBUG)
 {
-	for (auto& b : bindables)
-	{
-		b->Bind(gfx);
-	}
-	gfx.DrawIndexed(pIndexBuffer->GetCount());
+    // Bind unique bindables
+    for (auto& b : bindables)
+    {
+        b->Bind(gfx);
+    }
+
+    // Bind shared bindables
+    for (auto& b : sharedBindables)
+    {
+        b->Bind(gfx);
+    }
+
+    gfx.DrawIndexed(pIndexBuffer->GetCount());
 }
 
-void Renderable::AddBindable(std::unique_ptr<Bindable> bindable) noexcept(!_DEBUG)
+void Renderable::AddUniqueBindable(std::unique_ptr<Bindable> bindable) noexcept(!_DEBUG)
 {
     // Check if this is an IndexBuffer
     if (auto* indexBuffer = dynamic_cast<IndexBuffer*>(bindable.get()))

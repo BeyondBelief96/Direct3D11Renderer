@@ -78,7 +78,7 @@
     <ClCompile Include="src\Renderable\Renderable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderable\Box.cpp">
+    <ClCompile Include="src\Renderable\Cube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Bindable\TransformConstantBuffer.cpp">
@@ -164,7 +164,7 @@
     <ClInclude Include="include\Renderable\Renderable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderable\Box.h">
+    <ClInclude Include="include\Renderable\Cube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Bindable\BindableBase.h">
@@ -177,6 +177,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Exceptions\BindableLookupException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Geometry\GeometryMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Geometry\GeometryFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

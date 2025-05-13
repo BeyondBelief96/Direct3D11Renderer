@@ -1,14 +1,16 @@
-#include "Renderable/Box.h"
+#include "Renderable/Cube.h"
 #include "Bindable/BindableBase.h"
 #include "Bindable/BindableCache.h"
+#include "Geometry/GeometryFactory.h"
 #include <memory>
 
-Box::Box(Graphics& gfx,
+Cube::Cube(Graphics& gfx,
 	std::mt19937& rng,
 	std::uniform_real_distribution<float>& adist,
 	std::uniform_real_distribution<float>& ddist,
 	std::uniform_real_distribution<float>& odist,
-	std::uniform_real_distribution<float>& rdist)
+	std::uniform_real_distribution<float>& rdist,
+	std::uniform_real_distribution<float>& bdist)
 	:
 	r(rdist(rng)),
 	droll(ddist(rng)),
@@ -21,6 +23,8 @@ Box::Box(Graphics& gfx,
 	theta(adist(rng)),
 	phi(adist(rng))
 {
+	auto cubeMesh = GeometryFactory::CreateCube<VertexPosition>();
+
 	// Vertex Shader - shared
 	auto vs = AddSharedBindable<VertexShader>(gfx, "box_vs", L"VertexShader.cso");
 	auto pvsbc = vs->GetByteCode();
@@ -28,41 +32,11 @@ Box::Box(Graphics& gfx,
 	// Pixel Shader - shared
 	AddSharedBindable<PixelShader>(gfx, "box_ps", L"PixelShader.cso");
 
-	struct Vertex
-	{
-		struct
-		{
-			float x;
-			float y;
-			float z;
-		} pos;
-	};
-	const std::vector<Vertex> vertices =
-	{
-		{ -1.0f,-1.0f,-1.0f },
-		{ 1.0f,-1.0f,-1.0f },
-		{ -1.0f,1.0f,-1.0f },
-		{ 1.0f,1.0f,-1.0f },
-		{ -1.0f,-1.0f,1.0f },
-		{ 1.0f,-1.0f,1.0f },
-		{ -1.0f,1.0f,1.0f },
-		{ 1.0f,1.0f,1.0f },
-	};
-	
 	// Vertex Buffer - shared
-	AddSharedBindable<VertexBuffer>(gfx, "box_vb", vertices);
+	AddSharedBindable<VertexBuffer>(gfx, "box_vb", cubeMesh.vertices);
 
-	// Index buffer - shared
-	const std::vector<unsigned short> indices =
-	{
-		0,2,1, 2,3,1,
-		1,3,5, 3,7,5,
-		2,6,3, 3,6,7,
-		4,5,7, 4,7,6,
-		0,4,2, 2,4,6,
-		0,1,4, 1,5,4
-	};
-	AddSharedBindable<IndexBuffer>(gfx, "box_ib", indices);
+	// Index Buffer - shared
+	AddSharedBindable<IndexBuffer>(gfx, "box_ib", cubeMesh.indices);
 
 	// Input Layout - shared
 	const std::vector<D3D11_INPUT_ELEMENT_DESC> layout =
@@ -94,10 +68,16 @@ Box::Box(Graphics& gfx,
 
 	// Transform buffer - unique per box
 	AddUniqueBindable(std::make_unique<TransformConstantBuffer>(gfx, *this));
+
+	// Apply deformation transform
+	DirectX::XMStoreFloat3x3(
+		&mt,
+		DirectX::XMMatrixScaling(1.0f, 1.0f, bdist(rng))
+	);
 }
 
 
-void Box::Update(float dt) noexcept
+void Cube::Update(float dt) noexcept
 {
 	yaw += dyaw * dt;
 	pitch += dpitch * dt;
@@ -107,7 +87,7 @@ void Box::Update(float dt) noexcept
 	chi += dchi * dt;
 }
 
-DirectX::XMMATRIX Box::GetTransformXM() const noexcept
+DirectX::XMMATRIX Cube::GetTransformXM() const noexcept
 {
 	return DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw, roll) *
 		DirectX::XMMatrixTranslation(r, 0.0f, 0.0f) *

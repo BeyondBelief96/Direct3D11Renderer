@@ -1,7 +1,7 @@
 #pragma once
 #include "Window.h"
 #include "D3Timer.h"
-#include "Renderable/Box.h"
+#include "Renderable/Cube.h"
 #include <vector>
 #include <memory>
 
@@ -15,5 +15,5 @@ private:
 
 	Window wnd;
 	D3Timer timer;
-	std::vector<std::unique_ptr<Box>> boxes;
+	std::vector<std::unique_ptr<Cube>> cubes;
 };

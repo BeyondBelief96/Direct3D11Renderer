@@ -163,7 +163,7 @@
     <ClCompile Include="src\Keyboard.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Mouse.cpp" />
-    <ClCompile Include="src\Renderable\Box.cpp" />
+    <ClCompile Include="src\Renderable\Cube.cpp" />
     <ClCompile Include="src\Renderable\Renderable.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
@@ -189,11 +189,13 @@
     <ClInclude Include="include\DxgiInfoManager.h" />
     <ClInclude Include="include\Exceptions\HrException.h" />
     <ClInclude Include="include\Exceptions\WindowExceptions.h" />
+    <ClInclude Include="include\Geometry\GeometryFactory.h" />
+    <ClInclude Include="include\Geometry\GeometryMesh.h" />
     <ClInclude Include="include\Graphics.h" />
     <ClInclude Include="include\Exceptions\GraphicsExceptions.h" />
     <ClInclude Include="include\Keyboard.h" />
     <ClInclude Include="include\Mouse.h" />
-    <ClInclude Include="include\Renderable\Box.h" />
+    <ClInclude Include="include\Renderable\Cube.h" />
     <ClInclude Include="include\Renderable\Renderable.h" />
     <ClInclude Include="include\resource.h" />
     <ClInclude Include="include\Window.h" />

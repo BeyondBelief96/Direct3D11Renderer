@@ -9,6 +9,6 @@ public:
 	TransformConstantBuffer(Graphics& gfx, const Renderable& parent);
 	void Bind(Graphics& gfx) noexcept override;
 private:
-	VertexConstantBuffer<DirectX::XMMATRIX> vertexConstantBuffer;
+	static std::unique_ptr<VertexConstantBuffer<DirectX::XMMATRIX>> pVertexConstantBuffer;
 	const Renderable& parent;
 };

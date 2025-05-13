@@ -1,5 +1,4 @@
 #pragma once
-#define _USE_MATH_DEFINES
 #include "GeometryMesh.h"
 #include <cmath>
 #include <vector>

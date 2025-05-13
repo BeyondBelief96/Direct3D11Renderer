@@ -220,4 +220,7 @@
     <FxCompile Include="shaders\ColorIndexVS.hlsl" />
     <FxCompile Include="shaders\ColorIndexPS.hlsl" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>

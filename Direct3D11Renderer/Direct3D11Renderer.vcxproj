@@ -71,10 +71,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\Renderable;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\Geometry;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\Exceptions;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\Bindable;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\imgui;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\Renderable;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\Geometry;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\Exceptions;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\Bindable;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\imgui;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -164,6 +164,13 @@
     <ClCompile Include="src\Exceptions\WindowExceptions.cpp" />
     <ClCompile Include="src\Graphics.cpp" />
     <ClCompile Include="src\Exceptions\GraphicsExceptions.cpp" />
+    <ClCompile Include="src\imgui\imgui.cpp" />
+    <ClCompile Include="src\imgui\imgui_demo.cpp" />
+    <ClCompile Include="src\imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="src\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="src\imgui\imgui_tables.cpp" />
+    <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Keyboard.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Mouse.cpp" />
@@ -203,6 +210,14 @@
     <ClInclude Include="include\Geometry\GeometryMesh.h" />
     <ClInclude Include="include\Graphics.h" />
     <ClInclude Include="include\Exceptions\GraphicsExceptions.h" />
+    <ClInclude Include="include\imgui\imconfig.h" />
+    <ClInclude Include="include\imgui\imgui.h" />
+    <ClInclude Include="include\imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="include\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="include\imgui\imgui_internal.h" />
+    <ClInclude Include="include\imgui\imstb_rectpack.h" />
+    <ClInclude Include="include\imgui\imstb_textedit.h" />
+    <ClInclude Include="include\imgui\imstb_truetype.h" />
     <ClInclude Include="include\Keyboard.h" />
     <ClInclude Include="include\Mouse.h" />
     <ClInclude Include="include\Renderable\Cube.h" />

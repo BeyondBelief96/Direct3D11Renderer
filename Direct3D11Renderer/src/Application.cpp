@@ -9,7 +9,7 @@
 #include "imgui_impl_dx11.h"
 
 
-Application::Application() : wnd(800, 600, L"D3DEngine")
+Application::Application() : wnd(1920, 1080, L"D3DEngine")
 {
 	std::mt19937 rng(std::random_device{}());
 	std::uniform_real_distribution<float> adist(0.0f, 3.1415f * 2.0f);
@@ -34,32 +34,32 @@ Application::Application() : wnd(800, 600, L"D3DEngine")
         ));
 
         // Create spheres
-        //renderables.push_back(std::make_unique<Sphere>(
-        //    wnd.Gfx(), rng, adist, ddist, odist, rdist, 1.0f, 12
-        //));
+        renderables.push_back(std::make_unique<Sphere>(
+            wnd.Gfx(), rng, adist, ddist, odist, rdist, 1.0f, 12
+        ));
 
         //// Create pyramids with various sides
-        //const int sides[] = { 3, 4, 5, 6 };
-        //const float heights[] = { 2.0f, 2.5f, 3.0f, 3.5f };
+        const int sides[] = { 3, 4, 5, 6 };
+        const float heights[] = { 2.0f, 2.5f, 3.0f, 3.5f };
 
-        //for (int j = 0; j < 4; j++)
-        //{
-        //    renderables.push_back(std::make_unique<Pyramid>(
-        //        wnd.Gfx(), rng, adist, ddist, odist, rdist,
-        //        1.0f + (float)j * 0.3f,  // Varying radius
-        //        heights[j],              // Varying height
-        //        sides[j]                 // Varying number of sides
-        //    ));
-        //}
+        for (int j = 0; j < 4; j++)
+        {
+            renderables.push_back(std::make_unique<Pyramid>(
+                wnd.Gfx(), rng, adist, ddist, odist, rdist,
+                1.0f + (float)j * 0.3f,  // Varying radius
+                heights[j],              // Varying height
+                sides[j]                 // Varying number of sides
+            ));
+        }
 
         //// Create planes with different tessellations
-        //renderables.push_back(std::make_unique<Plane>(
-        //    wnd.Gfx(), rng, adist, ddist, odist, rdist,
-        //    2.0f + (float)i * 0.2f,   // Width
-        //    2.0f + (float)i * 0.1f,   // Height
-        //    1 + i,                    // Divisions X
-        //    1 + i                     // Divisions Y
-        //));
+        renderables.push_back(std::make_unique<Plane>(
+            wnd.Gfx(), rng, adist, ddist, odist, rdist,
+            2.0f + (float)i * 0.2f,   // Width
+            2.0f + (float)i * 0.1f,   // Height
+            1 + i,                    // Divisions X
+            1 + i                     // Divisions Y
+        ));
     }
 	wnd.Gfx().SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
 }

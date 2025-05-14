@@ -12,7 +12,7 @@
 class Graphics
 {
 public:
-    Graphics(HWND hwnd);
+    Graphics(HWND hwnd, int width, int height);
     ~Graphics();
     Graphics(const Graphics&) = delete;
     Graphics& operator=(const Graphics& rhs) = delete;
@@ -30,6 +30,8 @@ public:
 #endif
 
 private:
+    int viewportWidth;
+	int viewportHeight;
     DirectX::XMMATRIX projection;
 #ifdef _DEBUG
     DxgiInfoManager infoManager;

@@ -50,9 +50,9 @@ Window::Window(int width, int height, const WCHAR* name)
 	: width(width), height(height), hwnd(nullptr)
 {
 	RECT wr;
-	wr.left = 100;
+	wr.left = 0;
 	wr.right = width + wr.left;
-	wr.top = 100;
+	wr.top = 0;
 	wr.bottom = height + wr.top;
 
 	if (AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE) == 0)
@@ -85,7 +85,7 @@ Window::Window(int width, int height, const WCHAR* name)
 	ImGui_ImplWin32_Init(hwnd);
 
 	// Create graphics object
-	pGraphics = std::make_unique<Graphics>(hwnd);
+	pGraphics = std::make_unique<Graphics>(hwnd, width, height);
 }
 
 Window::~Window()

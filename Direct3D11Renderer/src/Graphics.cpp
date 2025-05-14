@@ -10,7 +10,10 @@
 
 namespace DX = DirectX;
 
-Graphics::Graphics(HWND hwnd) : projection(DX::XMMatrixIdentity())
+Graphics::Graphics(HWND hwnd, int width, int height) 
+    : projection(DX::XMMatrixIdentity()),
+	viewportWidth(width),
+	viewportHeight(height)
 {
     DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
     swapChainDesc.BufferDesc.Width = 0;
@@ -71,8 +74,8 @@ Graphics::Graphics(HWND hwnd) : projection(DX::XMMatrixIdentity())
     // create depth stencil texture
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pDepthStencilBuffer;
 	D3D11_TEXTURE2D_DESC depthStencilBufferDesc = {};
-	depthStencilBufferDesc.Width = 800;
-	depthStencilBufferDesc.Height = 600;
+	depthStencilBufferDesc.Width = viewportWidth;
+	depthStencilBufferDesc.Height = viewportHeight;
 	depthStencilBufferDesc.MipLevels = 1u;
 	depthStencilBufferDesc.ArraySize = 1u;
     depthStencilBufferDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -94,8 +97,8 @@ Graphics::Graphics(HWND hwnd) : projection(DX::XMMatrixIdentity())
 
     // configure viewport
     D3D11_VIEWPORT vp;
-    vp.Width = 800.0f;
-    vp.Height = 600.0f;
+    vp.Width = viewportWidth;
+    vp.Height = viewportHeight;
     vp.MinDepth = 0.0f;
     vp.MaxDepth = 1.0f;
     vp.TopLeftX = 0.0f;

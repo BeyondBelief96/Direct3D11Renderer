@@ -23,15 +23,21 @@ Plane::Plane(
     theta(adist(rng)),
     phi(adist(rng))
 {
-    // Create a plane mesh
-    auto planeMesh = GeometryFactory::CreatePlane<VertexPosition>(width, height, divisionsX, divisionsY);
+    // Create a plane with texture coordinates
+    auto planeMesh = GeometryFactory::CreatePlane<VertexPositionTexture>(width, height, divisionsX, divisionsY);
+
+    // Add Texture
+    AddSharedBindable<Texture>(gfx, "kappa_texture", L"assets/kappa50.png");
+
+	// Add Sampler
+    AddSharedBindable<Sampler>(gfx, "plane_sampler");
 
     // Bind vertex shader
-    auto vs = AddSharedBindable<VertexShader>(gfx, "vs_plane", L"ColorIndexVS.cso");
+    auto vs = AddSharedBindable<VertexShader>(gfx, "vs_plane", L"TextureVS.cso");
     auto pvs = vs->GetByteCode();
 
     // Bind Pixel Shader
-    auto ps = AddSharedBindable<PixelShader>(gfx, "ps_plane", L"ColorIndexPS.cso");
+    auto ps = AddSharedBindable<PixelShader>(gfx, "ps_plane", L"TexturePS.cso");
 
     // Bind Vertex Buffer
     std::string vbKey = "plane_vertices_" + std::to_string(divisionsX) + "_" + std::to_string(divisionsY);
@@ -45,6 +51,7 @@ Plane::Plane(
     const std::vector<D3D11_INPUT_ELEMENT_DESC> layout =
     {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
     AddSharedBindable<InputLayout>(gfx, "plane_input_layout", layout, pvs);
 
@@ -53,28 +60,6 @@ Plane::Plane(
 
     // Create the transform constant buffer
     AddUniqueBindable(std::make_unique<TransformConstantBuffer>(gfx, *this));
-
-    // Create the pixel shader constant buffer with a checkerboard pattern
-    struct PixelShaderConstants
-    {
-        struct { float r, g, b, a; } face_colors[8];
-    };
-
-    // Generate checkerboard colors
-    PixelShaderConstants cb;
-
-	// Set the colors for the checkerboard pattern
-	cb.face_colors[0] = { 1.0f, 0.0f, 0.0f, 1.0f }; // Red
-	cb.face_colors[1] = { 0.0f, 1.0f, 0.0f, 1.0f }; // Green
-	cb.face_colors[2] = { 0.0f, 0.0f, 1.0f, 1.0f }; // Blue
-	cb.face_colors[3] = { 1.0f, 1.0f, 0.0f, 1.0f }; // Yellow
-	cb.face_colors[4] = { 1.0f, 0.0f, 1.0f, 1.0f }; // Magenta
-	cb.face_colors[5] = { 0.0f, 1.0f, 1.0f, 1.0f }; // Cyan
-	cb.face_colors[6] = { 1.0f, 1.0f, 1.0f, 1.0f }; // White
-	cb.face_colors[7] = { 0.0f, 0.0f, 0.0f, 1.0f }; // Black
-
-    // Add the pixel shader constant buffer
-    AddUniqueBindable(std::make_unique<PixelConstantBuffer<PixelShaderConstants>>(gfx, cb));
 }
 
 void Plane::Update(float dt) noexcept

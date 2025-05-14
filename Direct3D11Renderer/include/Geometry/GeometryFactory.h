@@ -314,24 +314,16 @@ public:
         int vertexIndex = 0;
         for (int y = 0; y < verticesY; y++)
         {
-            const float yPos = static_cast<float>(y) * divisionSizeY;
+            const float yPos = static_cast<float>(y) * divisionSizeY - halfHeight;
 
             for (int x = 0; x < verticesX; x++, vertexIndex++)
             {
-                const auto vertexPos = dx::XMVectorAdd(
-                    bottomLeft,
-                    dx::XMVectorSet(static_cast<float>(x) * divisionSizeX, yPos, 0.0f, 0.0f)
-                );
+                const float xPos = static_cast<float>(x) * divisionSizeX - halfWidth;
 
                 // Set position
-                dx::XMStoreFloat3(&vertices[vertexIndex].position, vertexPos);
+                vertices[vertexIndex].position = { xPos, yPos, 0.0f };
 
-                // Add normal if vertex type supports it
-                if constexpr (has_normal_member<VertexType>::value) {
-                    vertices[vertexIndex].normal = { 0.0f, 0.0f, 1.0f }; // Normal points in +Z direction
-                }
-
-                // Add texture coordinates if vertex type supports it
+                // Set texture coordinates (important for our texture mapping)
                 if constexpr (has_texcoord_member<VertexType>::value) {
                     float u = static_cast<float>(x) / divisionsX;
                     float v = static_cast<float>(y) / divisionsY;

@@ -99,6 +99,12 @@
     <ClCompile Include="src\Renderable\Plane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Bindable\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bindable\Sampler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ChiliWin.h">
@@ -203,6 +209,15 @@
     <ClInclude Include="include\Renderable\Plane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Bindable\Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WICFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Bindable\Sampler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Direct3D11Renderer.rc">
@@ -213,14 +228,16 @@
     <Image Include="assets\chili.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="assets\kappa50.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\VertexShader.hlsl" />
     <FxCompile Include="shaders\PixelShader.hlsl" />
     <FxCompile Include="shaders\ColorIndexVS.hlsl" />
     <FxCompile Include="shaders\ColorIndexPS.hlsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <FxCompile Include="shaders\TextureVS.hlsl" />
+    <FxCompile Include="shaders\TexturePS.hlsl" />
   </ItemGroup>
 </Project>

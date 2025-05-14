@@ -9,6 +9,12 @@ struct VertexPosition
 	DirectX::XMFLOAT3 position;
 };
 
+struct VertexPositionTexture
+{
+	DirectX::XMFLOAT3 position;
+	DirectX::XMFLOAT2 texCoord;
+};
+
 template<typename VertexType>
 class GeometryMesh
 {

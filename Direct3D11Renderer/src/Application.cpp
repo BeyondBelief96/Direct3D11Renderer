@@ -3,6 +3,7 @@
 #include "Renderable/Sphere.h"
 #include "Renderable/Pyramid.h"
 #include "Renderable/Plane.h"
+#include "Renderable/TexturedCube.h"
 
 
 Application::Application() : wnd(800, 600, L"D3DEngine")
@@ -15,14 +16,21 @@ Application::Application() : wnd(800, 600, L"D3DEngine")
 	std::uniform_real_distribution<float> bdist(0.4f, 3.0f);
 	std::uniform_real_distribution<float> sdist(0.8f, 1.5f);
     // Create a mix of geometry types
-    for (int i = 0; i < 50; i++)
+    for (int i = 0; i < 20; i++)
     {
-        //// Create boxes
-        //renderables.push_back(std::make_unique<Cube>(
-        //    wnd.Gfx(), rng, adist, ddist, odist, rdist, bdist
-        //));
+        // Create boxes
+        renderables.push_back(std::make_unique<TexturedCube>(
+            wnd.Gfx(),
+            rng,
+            adist,
+            ddist,
+            odist,
+            rdist,
+            3.0f,
+            L"assets/cube.png" 
+        ));
 
-        //// Create spheres
+        // Create spheres
         //renderables.push_back(std::make_unique<Sphere>(
         //    wnd.Gfx(), rng, adist, ddist, odist, rdist, 1.0f, 12
         //));
@@ -41,14 +49,14 @@ Application::Application() : wnd(800, 600, L"D3DEngine")
         //    ));
         //}
 
-        // Create planes with different tessellations
-        renderables.push_back(std::make_unique<Plane>(
-            wnd.Gfx(), rng, adist, ddist, odist, rdist,
-            2.0f + (float)i * 0.2f,   // Width
-            2.0f + (float)i * 0.1f,   // Height
-            1 + i,                    // Divisions X
-            1 + i                     // Divisions Y
-        ));
+        //// Create planes with different tessellations
+        //renderables.push_back(std::make_unique<Plane>(
+        //    wnd.Gfx(), rng, adist, ddist, odist, rdist,
+        //    2.0f + (float)i * 0.2f,   // Width
+        //    2.0f + (float)i * 0.1f,   // Height
+        //    1 + i,                    // Divisions X
+        //    1 + i                     // Divisions Y
+        //));
     }
 	wnd.Gfx().SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
 }

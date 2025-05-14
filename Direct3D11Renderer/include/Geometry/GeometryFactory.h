@@ -45,6 +45,74 @@ public:
 	}
 
     template<typename VertexType>
+    static GeometryMesh<VertexType> CreateTexturedCube(float size = 1.0f)
+    {
+        const float halfSize = size / 2.0f;
+
+        // Create vertices with both position and texture coordinates
+        std::vector<VertexType> vertices(14);
+
+        // Front face vertices
+        vertices[0].position = { -halfSize, -halfSize, -halfSize }; // bottom-left
+        vertices[0].texCoord = { 2.0f / 3.0f, 0.0f / 4.0f };
+
+        vertices[1].position = { halfSize, -halfSize, -halfSize }; // bottom-right
+        vertices[1].texCoord = { 1.0f / 3.0f, 0.0f / 4.0f };
+
+        vertices[2].position = { -halfSize, halfSize, -halfSize }; // top-left
+        vertices[2].texCoord = { 2.0f / 3.0f, 1.0f / 4.0f };
+
+        vertices[3].position = { halfSize, halfSize, -halfSize }; // top-right
+        vertices[3].texCoord = { 1.0f / 3.0f, 1.0f / 4.0f };
+
+        // Back face vertices
+        vertices[4].position = { -halfSize, -halfSize, halfSize }; // bottom-left
+        vertices[4].texCoord = { 2.0f / 3.0f, 3.0f / 4.0f };
+
+        vertices[5].position = { halfSize, -halfSize, halfSize }; // bottom-right
+        vertices[5].texCoord = { 1.0f / 3.0f, 3.0f / 4.0f };
+
+        vertices[6].position = { -halfSize, halfSize, halfSize }; // top-left
+        vertices[6].texCoord = { 2.0f / 3.0f, 2.0f / 4.0f };
+
+        vertices[7].position = { halfSize, halfSize, halfSize }; // top-right
+        vertices[7].texCoord = { 1.0f / 3.0f, 2.0f / 4.0f };
+
+        // Additional vertices for bottom face
+        vertices[8].position = { -halfSize, -halfSize, -halfSize }; // reused position
+        vertices[8].texCoord = { 2.0f / 3.0f, 4.0f / 4.0f };
+
+        vertices[9].position = { halfSize, -halfSize, -halfSize }; // reused position
+        vertices[9].texCoord = { 1.0f / 3.0f, 4.0f / 4.0f };
+
+        // Additional vertices for left face
+        vertices[10].position = { -halfSize, -halfSize, -halfSize }; // reused position
+        vertices[10].texCoord = { 3.0f / 3.0f, 1.0f / 4.0f };
+
+        vertices[11].position = { -halfSize, -halfSize, halfSize }; // reused position
+        vertices[11].texCoord = { 3.0f / 3.0f, 2.0f / 4.0f };
+
+        // Additional vertices for right face
+        vertices[12].position = { halfSize, -halfSize, -halfSize }; // reused position
+        vertices[12].texCoord = { 0.0f / 3.0f, 1.0f / 4.0f };
+
+        vertices[13].position = { halfSize, -halfSize, halfSize }; // reused position
+        vertices[13].texCoord = { 0.0f / 3.0f, 2.0f / 4.0f };
+
+        // Define indices for each face
+        std::vector<unsigned short> indices = {
+            0,2,1,    2,3,1,    // Front face
+            4,8,5,    5,8,9,    // Bottom face (reusing some vertices with different UVs)
+            2,6,3,    3,6,7,    // Top face
+            4,5,7,    4,7,6,    // Back face
+            2,10,11,  2,11,6,   // Left face (reusing positions but with different UVs)
+            12,3,7,   12,7,13   // Right face (reusing positions but with different UVs)
+        };
+
+        return GeometryMesh<VertexType>(std::move(vertices), std::move(indices));
+    }
+
+    template<typename VertexType>
     static GeometryMesh<VertexType> CreateSphere(float radius = 1.0f, int latDiv = 12, int longDiv = 24)
     {
         namespace dx = DirectX;

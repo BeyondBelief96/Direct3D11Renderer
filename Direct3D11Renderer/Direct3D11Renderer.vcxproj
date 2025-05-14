@@ -172,6 +172,7 @@
     <ClCompile Include="src\Renderable\Pyramid.cpp" />
     <ClCompile Include="src\Renderable\Renderable.cpp" />
     <ClCompile Include="src\Renderable\Sphere.cpp" />
+    <ClCompile Include="src\Renderable\TexturedCube.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -209,6 +210,7 @@
     <ClInclude Include="include\Renderable\Pyramid.h" />
     <ClInclude Include="include\Renderable\Renderable.h" />
     <ClInclude Include="include\Renderable\Sphere.h" />
+    <ClInclude Include="include\Renderable\TexturedCube.h" />
     <ClInclude Include="include\resource.h" />
     <ClInclude Include="include\WICFactory.h" />
     <ClInclude Include="include\Window.h" />
@@ -218,6 +220,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\chili.ico" />
+    <Image Include="assets\cube.png" />
     <Image Include="assets\kappa50.png" />
   </ItemGroup>
   <ItemGroup>

@@ -105,6 +105,9 @@
     <ClCompile Include="src\Bindable\Sampler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderable\TexturedCube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ChiliWin.h">
@@ -218,6 +221,9 @@
     <ClInclude Include="include\Bindable\Sampler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Renderable\TexturedCube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Direct3D11Renderer.rc">
@@ -229,6 +235,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="assets\kappa50.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\cube.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -17,5 +17,6 @@ private:
 	ImGuiManager imgui;
 	Window wnd;
 	D3Timer timer;
+	float speed_factor = 1.0f;
 	std::vector<std::unique_ptr<class Renderable>> renderables;
 };

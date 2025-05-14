@@ -4,6 +4,7 @@
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 #include "imgui_impl_dx11.h"
+#include "imgui_impl_win32.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
@@ -114,8 +115,28 @@ Graphics::~Graphics()
     ImGui_ImplDX11_Shutdown();
 }
 
+void Graphics::BeginFrame(float red, float green, float blue)
+{
+	if (imguiEnabled)
+	{
+		ImGui_ImplDX11_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+        ImGui::NewFrame();
+	}
+
+    const float color[] = { red, green, blue, 1.0f };
+	pContext->ClearRenderTargetView(pTarget.Get(), color);
+	pContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
+}
+
 void Graphics::EndFrame()
 {
+    if (imguiEnabled)
+    {
+        ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+    }
+
     HRESULT hr;
 #ifdef _DEBUG
     infoManager.Set();
@@ -137,13 +158,6 @@ void Graphics::EndFrame()
     }
 }
 
-void Graphics::ClearBuffer(float red, float green, float blue) noexcept
-{
-    const float color[] = { red, green, blue, 1.0f };
-    pContext->ClearRenderTargetView(pTarget.Get(), color);
-	pContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
-}
-
 void Graphics::DrawIndexed(UINT count) noexcept(!_DEBUG)
 {
 	GFX_THROW_INFO_ONLY(pContext->DrawIndexed(count, 0u, 0u));
@@ -157,6 +171,21 @@ DX::XMMATRIX Graphics::GetProjection() const noexcept
 void Graphics::SetProjection(DirectX::FXMMATRIX proj) noexcept
 {
 	projection = proj;
+}
+
+void Graphics::EnableImgui() noexcept
+{
+    imguiEnabled = true;
+}
+
+void Graphics::DisableImgui() noexcept
+{
+    imguiEnabled = false;
+}
+
+bool Graphics::IsImguiEnabled() const noexcept
+{
+    return imguiEnabled;
 }
 
 ID3D11DeviceContext* const Graphics::GetContext() noexcept

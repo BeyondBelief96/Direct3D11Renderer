@@ -17,11 +17,15 @@ public:
     Graphics(const Graphics&) = delete;
     Graphics& operator=(const Graphics& rhs) = delete;
 
+    void BeginFrame(float red, float green, float blue);
     void EndFrame();
-    void ClearBuffer(float red, float green, float blue) noexcept;
     void DrawIndexed(UINT count) noexcept(!_DEBUG);
     DirectX::XMMATRIX GetProjection() const noexcept;
     void SetProjection(DirectX::FXMMATRIX proj) noexcept;
+
+    void EnableImgui() noexcept;
+	void DisableImgui() noexcept;
+    bool IsImguiEnabled() const noexcept;
 
 	ID3D11DeviceContext* const GetContext() noexcept;
     ID3D11Device* const GetDevice() noexcept;
@@ -30,6 +34,7 @@ public:
 #endif
 
 private:
+    bool imguiEnabled = true;
     int viewportWidth;
 	int viewportHeight;
     DirectX::XMMATRIX projection;

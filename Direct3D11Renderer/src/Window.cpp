@@ -3,6 +3,10 @@
 #include "Exceptions/WindowExceptions.h"
 #include <sstream>
 #include "resource.h"
+#include "imgui_impl_win32.h"
+
+// Forward declaration of the ImGui_ImplWin32_WndProcHandler function
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 // WindowClass
 Window::WindowClass Window::WindowClass::wndClass;
@@ -77,12 +81,16 @@ Window::Window(int width, int height, const WCHAR* name)
 
 	ShowWindow(hwnd, SW_SHOW);
 
+	// Initialize ImGui
+	ImGui_ImplWin32_Init(hwnd);
+
 	// Create graphics object
 	pGraphics = std::make_unique<Graphics>(hwnd);
 }
 
 Window::~Window()
 {
+	ImGui_ImplWin32_Shutdown();
 	DestroyWindow(hwnd);
 }
 
@@ -150,6 +158,11 @@ LRESULT Window::HandleMsgThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 LRESULT Window::HandleMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+	{
+		return true;
+	}
+
 	switch (msg)
 	{
 	case WM_CLOSE:

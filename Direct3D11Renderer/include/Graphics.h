@@ -13,7 +13,7 @@ class Graphics
 {
 public:
     Graphics(HWND hwnd);
-    ~Graphics() = default;
+    ~Graphics();
     Graphics(const Graphics&) = delete;
     Graphics& operator=(const Graphics& rhs) = delete;
 

@@ -164,6 +164,7 @@
     <ClCompile Include="src\Exceptions\WindowExceptions.cpp" />
     <ClCompile Include="src\Graphics.cpp" />
     <ClCompile Include="src\Exceptions\GraphicsExceptions.cpp" />
+    <ClCompile Include="src\ImGuiManager.cpp" />
     <ClCompile Include="src\imgui\imgui.cpp" />
     <ClCompile Include="src\imgui\imgui_demo.cpp" />
     <ClCompile Include="src\imgui\imgui_draw.cpp" />
@@ -210,6 +211,7 @@
     <ClInclude Include="include\Geometry\GeometryMesh.h" />
     <ClInclude Include="include\Graphics.h" />
     <ClInclude Include="include\Exceptions\GraphicsExceptions.h" />
+    <ClInclude Include="include\ImGuiManager.h" />
     <ClInclude Include="include\imgui\imconfig.h" />
     <ClInclude Include="include\imgui\imgui.h" />
     <ClInclude Include="include\imgui\imgui_impl_dx11.h" />

@@ -2,6 +2,7 @@
 #include "Window.h"
 #include "D3Timer.h"
 #include "Renderable/Renderable.h"
+#include "ImGuiManager.h"
 #include <vector>
 #include <memory>
 
@@ -13,6 +14,7 @@ public:
 private:
 	void ProcessFrame();
 
+	ImGuiManager imgui;
 	Window wnd;
 	D3Timer timer;
 	std::vector<std::unique_ptr<class Renderable>> renderables;

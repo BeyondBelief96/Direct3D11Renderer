@@ -4,6 +4,9 @@
 #include "Renderable/Pyramid.h"
 #include "Renderable/Plane.h"
 #include "Renderable/TexturedCube.h"
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx11.h"
 
 
 Application::Application() : wnd(800, 600, L"D3DEngine")
@@ -83,6 +86,22 @@ void Application::ProcessFrame()
 		box->Update(dt);
 		box->Render(wnd.Gfx());
 	}
+
+    // ImGui 
+    ImGui_ImplDX11_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+
+    static bool show_demo_window = true;
+    if (show_demo_window)
+    {
+        ImGui::ShowDemoWindow(&show_demo_window);
+    }
+
+    ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+
 	wnd.Gfx().EndFrame();
 }
 

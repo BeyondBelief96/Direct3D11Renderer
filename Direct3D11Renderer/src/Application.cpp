@@ -79,28 +79,51 @@ int Application::Run()
 
 void Application::ProcessFrame()
 {
-	auto dt = timer.Mark() * speed_factor;
-    
-	wnd.Gfx().BeginFrame(0.07f, 0.0f, 0.12f);
+    // Store ImGui speed setting separately
+    static float ui_speed_factor = speed_factor;
 
-	for (auto& box : renderables)
-	{
-		box->Update(dt);
-		box->Render(wnd.Gfx());
-	}
+    // Check if space is pressed and update speed_factor accordingly
+    if (wnd.kbd.KeyIsPressed(VK_SPACE))
+    {
+        speed_factor = 0.0f; // Set to 0 when space is pressed
+    }
+    else
+    {
+        speed_factor = ui_speed_factor; // Restore to UI value when not pressed
+    }
+
+    auto dt = timer.Mark() * speed_factor;
+
+    wnd.Gfx().BeginFrame(0.07f, 0.0f, 0.12f);
+
+    for (auto& box : renderables)
+    {
+        box->Update(dt);
+        box->Render(wnd.Gfx());
+    }
 
     static char buffer[1024];
 
     if (ImGui::Begin("Simulation Speed"))
     {
-        ImGui::SliderFloat("Speed Factor", &speed_factor, 0.0f, 4.0f);
-		ImGui::Text("Application Average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
-			ImGui::GetIO().Framerate);
-        ImGui::InputText("Butts", buffer, sizeof(buffer));
+        // Update the UI speed factor instead of speed_factor directly
+        if (ImGui::SliderFloat("Speed Factor", &ui_speed_factor, 0.0f, 4.0f))
+        {
+            // Only update the actual speed factor if space is not pressed
+            if (!wnd.kbd.KeyIsPressed(VK_SPACE))
+            {
+                speed_factor = ui_speed_factor;
+            }
+        }
+
+        ImGui::Text("Application Average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
+            ImGui::GetIO().Framerate);
+        ImGui::Text("Status: %s", wnd.kbd.KeyIsPressed(VK_SPACE) ? "PAUSED" : "RUNNING (hold spacebar to pause)");
     }
     ImGui::End();
 
-	wnd.Gfx().EndFrame();
+    wnd.Gfx().EndFrame();
 }
+
 
 

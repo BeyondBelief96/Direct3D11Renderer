@@ -120,6 +120,61 @@ std::optional<int> Window::ProcessMessages()
 	return std::optional<int> {};
 }
 
+void Window::CaptureMouse()
+{
+	if (!mouseCaptured)
+	{
+		// Store original mouse position
+		GetCursorPos(&originalMousePos);
+
+		// Hide Cursor
+		ShowCursor(FALSE);
+
+		// Confine cursor to window
+		RECT clientRect;
+		GetClientRect(hwnd, &clientRect);
+		POINT upperLeft = { 0,0 };
+		ClientToScreen(hwnd, &upperLeft);
+
+		POINT lowerRight = { clientRect.right, clientRect.bottom };
+
+		RECT clipRect = { upperLeft.x, upperLeft.y, lowerRight.x, lowerRight.y };
+		ClipCursor(&clipRect);
+
+		// Center cursor in window
+		POINT centerPos = { width / 2, height / 2 };
+		ClientToScreen(hwnd, &centerPos);
+		SetCursorPos(centerPos.x, centerPos.y);
+
+		mouseCaptured = true;
+
+		SetCapture(hwnd);
+	}
+}
+
+void Window::ReleaseMouse()
+{
+	if (mouseCaptured)
+	{
+		// Show Cursor
+		ShowCursor(TRUE);
+		// Release cursor from window
+		ClipCursor(nullptr);
+		// Restore original mouse position
+		SetCursorPos(originalMousePos.x, originalMousePos.y);
+
+		// Release capture
+		ReleaseCapture();
+
+		mouseCaptured = false;
+	}
+}
+
+bool Window::IsMouseCaptured() const noexcept
+{
+	return mouseCaptured;
+}
+
 Graphics& Window::Gfx()
 {
 	if (!pGraphics)
@@ -208,29 +263,37 @@ LRESULT Window::HandleMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		{
 			break;
 		}
+
 		const POINTS pt = MAKEPOINTS(lParam);
-		// in client region -> log move, and log enter + capture mouse (if not previously in window)
-		if (pt.x >= 0 && pt.x < width && pt.y >= 0 && pt.y < height)
+
+		if (mouseCaptured)
 		{
-			mouse.OnMouseMove(pt.x, pt.y);
+			// When mouse is captured, calculate relative movement from center
+			int deltaX = pt.x - width / 2;
+			int deltaY = pt.y - height / 2;
+
+			// Only process if there's actual movement
+			if (deltaX != 0 || deltaY != 0)
+			{
+				// Notify mouse of movement using deltas
+				mouse.OnMouseMove(deltaX, deltaY, true);
+
+				// Reset cursor to center
+				POINT centerPos = { width / 2, height / 2 };
+				ClientToScreen(hwnd, &centerPos);
+				SetCursorPos(centerPos.x, centerPos.y);
+			}
+		}
+		else
+		{
+			// Normal mouse movement
+			mouse.OnMouseMove(pt.x, pt.y, false);
+
+			// When mouse enters the window, set capture and notify
 			if (!mouse.IsInWindow())
 			{
 				SetCapture(hwnd);
 				mouse.OnMouseEnter();
-			}
-		}
-		// not in client -> log move / maintain capture if button down
-		else
-		{
-			if (wParam & (MK_LBUTTON | MK_RBUTTON))
-			{
-				mouse.OnMouseMove(pt.x, pt.y);
-			}
-			// button up -> release capture / log event for leaving
-			else
-			{
-				ReleaseCapture();
-				mouse.OnMouseLeave();
 			}
 		}
 		break;

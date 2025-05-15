@@ -91,8 +91,11 @@ public:
 		return buffer.empty();
 	}
 	void Flush() noexcept;
+	int GetDeltaX() const noexcept;
+	int GetDeltaY() const noexcept;
+	void ClearDelta() noexcept;
 private:
-	void OnMouseMove(int x, int y) noexcept;
+	void OnMouseMove(int x, int y, bool relative) noexcept;
 	void OnMouseLeave() noexcept;
 	void OnMouseEnter() noexcept;
 	void OnLeftPressed(int x, int y) noexcept;
@@ -107,6 +110,8 @@ private:
 	static constexpr unsigned int bufferSize = 16u;
 	int x;
 	int y;
+	int deltaX;
+	int deltaY;
 	bool leftIsPressed = false;
 	bool rightIsPressed = false;
 	bool isInWindow = false;

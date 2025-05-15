@@ -20,8 +20,14 @@ public:
     void BeginFrame(float red, float green, float blue);
     void EndFrame();
     void DrawIndexed(UINT count) noexcept(!_DEBUG);
+
     DirectX::XMMATRIX GetProjection() const noexcept;
     void SetProjection(DirectX::FXMMATRIX proj) noexcept;
+
+	DirectX::XMMATRIX GetView() const noexcept;
+	void SetView(DirectX::FXMMATRIX cam) noexcept;
+
+    DirectX::XMMATRIX GetViewProjection() const noexcept;
 
     void EnableImgui() noexcept;
 	void DisableImgui() noexcept;
@@ -38,6 +44,7 @@ private:
     int viewportWidth;
 	int viewportHeight;
     DirectX::XMMATRIX projection;
+    DirectX::XMMATRIX view;
 #ifdef _DEBUG
     DxgiInfoManager infoManager;
 #endif

@@ -2,7 +2,7 @@
 #include "Mouse.h"
 #include "ChiliWin.h"
 
-Mouse::Mouse() : x(0), y(0)
+Mouse::Mouse() : x(0), y(0), deltaX(0), deltaY(0)
 {
 }
 
@@ -55,11 +55,30 @@ void Mouse::Flush() noexcept
 	buffer = std::queue<Event>();
 }
 
-void Mouse::OnMouseMove(int newx, int newy) noexcept
+void Mouse::ClearDelta() noexcept
 {
-	x = newx;
-	y = newy;
+	deltaX = 0;
+	deltaY = 0;
+}
 
+void Mouse::OnMouseMove(int newx, int newy, bool relative) noexcept
+{
+	if (relative)
+	{
+		// For relative movement (when mouse is captured)
+		deltaX = newx;
+		deltaY = newy;
+	}
+	else
+	{
+		// For absolute movement
+		deltaX = newx - x;
+		deltaY = newy - y;
+		x = newx;
+		y = newy;
+	}
+
+	// Push event to queue
 	buffer.push(Mouse::Event(Mouse::Event::Type::Move, *this));
 	TrimBuffer();
 }
@@ -144,4 +163,14 @@ void Mouse::OnWheelDelta(int x, int y, int delta) noexcept
 		wheelDeltaCarry += WHEEL_DELTA;
 		OnWheelDown(x, y);
 	}
+}
+
+int Mouse::GetDeltaX() const noexcept
+{
+	return deltaX;
+}
+
+int Mouse::GetDeltaY() const noexcept
+{
+	return deltaY;
 }

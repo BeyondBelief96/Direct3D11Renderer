@@ -3,6 +3,8 @@
 #include "D3Timer.h"
 #include "Renderable/Renderable.h"
 #include "ImGuiManager.h"
+#include "Camera/FixedCamera.h"
+#include "Camera/FreeFlyCamera.h"
 #include <vector>
 #include <memory>
 
@@ -15,6 +17,8 @@ private:
 	void ProcessFrame();
 
 	ImGuiManager imgui;
+	//FixedCamera camera;
+	FreeFlyCamera freeCamera;
 	Window wnd;
 	D3Timer timer;
 	float speed_factor = 1.0f;

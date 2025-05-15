@@ -1,7 +1,7 @@
 
 cbuffer cbuf
 {
-    matrix transform;
+    matrix modelViewProj;
 };
 
 struct VSOut
@@ -13,7 +13,7 @@ struct VSOut
 VSOut main(float3 pos : POSITION, float2 texCoord : TEXCOORD)
 {
     VSOut vso;
-    vso.position = mul(float4(pos, 1.0f), transform);
+    vso.position = mul(float4(pos, 1.0f), modelViewProj);
     vso.texCoord = texCoord;
     return vso;
 }

@@ -9,7 +9,9 @@
 #include "imgui_impl_dx11.h"
 
 
-Application::Application() : wnd(1920, 1080, L"D3DEngine")
+Application::Application() 
+    : wnd(1920, 1080, L"D3DEngine"),
+    freeCamera({ 0.0f, 0.0f, -5.0f })
 {
 	std::mt19937 rng(std::random_device{}());
 	std::uniform_real_distribution<float> adist(0.0f, 3.1415f * 2.0f);
@@ -61,7 +63,7 @@ Application::Application() : wnd(1920, 1080, L"D3DEngine")
             1 + i                     // Divisions Y
         ));
     }
-	wnd.Gfx().SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
+	wnd.Gfx().SetProjection(freeCamera.GetProjectionMatrix(45.0f, 16.0f/9.0f, 0.5f, 100.0f));
 }
 
 int Application::Run()
@@ -92,13 +94,17 @@ void Application::ProcessFrame()
         speed_factor = ui_speed_factor; // Restore to UI value when not pressed
     }
 
-    auto dt = timer.Mark() * speed_factor;
+    auto dt = timer.Mark();
 
+    freeCamera.ProcessInput(wnd, wnd.mouse, wnd.kbd, dt);
+
+    wnd.Gfx().SetView(freeCamera.GetViewMatrix());
     wnd.Gfx().BeginFrame(0.07f, 0.0f, 0.12f);
+
 
     for (auto& box : renderables)
     {
-        box->Update(dt);
+        box->Update(dt * speed_factor);
         box->Render(wnd.Gfx());
     }
 
@@ -120,6 +126,7 @@ void Application::ProcessFrame()
             ImGui::GetIO().Framerate);
         ImGui::Text("Status: %s", wnd.kbd.KeyIsPressed(VK_SPACE) ? "PAUSED" : "RUNNING (hold spacebar to pause)");
     }
+    //camera.SpawnControlWindow();
     ImGui::End();
 
     wnd.Gfx().EndFrame();

@@ -33,6 +33,10 @@ public:
 	Window& operator=(const Window&) = delete;
 	void SetTitle(const WCHAR* title);
 	static std::optional<int> ProcessMessages();
+
+	void CaptureMouse();
+	void ReleaseMouse();
+	bool IsMouseCaptured() const noexcept;
 	Graphics& Gfx();
 
 	Keyboard kbd;
@@ -45,5 +49,7 @@ private:
 	int width;
 	int height;
 	HWND hwnd;
+	bool mouseCaptured = false;
+	POINT originalMousePos = {};
 	std::unique_ptr<Graphics> pGraphics;
 };

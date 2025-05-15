@@ -13,6 +13,7 @@ namespace DX = DirectX;
 
 Graphics::Graphics(HWND hwnd, int width, int height) 
     : projection(DX::XMMatrixIdentity()),
+    view(DX::XMMatrixIdentity()),
 	viewportWidth(width),
 	viewportHeight(height)
 {
@@ -98,8 +99,8 @@ Graphics::Graphics(HWND hwnd, int width, int height)
 
     // configure viewport
     D3D11_VIEWPORT vp;
-    vp.Width = viewportWidth;
-    vp.Height = viewportHeight;
+    vp.Width = (float)viewportWidth;
+    vp.Height = (float)viewportHeight;
     vp.MinDepth = 0.0f;
     vp.MaxDepth = 1.0f;
     vp.TopLeftX = 0.0f;
@@ -171,6 +172,21 @@ DX::XMMATRIX Graphics::GetProjection() const noexcept
 void Graphics::SetProjection(DirectX::FXMMATRIX proj) noexcept
 {
 	projection = proj;
+}
+
+DirectX::XMMATRIX Graphics::GetView() const noexcept
+{
+    return view;
+}
+
+void Graphics::SetView(DirectX::FXMMATRIX cam) noexcept
+{
+    view = cam;
+}
+
+DirectX::XMMATRIX Graphics::GetViewProjection() const noexcept
+{
+    return view * projection;
 }
 
 void Graphics::EnableImgui() noexcept

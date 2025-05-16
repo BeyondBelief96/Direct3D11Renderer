@@ -11,17 +11,7 @@ Plane::Plane(
     float height,
     int divisionsX,
     int divisionsY
-)
-    : r(rdist(rng)),
-    droll(ddist(rng)),
-    dpitch(ddist(rng)),
-    dyaw(ddist(rng)),
-    dphi(odist(rng)),
-    dtheta(odist(rng)),
-    dchi(odist(rng)),
-    chi(adist(rng)),
-    theta(adist(rng)),
-    phi(adist(rng))
+) :RenderableTestObject(rng, adist, ddist, odist, rdist)
 {
     // Create a plane with texture coordinates
     auto planeMesh = GeometryFactory::CreatePlane<VertexPositionTexture>(width, height, divisionsX, divisionsY);
@@ -60,16 +50,6 @@ Plane::Plane(
 
     // Create the transform constant buffer
     AddUniqueBindable(std::make_unique<TransformConstantBuffer>(gfx, *this));
-}
-
-void Plane::Update(float dt) noexcept
-{
-    roll += droll * dt;
-    pitch += dpitch * dt;
-    yaw += dyaw * dt;
-    theta += dtheta * dt;
-    phi += dphi * dt;
-    chi += dchi * dt;
 }
 
 DirectX::XMMATRIX Plane::GetTransformXM() const noexcept

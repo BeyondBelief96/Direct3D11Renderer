@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "Renderable/Cube.h"
+#include "Renderable/Sphere.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
@@ -41,6 +42,7 @@ Application::Application()
             rdist,
             bdist,
             materialColor);
+
 
         renderables.push_back(std::move(cube));
     }

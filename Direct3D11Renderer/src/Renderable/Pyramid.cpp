@@ -10,17 +10,7 @@ Pyramid::Pyramid(
     float radius,
     float height,
     int sides
-)
-    : r(rdist(rng)),
-    droll(ddist(rng)),
-    dpitch(ddist(rng)),
-    dyaw(ddist(rng)),
-    dphi(odist(rng)),
-    dtheta(odist(rng)),
-    dchi(odist(rng)),
-    chi(adist(rng)),
-    theta(adist(rng)),
-    phi(adist(rng))
+) : RenderableTestObject(rng, adist, ddist, odist, rdist)
 {
     // Create a prism mesh (we'll use this for our pyramid by transforming it)
     auto prismMesh = GeometryFactory::CreatePrism<VertexPosition>(radius, height, sides);
@@ -84,16 +74,6 @@ Pyramid::Pyramid(
 
     // Add the pixel shader constant buffer
     AddUniqueBindable(std::make_unique<PixelConstantBuffer<PixelShaderConstants>>(gfx, cb));
-}
-
-void Pyramid::Update(float dt) noexcept
-{
-    roll += droll * dt;
-    pitch += dpitch * dt;
-    yaw += dyaw * dt;
-    theta += dtheta * dt;
-    phi += dphi * dt;
-    chi += dchi * dt;
 }
 
 DirectX::XMMATRIX Pyramid::GetTransformXM() const noexcept

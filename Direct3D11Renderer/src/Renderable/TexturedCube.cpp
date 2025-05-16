@@ -9,19 +9,7 @@ TexturedCube::TexturedCube(
     std::uniform_real_distribution<float>& odist,
     std::uniform_real_distribution<float>& rdist,
     float size, const std::wstring& textureFilename)
-    : r(rdist(rng)),
-    roll(ddist(rng)),
-    pitch(ddist(rng)),
-    yaw(ddist(rng)),
-    theta(odist(rng)),
-    phi(odist(rng)),
-    chi(odist(rng)),
-    droll(adist(rng)),
-    dpitch(adist(rng)),
-    dyaw(adist(rng)),
-    dtheta(adist(rng)),
-    dphi(adist(rng)),
-    dchi(adist(rng))
+	: RenderableTestObject(rng, adist, ddist, odist, rdist)
 {
     // Create a cube mesh with texture coordinates
     auto cubeMesh = GeometryFactory::CreateTexturedCube<VertexPositionTexture>(size);
@@ -57,16 +45,6 @@ TexturedCube::TexturedCube(
 
     // Transform Constant Buffer
 	AddUniqueBindable(std::make_unique<TransformConstantBuffer>(gfx, *this));
-}
-
-void TexturedCube::Update(float dt) noexcept
-{
-    roll += droll * dt;
-    pitch += dpitch * dt;
-    yaw += dyaw * dt;
-    theta += dtheta * dt;
-    phi += dphi * dt;
-    chi += dchi * dt;
 }
 
 DirectX::XMMATRIX TexturedCube::GetTransformXM() const noexcept

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Renderable.h"
+#include "RenderableTestObject.h"
 #include "Geometry/GeometryFactory.h"
 #include <random>
 #include <DirectXMath.h>
 
-class TexturedCube : public Renderable
+class TexturedCube : public RenderableTestObject
 {
 public:
     TexturedCube(
@@ -19,23 +19,5 @@ public:
         const std::wstring& textureFilename = L""
     );
 
-    void Update(float dt) noexcept override;
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
-private:
-    // Positional
-    float r;
-    float roll = 0.0f;
-    float pitch = 0.0f;
-    float yaw = 0.0f;
-    float theta;
-    float phi;
-    float chi;
-
-    // Speed (delta/s)
-    float droll;
-    float dpitch;
-    float dyaw;
-    float dtheta;
-    float dphi;
-    float dchi;
 };

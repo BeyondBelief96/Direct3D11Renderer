@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Renderable.h"
+#include "RenderableTestObject.h"
 
 class SolidSphere : public Renderable
 {

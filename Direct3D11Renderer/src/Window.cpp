@@ -3,7 +3,7 @@
 #include "Exceptions/WindowExceptions.h"
 #include <sstream>
 #include "resource.h"
-#include "imgui_impl_win32.h"
+#include "imgui/imgui_impl_win32.h"
 
 // Forward declaration of the ImGui_ImplWin32_WndProcHandler function
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

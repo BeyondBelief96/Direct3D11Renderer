@@ -1,16 +1,7 @@
 #include "Renderable/Sphere.h"
 
 Sphere::Sphere(Graphics& gfx, std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist, float radius, int tessellation)
-	: r(rdist(rng)), 
-    droll(ddist(rng)),
-    dpitch(ddist(rng)),
-    dyaw(ddist(rng)),
-    dphi(odist(rng)),
-    dtheta(odist(rng)),
-    dchi(odist(rng)),
-    chi(adist(rng)),
-    theta(adist(rng)),
-    phi(adist(rng))
+	: RenderableTestObject(rng, adist, ddist, odist, rdist)
 {
 	// Create a sphere mesh
     auto sphereMesh = GeometryFactory::CreateSphere<VertexPosition>(radius, tessellation);
@@ -66,17 +57,6 @@ Sphere::Sphere(Graphics& gfx, std::mt19937& rng, std::uniform_real_distribution<
 
 	// Add the pixel shader constant buffer
     AddUniqueBindable(std::make_unique<PixelConstantBuffer<PixelShaderConstants>>(gfx, cb));
-
-}
-
-void Sphere::Update(float dt) noexcept
-{
-    roll += droll * dt;
-    pitch += dpitch * dt;
-    yaw += dyaw * dt;
-    theta += dtheta * dt;
-    phi += dphi * dt;
-    chi += dchi * dt;
 }
 
 DirectX::XMMATRIX Sphere::GetTransformXM() const noexcept

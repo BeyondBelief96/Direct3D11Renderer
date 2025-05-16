@@ -45,6 +45,121 @@ public:
 	}
 
     template<typename VertexType>
+    static GeometryMesh<VertexType> CreateIndependentCube(float size = 1.0f)
+    {
+        const float halfSize = size / 2.0f;
+
+        // Create 24 vertices (4 for each of the 6 faces)
+        std::vector<VertexType> vertices(24);
+
+        // Near side (negative Z)
+        vertices[0].position = { -halfSize, -halfSize, -halfSize }; // bottom-left
+        vertices[1].position = { halfSize, -halfSize, -halfSize };  // bottom-right
+        vertices[2].position = { -halfSize, halfSize, -halfSize };  // top-left
+        vertices[3].position = { halfSize, halfSize, -halfSize };   // top-right
+
+        // Far side (positive Z)
+        vertices[4].position = { -halfSize, -halfSize, halfSize };  // bottom-left
+        vertices[5].position = { halfSize, -halfSize, halfSize };   // bottom-right
+        vertices[6].position = { -halfSize, halfSize, halfSize };   // top-left
+        vertices[7].position = { halfSize, halfSize, halfSize };    // top-right
+
+        // Left side (negative X)
+        vertices[8].position = { -halfSize, -halfSize, -halfSize }; // bottom-near
+        vertices[9].position = { -halfSize, halfSize, -halfSize };  // top-near
+        vertices[10].position = { -halfSize, -halfSize, halfSize }; // bottom-far
+        vertices[11].position = { -halfSize, halfSize, halfSize };  // top-far
+
+        // Right side (positive X)
+        vertices[12].position = { halfSize, -halfSize, -halfSize }; // bottom-near
+        vertices[13].position = { halfSize, halfSize, -halfSize };  // top-near
+        vertices[14].position = { halfSize, -halfSize, halfSize };  // bottom-far
+        vertices[15].position = { halfSize, halfSize, halfSize };   // top-far
+
+        // Bottom side (negative Y)
+        vertices[16].position = { -halfSize, -halfSize, -halfSize }; // left-near
+        vertices[17].position = { halfSize, -halfSize, -halfSize };  // right-near
+        vertices[18].position = { -halfSize, -halfSize, halfSize };  // left-far
+        vertices[19].position = { halfSize, -halfSize, halfSize };   // right-far
+
+        // Top side (positive Y)
+        vertices[20].position = { -halfSize, halfSize, -halfSize }; // left-near
+        vertices[21].position = { halfSize, halfSize, -halfSize };  // right-near
+        vertices[22].position = { -halfSize, halfSize, halfSize };  // left-far
+        vertices[23].position = { halfSize, halfSize, halfSize };   // right-far
+
+        // Add per-face normals if the vertex type supports it
+        if constexpr (has_normal_member<VertexType>::value) {
+            // Near face (negative Z)
+            for (int i = 0; i < 4; i++) {
+                vertices[i].normal = { 0.0f, 0.0f, -1.0f };
+            }
+
+            // Far face (positive Z)
+            for (int i = 4; i < 8; i++) {
+                vertices[i].normal = { 0.0f, 0.0f, 1.0f };
+            }
+
+            // Left face (negative X)
+            for (int i = 8; i < 12; i++) {
+                vertices[i].normal = { -1.0f, 0.0f, 0.0f };
+            }
+
+            // Right face (positive X)
+            for (int i = 12; i < 16; i++) {
+                vertices[i].normal = { 1.0f, 0.0f, 0.0f };
+            }
+
+            // Bottom face (negative Y)
+            for (int i = 16; i < 20; i++) {
+                vertices[i].normal = { 0.0f, -1.0f, 0.0f };
+            }
+
+            // Top face (positive Y)
+            for (int i = 20; i < 24; i++) {
+                vertices[i].normal = { 0.0f, 1.0f, 0.0f };
+            }
+        }
+
+        // Add texture coordinates if the vertex type supports them
+        if constexpr (has_texcoord_member<VertexType>::value) {
+            // For each face, define texture coordinates
+            // Bottom-left, bottom-right, top-left, top-right
+            const DirectX::XMFLOAT2 texCoords[4] = {
+                { 0.0f, 1.0f }, // Bottom-left
+                { 1.0f, 1.0f }, // Bottom-right
+                { 0.0f, 0.0f }, // Top-left
+                { 1.0f, 0.0f }  // Top-right
+            };
+
+            // Apply the texture coordinates to each face
+            for (int face = 0; face < 6; face++) {
+                for (int i = 0; i < 4; i++) {
+                    vertices[face * 4 + i].texCoord = texCoords[i];
+                }
+            }
+        }
+
+        // Define indices for all faces (2 triangles per face)
+        std::vector<unsigned short> indices = {
+            // Near face (negative Z)
+            0, 2, 1,    2, 3, 1,
+            // Far face (positive Z)
+            4, 5, 7,    4, 7, 6,
+            // Left face (negative X)
+            8, 10, 9,   10, 11, 9,
+            // Right face (positive X)
+            12, 13, 15, 12, 15, 14,
+            // Bottom face (negative Y)
+            16, 17, 18, 18, 17, 19,
+            // Top face (positive Y)
+            20, 23, 21, 20, 22, 23
+        };
+
+        return GeometryMesh<VertexType>(std::move(vertices), std::move(indices));
+    }
+
+    template<typename VertexType>
     static GeometryMesh<VertexType> CreateTexturedCube(float size = 1.0f)
     {
         const float halfSize = size / 2.0f;

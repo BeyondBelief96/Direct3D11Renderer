@@ -5,6 +5,7 @@
 #include "ImGuiManager.h"
 #include "Camera/FixedCamera.h"
 #include "Camera/FreeFlyCamera.h"
+#include "Lights/PointLight.h"
 #include <vector>
 #include <memory>
 
@@ -22,5 +23,6 @@ private:
 	Window wnd;
 	D3Timer timer;
 	float speed_factor = 1.0f;
+	PointLight light;
 	std::vector<std::unique_ptr<class Renderable>> renderables;
 };

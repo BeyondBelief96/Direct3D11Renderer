@@ -9,6 +9,12 @@ public:
 	TransformConstantBuffer(Graphics& gfx, const Renderable& parent);
 	void Bind(Graphics& gfx) noexcept override;
 private:
-	static std::unique_ptr<VertexConstantBuffer<DirectX::XMMATRIX>> pVertexConstantBuffer;
+	// Transform buffer
+	struct TransformBuffer
+	{
+		DirectX::XMMATRIX modelViewProj;
+		DirectX::XMMATRIX model;
+	};
+	static std::unique_ptr<VertexConstantBuffer<TransformBuffer>> pVertexConstantBuffer;
 	const Renderable& parent;
 };

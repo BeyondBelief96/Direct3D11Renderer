@@ -138,6 +138,12 @@
     <ClCompile Include="src\Camera\FreeFlyCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Lights\PointLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderable\SolidSphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ChiliWin.h">
@@ -287,6 +293,12 @@
     <ClInclude Include="include\Camera\FreeFlyCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Lights\PointLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderable\SolidSphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Direct3D11Renderer.rc">
@@ -313,5 +325,7 @@
     <FxCompile Include="shaders\TexturePS.hlsl" />
     <FxCompile Include="shaders\PhongVS.hlsl" />
     <FxCompile Include="shaders\PhongPS.hlsl" />
+    <FxCompile Include="shaders\SolidVS.hlsl" />
+    <FxCompile Include="shaders\SolidPS.hlsl" />
   </ItemGroup>
 </Project>

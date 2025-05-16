@@ -23,15 +23,14 @@ Cube::Cube(Graphics& gfx,
 	theta(adist(rng)),
 	phi(adist(rng))
 {
-	auto cubeMesh = GeometryFactory::CreateCube<VertexPosition>();
-	cubeMesh.SetFlatNormals();
+	auto cubeMesh = GeometryFactory::CreateIndependentCube<VertexPositionNormal>();
 
 	// Vertex Shader - shared
-	auto vs = AddSharedBindable<VertexShader>(gfx, "box_vs", L"VertexShader.cso");
+	auto vs = AddSharedBindable<VertexShader>(gfx, "box_vs", L"PhongVS.cso");
 	auto pvsbc = vs->GetByteCode();
 
 	// Pixel Shader - shared
-	AddSharedBindable<PixelShader>(gfx, "box_ps", L"PixelShader.cso");
+	AddSharedBindable<PixelShader>(gfx, "box_ps", L"PhongPS.cso");
 
 	// Vertex Buffer - shared
 	AddSharedBindable<VertexBuffer>(gfx, "box_vb", cubeMesh.vertices);
@@ -42,27 +41,17 @@ Cube::Cube(Graphics& gfx,
 	// Input Layout - shared
 	const std::vector<D3D11_INPUT_ELEMENT_DESC> layout =
 	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "Normal", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	AddSharedBindable<InputLayout>(gfx, "box_input", layout, pvsbc);
 
-	// Color buffer - shared (all boxes use same colors)
-	struct ConstantBuffer2
+	/*struct PSLightConstants
 	{
-		struct { float r, g, b, a; } face_colors[6];
+		DirectX::XMVECTOR lightPos;
 	};
-	const ConstantBuffer2 cb2 =
-	{
-		{
-			{ 1.0f,0.0f,1.0f },
-			{ 1.0f,0.0f,0.0f },
-			{ 0.0f,1.0f,0.0f },
-			{ 0.0f,0.0f,1.0f },
-			{ 1.0f,1.0f,0.0f },
-			{ 0.0f,1.0f,1.0f },
-		}
-	};
-	AddSharedBindable<PixelConstantBuffer<ConstantBuffer2>>(gfx, "box_color", cb2);
+
+	AddSharedBindable<PixelConstantBuffer<PSLightConstants>>(gfx, "light");*/
 
 	// Topology - shared
 	AddSharedBindable<Topology>(gfx, "triangle_list", D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

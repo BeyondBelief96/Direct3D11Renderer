@@ -9,6 +9,12 @@ struct VertexPosition
 	DirectX::XMFLOAT3 position;
 };
 
+struct VertexPositionNormal
+{
+	DirectX::XMFLOAT3 position;
+	DirectX::XMFLOAT3 normal;
+};
+
 struct VertexPositionTexture
 {
 	DirectX::XMFLOAT3 position;
@@ -63,7 +69,7 @@ public:
 		}
 	}
 
-    void SetFlatNormals() noexcept
+    void SetFlatNormals() noexcept(!_DEBUG)
     {
         if constexpr (has_normal_member<VertexType>::value)
         {
@@ -84,12 +90,9 @@ public:
                 const auto n = XMVector3Normalize(XMVector3Cross((p1 - p0), (p2 - p0)));
 
                 // Store the same normal for all three vertices
-                XMFLOAT3 normalFloat;
-                XMStoreFloat3(&normalFloat, n);
-
-                v0.normal = normalFloat;
-                v1.normal = normalFloat;
-                v2.normal = normalFloat;
+				XMStoreFloat3(&v0.normal, n);
+				XMStoreFloat3(&v1.normal, n);
+				XMStoreFloat3(&v2.normal, n);
             }
         }
     }

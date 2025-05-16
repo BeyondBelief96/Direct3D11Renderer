@@ -15,10 +15,16 @@ public:
 private:
 	struct PointLightConstantBuffer
 	{
-		DirectX::XMFLOAT3 lightPos;
-		float padding;
+		alignas(16)DirectX::XMFLOAT3 lightPos;
+		alignas(16)DirectX::XMFLOAT3 materialColor;
+		alignas(16)DirectX::XMFLOAT3 ambientColor;
+		alignas(16)DirectX::XMFLOAT3 diffuseColor;
+		float diffuseIntensity;
+		float attConstant;
+		float attLinear;
+		float attQuadratic;
 	};
-	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
+	PointLightConstantBuffer lightConstantBuffer;
 	mutable SolidSphere mesh;
 	mutable PixelConstantBuffer<PointLightConstantBuffer> lightPosCBuf;
 };

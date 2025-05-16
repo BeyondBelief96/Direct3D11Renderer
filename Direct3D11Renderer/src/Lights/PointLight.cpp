@@ -5,7 +5,7 @@ PointLight::PointLight(Graphics& gfx, float radius) :
 	mesh(gfx, radius),
 	lightPosCBuf(gfx)
 {
-	
+	Reset();
 }
 
 void PointLight::SpawnControlWindow() noexcept
@@ -13,9 +13,21 @@ void PointLight::SpawnControlWindow() noexcept
 	if (ImGui::Begin("Light"))
 	{
 		ImGui::Text("Position");
-		ImGui::SliderFloat("X", &position.x, -60.0f, 60.0f, "%.1f");
-		ImGui::SliderFloat("Y", &position.y, -60.0f, 60.0f, "%.1f");
-		ImGui::SliderFloat("Z", &position.z, -60.0f, 60.0f, "%.1f");
+		ImGui::SliderFloat("X", &lightConstantBuffer.lightPos.x, -60.0f, 60.0f, "%.1f");
+		ImGui::SliderFloat("Y", &lightConstantBuffer.lightPos.y, -60.0f, 60.0f, "%.1f");
+		ImGui::SliderFloat("Z", &lightConstantBuffer.lightPos.z, -60.0f, 60.0f, "%.1f");
+
+		ImGui::Text("Intensity/Color");
+		ImGui::SliderFloat("Intensity", &lightConstantBuffer.diffuseIntensity, 0.01f, 2.0f, "%.2f");
+		ImGui::ColorEdit3("Diffuse Color", &lightConstantBuffer.diffuseColor.x);
+		ImGui::ColorEdit3("Ambient", &lightConstantBuffer.ambientColor.x);
+		ImGui::ColorEdit3("Material Color", &lightConstantBuffer.materialColor.x);
+
+		ImGui::Text("Falloff");
+		ImGui::SliderFloat("Constant", &lightConstantBuffer.attConstant, 0.05f, 10.0f, "%.2f");
+		ImGui::SliderFloat("Linear", &lightConstantBuffer.attLinear, 0.0001f, 4.0f, "%.4f", ImGuiSliderFlags_Logarithmic);
+		ImGui::SliderFloat("Quadratic", &lightConstantBuffer.attQuadratic, 0.0000001f, 10.0f, "%.7f", ImGuiSliderFlags_Logarithmic);
+
 		if (ImGui::Button("Reset"))
 		{
 			Reset();
@@ -26,17 +38,30 @@ void PointLight::SpawnControlWindow() noexcept
 
 void PointLight::Reset() noexcept
 {
-	position = { 0.0f, 0.0f, 0.0f };
-}
-
-void PointLight::Render(Graphics& gfx) const noexcept(!_DEBUG)
-{
-	mesh.SetPosition(position);
-	mesh.Render(gfx);
+	lightConstantBuffer =
+	{
+		{0.0f, 0.0f, 0.0f},
+		{0.7f, 0.7f, 0.9f},
+		{0.05f, 0.05f, 0.05f},
+		{1.0f, 1.0f, 1.0f },
+		1.0f,
+		1.0f,
+		0.045f,
+		0.0075f
+	};
 }
 
 void PointLight::Bind(Graphics& gfx) const noexcept
 {
-	lightPosCBuf.Update(gfx, PointLightConstantBuffer{ position });
+	// Updates the constant buffer with the current light position
+	lightPosCBuf.Update(gfx, PointLightConstantBuffer{ lightConstantBuffer });
+
+	// Bind the constant buffer to the pixel shader
 	lightPosCBuf.Bind(gfx);
+}
+
+void PointLight::Render(Graphics& gfx) const noexcept(!_DEBUG)
+{
+	mesh.SetPosition(lightConstantBuffer.lightPos);
+	mesh.Render(gfx);
 }

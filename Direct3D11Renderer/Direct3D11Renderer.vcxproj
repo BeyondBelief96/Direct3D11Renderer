@@ -71,10 +71,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\Renderable;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\Geometry;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\Exceptions;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\Bindable;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\imgui;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include/**;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\Renderable;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\Geometry;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\Exceptions;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\Bindable;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include\imgui;C:\Users\brand\Code\graphics\Direct3D11Renderer\Direct3D11Renderer\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include/**;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -182,6 +182,7 @@
     <ClCompile Include="src\Renderable\Plane.cpp" />
     <ClCompile Include="src\Renderable\Pyramid.cpp" />
     <ClCompile Include="src\Renderable\Renderable.cpp" />
+    <ClCompile Include="src\Renderable\RenderableTestObject.cpp" />
     <ClCompile Include="src\Renderable\SolidSphere.cpp" />
     <ClCompile Include="src\Renderable\Sphere.cpp" />
     <ClCompile Include="src\Renderable\TexturedCube.cpp" />
@@ -233,6 +234,7 @@
     <ClInclude Include="include\Renderable\Plane.h" />
     <ClInclude Include="include\Renderable\Pyramid.h" />
     <ClInclude Include="include\Renderable\Renderable.h" />
+    <ClInclude Include="include\Renderable\RenderableTestObject.h" />
     <ClInclude Include="include\Renderable\SolidSphere.h" />
     <ClInclude Include="include\Renderable\Sphere.h" />
     <ClInclude Include="include\Renderable\TexturedCube.h" />

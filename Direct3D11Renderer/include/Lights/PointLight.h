@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Graphics.h"
-#include "SolidSphere.h"
-#include "ConstantBuffer.h"
+#include "Renderable/SolidSphere.h"
+#include "Bindable/ConstantBuffer.h"
 
 class PointLight
 {

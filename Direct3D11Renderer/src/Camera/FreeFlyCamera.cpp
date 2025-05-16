@@ -161,11 +161,11 @@ void FreeFlyCamera::ProcessInput(Window& wnd, Mouse& mouse, const Keyboard& keyb
 		const auto e = mouse.Read();
 		if (e.GetType() == Mouse::Event::Type::WheelUp)
 		{
-			UpdateZoom(-1.0f);
+			UpdateZoom(-0.05f);
 		}
 		else if (e.GetType() == Mouse::Event::Type::WheelDown)
 		{
-			UpdateZoom(1.0f);
+			UpdateZoom(0.05f);
 		}
 	}
 }

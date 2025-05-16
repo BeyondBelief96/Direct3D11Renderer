@@ -1,8 +1,8 @@
 #include "Application.h"
 #include "Renderable/Cube.h"
-#include "imgui.h"
-#include "imgui_impl_win32.h"
-#include "imgui_impl_dx11.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_win32.h"
+#include "imgui/imgui_impl_dx11.h"
 
 
 Application::Application()
@@ -79,6 +79,7 @@ void Application::ProcessFrame()
 
     freeCamera.ProcessInput(wnd, wnd.mouse, wnd.kbd, dt);
 
+    wnd.Gfx().SetProjection(freeCamera.GetProjectionMatrix(45.0f, 16.0f / 9.0f, 0.5f, 100.0f));
     wnd.Gfx().SetView(freeCamera.GetViewMatrix());
     wnd.Gfx().BeginFrame(0.07f, 0.0f, 0.12f);
     light.Bind(wnd.Gfx());

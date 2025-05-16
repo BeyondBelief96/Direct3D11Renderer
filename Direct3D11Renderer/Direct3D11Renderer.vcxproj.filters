@@ -311,5 +311,7 @@
     <FxCompile Include="shaders\ColorIndexPS.hlsl" />
     <FxCompile Include="shaders\TextureVS.hlsl" />
     <FxCompile Include="shaders\TexturePS.hlsl" />
+    <FxCompile Include="shaders\PhongVS.hlsl" />
+    <FxCompile Include="shaders\PhongPS.hlsl" />
   </ItemGroup>
 </Project>

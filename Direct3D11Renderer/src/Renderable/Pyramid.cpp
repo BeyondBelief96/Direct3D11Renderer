@@ -24,7 +24,7 @@ Pyramid::Pyramid(
 {
     // Create a prism mesh (we'll use this for our pyramid by transforming it)
     auto prismMesh = GeometryFactory::CreatePrism<VertexPosition>(radius, height, sides);
-
+    prismMesh.SetFlatNormals();
     // Transform the prism into a pyramid by adjusting the vertices
     // We'll set the top cap vertices to a single point
     const float halfHeight = height / 2.0f;

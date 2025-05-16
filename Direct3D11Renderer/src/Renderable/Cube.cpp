@@ -24,6 +24,7 @@ Cube::Cube(Graphics& gfx,
 	phi(adist(rng))
 {
 	auto cubeMesh = GeometryFactory::CreateCube<VertexPosition>();
+	cubeMesh.SetFlatNormals();
 
 	// Vertex Shader - shared
 	auto vs = AddSharedBindable<VertexShader>(gfx, "box_vs", L"VertexShader.cso");

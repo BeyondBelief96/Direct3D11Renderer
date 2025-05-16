@@ -25,7 +25,7 @@ TexturedCube::TexturedCube(
 {
     // Create a cube mesh with texture coordinates
     auto cubeMesh = GeometryFactory::CreateTexturedCube<VertexPositionTexture>(size);
-
+    cubeMesh.SetFlatNormals();
     // Vertex Shader
     auto vertexShader = AddSharedBindable<VertexShader>(gfx, "textured_vs", L"TextureVS.cso");
     auto vertexShaderByteCode = vertexShader->GetByteCode();

@@ -14,7 +14,7 @@ Sphere::Sphere(Graphics& gfx, std::mt19937& rng, std::uniform_real_distribution<
 {
 	// Create a sphere mesh
     auto sphereMesh = GeometryFactory::CreateSphere<VertexPosition>(radius, tessellation);
-    
+	sphereMesh.SetFlatNormals();
     // Bind vertex shader
     auto vs = AddSharedBindable<VertexShader>(gfx, "vs_sphere", L"ColorIndexVS.cso");
     auto pvs = vs->GetByteCode();

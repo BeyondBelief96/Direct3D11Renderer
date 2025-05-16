@@ -436,22 +436,4 @@ public:
 
         return GeometryMesh<VertexType>(std::move(vertices), std::move(indices));
     }
-
-    // Helper type traits to check for vertex members
-    template <typename T, typename = void>
-    struct has_texcoord_member : std::false_type {};
-
-    template <typename T>
-    struct has_texcoord_member<T,
-        std::void_t<decltype(std::declval<T>().texCoord)>>
-        : std::true_type {};
-
-    // Helper to check if a vertex type has a normal member
-    template <typename T, typename = void>
-    struct has_normal_member : std::false_type {};
-
-    template <typename T>
-    struct has_normal_member<T,
-        std::void_t<decltype(std::declval<T>().normal)>>
-        : std::true_type {};
 };

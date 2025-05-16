@@ -25,7 +25,7 @@ Plane::Plane(
 {
     // Create a plane with texture coordinates
     auto planeMesh = GeometryFactory::CreatePlane<VertexPositionTexture>(width, height, divisionsX, divisionsY);
-
+    planeMesh.SetFlatNormals();
     // Add Texture
     AddSharedBindable<Texture>(gfx, "kappa_texture", L"assets/kappa50.png");
 

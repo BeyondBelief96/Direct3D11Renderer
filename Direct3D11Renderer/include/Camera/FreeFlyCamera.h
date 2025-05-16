@@ -20,7 +20,7 @@ class FreeFlyCamera
 {
 public:
     // Constants
-    static constexpr float DEFAULT_YAW = -90.0f;
+    static constexpr float DEFAULT_YAW = 90.0f;
     static constexpr float DEFAULT_PITCH_VALUE = 0.0f;
     static constexpr float DEFAULT_SPEED = 10.0f;
     static constexpr float DEFAULT_SENSITIVITY = 0.1f;

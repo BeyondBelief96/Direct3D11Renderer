@@ -7,26 +7,32 @@
 
 Application::Application()
     : wnd(1920, 1080, L"D3DEngine"),
-    freeCamera({ 0.0f, 0.0f, 30.0f }),
+    freeCamera({ 0.0f, 0.0f, -30.0f }),
     light(wnd.Gfx())
 {
-	std::mt19937 rng(std::random_device{}());
-	std::uniform_real_distribution<float> adist(0.0f, 3.1415f * 2.0f);
-	std::uniform_real_distribution<float> ddist(0.0f, 3.1415f * 2.0f);
-	std::uniform_real_distribution<float> odist(0.0f, 3.1415f * 0.3f);
-	std::uniform_real_distribution<float> rdist(6.0f, 20.0f);
-	std::uniform_real_distribution<float> bdist(0.0f, 1.0f);
-	std::uniform_real_distribution<float> color_dist(0.0f, 1.0f);
+    std::mt19937 rng(std::random_device{}());
+    std::uniform_real_distribution<float> adist(0.0f, 3.1415f * 2.0f);
+    std::uniform_real_distribution<float> ddist(0.0f, 3.1415f * 2.0f);
+    std::uniform_real_distribution<float> odist(0.0f, 3.1415f * 0.3f);
+    std::uniform_real_distribution<float> rdist(6.0f, 20.0f);
+    std::uniform_real_distribution<float> bdist(0.0f, 1.0f);
+    std::uniform_real_distribution<float> color_dist(0.0f, 1.0f);
+
+    // Distribution for Z positions (positive values)
+    std::uniform_real_distribution<float> zdist(10.0f, 50.0f);
+    // Distribution for X and Y positions (both positive and negative)
+    std::uniform_real_distribution<float> xydist(-20.0f, 20.0f);
     // Create a mix of geometry types
     for (int i = 0; i < 200; i++)
     {
-		// Randomize the material color
-		DirectX::XMFLOAT3 materialColor(
-			color_dist(rng),
-			color_dist(rng),
-			color_dist(rng));
-        // Create boxes
-        renderables.push_back(std::make_unique<Cube>(
+        // Randomize the material color
+        DirectX::XMFLOAT3 materialColor(
+            color_dist(rng),
+            color_dist(rng),
+            color_dist(rng));
+
+        // Create boxes with explicit position control
+        auto cube = std::make_unique<Cube>(
             wnd.Gfx(),
             rng,
             adist,
@@ -34,7 +40,9 @@ Application::Application()
             odist,
             rdist,
             bdist,
-            materialColor));
+            materialColor);
+
+        renderables.push_back(std::move(cube));
     }
 	wnd.Gfx().SetProjection(freeCamera.GetProjectionMatrix(45.0f, 16.0f/9.0f, 0.5f, 100.0f));
 }

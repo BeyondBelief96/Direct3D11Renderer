@@ -49,7 +49,10 @@ Cube::Cube(Graphics& gfx,
 
 	struct PSObjectConstantBuffer
 	{
-		alignas(16) DirectX::XMFLOAT3 materialColor;
+		alignas(16) DirectX::XMFLOAT3 materialColor = { 1.0f, 1.0f, 1.0f };  // 12 bytes + 4 bytes padding (implicit)
+		float specularIntensity = 0.6f;                                      // 4 bytes
+		float specularPower = 30.0f;                                         // 4 bytes
+		float padding[2] = {};                                               // 8 bytes padding to make the total size a multiple of 16
 	} objectConstantBuffer;
 
 	objectConstantBuffer.materialColor = materialColor;

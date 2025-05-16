@@ -13,9 +13,9 @@ void PointLight::SpawnControlWindow() noexcept
 	if (ImGui::Begin("Light"))
 	{
 		ImGui::Text("Position");
-		ImGui::SliderFloat("X", &lightConstantBuffer.lightPos.x, -60.0f, 60.0f, "%.1f");
-		ImGui::SliderFloat("Y", &lightConstantBuffer.lightPos.y, -60.0f, 60.0f, "%.1f");
-		ImGui::SliderFloat("Z", &lightConstantBuffer.lightPos.z, -60.0f, 60.0f, "%.1f");
+		ImGui::SliderFloat("World X (+Right)", &lightConstantBuffer.lightPos.x, -60.0f, 60.0f, "%.1f");
+		ImGui::SliderFloat("World Y (+Up)", &lightConstantBuffer.lightPos.y, -60.0f, 60.0f, "%.1f");
+		ImGui::SliderFloat("World Z (+Forward)", &lightConstantBuffer.lightPos.z, -60.0f, 60.0f, "%.1f");
 
 		ImGui::Text("Intensity/Color");
 		ImGui::SliderFloat("Intensity", &lightConstantBuffer.diffuseIntensity, 0.01f, 2.0f, "%.2f");
@@ -51,10 +51,16 @@ void PointLight::Reset() noexcept
 
 void PointLight::Bind(Graphics& gfx) const noexcept
 {
-	// Updates the constant buffer with the current light position
-	lightPosCBuf.Update(gfx, PointLightConstantBuffer{ lightConstantBuffer });
+	// Create a copy of the light buffer
+	PointLightConstantBuffer lightBuffer = lightConstantBuffer;
 
-	// Bind the constant buffer to the pixel shader
+	DirectX::XMVECTOR lightPosWorld = DirectX::XMLoadFloat3(&lightConstantBuffer.lightPos);
+	DirectX::XMMATRIX viewMatrix = gfx.GetView();
+	DirectX::XMVECTOR lightPosView = DirectX::XMVector3Transform(lightPosWorld, viewMatrix);
+	DirectX::XMStoreFloat3(&lightBuffer.lightPos, lightPosView);
+
+	// Update the constant buffer with view-space position
+	lightPosCBuf.Update(gfx, lightBuffer);
 	lightPosCBuf.Bind(gfx);
 }
 

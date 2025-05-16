@@ -12,14 +12,13 @@ TransformConstantBuffer::TransformConstantBuffer(Graphics& gfx, const Renderable
 
 void TransformConstantBuffer::Bind(Graphics& gfx) noexcept
 {
-    // Get the model matrix from the renderable
-    DirectX::XMMATRIX model = parent.GetTransformXM();
+    DirectX::XMMATRIX modelView = parent.GetTransformXM() * gfx.GetView();
 
 	const TransformBuffer transformBuffer
 	{
-		DirectX::XMMatrixTranspose(model),
+		DirectX::XMMatrixTranspose(modelView),
 		DirectX::XMMatrixTranspose(
-			model * gfx.GetViewProjection())
+			modelView * gfx.GetProjection())
 	};
 
     // Update and bind the constant buffer

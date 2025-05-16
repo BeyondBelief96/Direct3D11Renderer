@@ -1,12 +1,12 @@
 #include "Bindable/TransformConstantBuffer.h"
 
-TransformConstantBuffer::TransformConstantBuffer(Graphics& gfx, const Renderable& parent)
+TransformConstantBuffer::TransformConstantBuffer(Graphics& gfx, const Renderable& parent, UINT slot)
 	:
 	parent(parent)
 {
 	if (!pVertexConstantBuffer)
 	{
-		pVertexConstantBuffer = std::make_unique<VertexConstantBuffer<TransformBuffer>>(gfx);
+		pVertexConstantBuffer = std::make_unique<VertexConstantBuffer<TransformBuffer>>(gfx, slot);
 	}
 }
 

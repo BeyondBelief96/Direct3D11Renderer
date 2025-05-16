@@ -6,7 +6,7 @@
 class TransformConstantBuffer : public Bindable
 {
 public:
-	TransformConstantBuffer(Graphics& gfx, const Renderable& parent);
+	TransformConstantBuffer(Graphics& gfx, const Renderable& parent, UINT slot = 0u);
 	void Bind(Graphics& gfx) noexcept override;
 private:
 	// Transform buffer

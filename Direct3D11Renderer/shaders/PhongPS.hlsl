@@ -1,13 +1,17 @@
 cbuffer Light
 {
     float3 lightPos;
-    float3 materialColor;
     float3 ambientColor;
     float3 diffuseColor;
     float diffuseIntensity;
     float attConstant;
     float attLinear;
     float attQuadratic;
+};
+
+cbuffer ObjectConstantBuffer
+{
+    float3 materialColor;
 };
 
 float4 main(float3 worldPos: Position, float3 normal : Normal) : SV_TARGET

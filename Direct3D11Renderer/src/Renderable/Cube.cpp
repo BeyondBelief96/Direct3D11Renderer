@@ -10,7 +10,8 @@ Cube::Cube(Graphics& gfx,
 	std::uniform_real_distribution<float>& ddist,
 	std::uniform_real_distribution<float>& odist,
 	std::uniform_real_distribution<float>& rdist,
-	std::uniform_real_distribution<float>& bdist)
+	std::uniform_real_distribution<float>& bdist,
+	DirectX::XMFLOAT3 materialColor)
 	:
 	r(rdist(rng)),
 	droll(ddist(rng)),
@@ -46,12 +47,13 @@ Cube::Cube(Graphics& gfx,
 	};
 	AddSharedBindable<InputLayout>(gfx, "box_input", layout, pvsbc);
 
-	/*struct PSLightConstants
+	struct PSObjectConstantBuffer
 	{
-		DirectX::XMVECTOR lightPos;
-	};
+		alignas(16) DirectX::XMFLOAT3 materialColor;
+	} objectConstantBuffer;
 
-	AddSharedBindable<PixelConstantBuffer<PSLightConstants>>(gfx, "light");*/
+	objectConstantBuffer.materialColor = materialColor;
+	AddUniqueBindable(std::make_unique<PixelConstantBuffer<PSObjectConstantBuffer>>(gfx, objectConstantBuffer, 1u));
 
 	// Topology - shared
 	AddSharedBindable<Topology>(gfx, "triangle_list", D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

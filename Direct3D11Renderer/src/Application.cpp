@@ -16,9 +16,15 @@ Application::Application()
 	std::uniform_real_distribution<float> odist(0.0f, 3.1415f * 0.3f);
 	std::uniform_real_distribution<float> rdist(6.0f, 20.0f);
 	std::uniform_real_distribution<float> bdist(0.0f, 1.0f);
+	std::uniform_real_distribution<float> color_dist(0.0f, 1.0f);
     // Create a mix of geometry types
     for (int i = 0; i < 200; i++)
     {
+		// Randomize the material color
+		DirectX::XMFLOAT3 materialColor(
+			color_dist(rng),
+			color_dist(rng),
+			color_dist(rng));
         // Create boxes
         renderables.push_back(std::make_unique<Cube>(
             wnd.Gfx(),
@@ -27,7 +33,8 @@ Application::Application()
             ddist,
             odist,
             rdist,
-            bdist));
+            bdist,
+            materialColor));
     }
 	wnd.Gfx().SetProjection(freeCamera.GetProjectionMatrix(45.0f, 16.0f/9.0f, 0.5f, 100.0f));
 }

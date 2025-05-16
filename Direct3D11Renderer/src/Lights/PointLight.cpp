@@ -21,7 +21,6 @@ void PointLight::SpawnControlWindow() noexcept
 		ImGui::SliderFloat("Intensity", &lightConstantBuffer.diffuseIntensity, 0.01f, 2.0f, "%.2f");
 		ImGui::ColorEdit3("Diffuse Color", &lightConstantBuffer.diffuseColor.x);
 		ImGui::ColorEdit3("Ambient", &lightConstantBuffer.ambientColor.x);
-		ImGui::ColorEdit3("Material Color", &lightConstantBuffer.materialColor.x);
 
 		ImGui::Text("Falloff");
 		ImGui::SliderFloat("Constant", &lightConstantBuffer.attConstant, 0.05f, 10.0f, "%.2f");
@@ -41,9 +40,8 @@ void PointLight::Reset() noexcept
 	lightConstantBuffer =
 	{
 		{0.0f, 0.0f, 0.0f},
-		{0.7f, 0.7f, 0.9f},
-		{0.05f, 0.05f, 0.05f},
-		{1.0f, 1.0f, 1.0f },
+		{0.3f, 0.3f, 0.3f},
+		{1.0f, 1.0f, 1.0f},
 		1.0f,
 		1.0f,
 		0.045f,

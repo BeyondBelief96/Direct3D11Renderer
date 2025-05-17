@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "Renderable/Cube.h"
 #include "Renderable/Sphere.h"
+#include "Renderable/TexturedCube.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
@@ -24,7 +25,7 @@ Application::Application()
     // Distribution for X and Y positions (both positive and negative)
     std::uniform_real_distribution<float> xydist(-20.0f, 20.0f);
     // Create a mix of geometry types
-    for (int i = 0; i < 200; i++)
+    for (int i = 0; i < 20; i++)
     {
         // Randomize the material color
         DirectX::XMFLOAT3 materialColor(
@@ -43,8 +44,19 @@ Application::Application()
             bdist,
             materialColor);
 
+        auto texturedCube = std::make_unique<TexturedCube>(
+            wnd.Gfx(),
+            rng,
+            adist,
+            ddist,
+            odist,
+            rdist,
+            1.0f,
+            L"assets/kappa50.png"
+        );
 
         renderables.push_back(std::move(cube));
+		renderables.push_back(std::move(texturedCube));
     }
 	wnd.Gfx().SetProjection(freeCamera.GetProjectionMatrix(45.0f, 16.0f/9.0f, 0.5f, 100.0f));
 }

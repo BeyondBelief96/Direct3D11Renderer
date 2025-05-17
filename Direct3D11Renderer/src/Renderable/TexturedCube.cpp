@@ -12,14 +12,13 @@ TexturedCube::TexturedCube(
 	: RenderableTestObject(rng, adist, ddist, odist, rdist)
 {
     // Create a cube mesh with texture coordinates
-    auto cubeMesh = GeometryFactory::CreateTexturedCube<VertexPositionTexture>(size);
-    cubeMesh.SetFlatNormals();
+    auto cubeMesh = GeometryFactory::CreateIndependentTexturedCube<VertexPositionNormalTexture>(size);
     // Vertex Shader
-    auto vertexShader = AddSharedBindable<VertexShader>(gfx, "textured_vs", L"TextureVS.cso");
+    auto vertexShader = AddSharedBindable<VertexShader>(gfx, "textured_vs", L"TexturedPhongVS.cso");
     auto vertexShaderByteCode = vertexShader->GetByteCode();
 
     // Pixel Shader
-    AddSharedBindable<PixelShader>(gfx, "textured_ps", L"TexturePS.cso");
+    AddSharedBindable<PixelShader>(gfx, "textured_ps", L"TexturedPhongPS.cso");
 
     // Vertex Buffer
     AddSharedBindable<VertexBuffer>(gfx, "textured_cube_vb" + std::to_string(size), cubeMesh.vertices);
@@ -30,8 +29,9 @@ TexturedCube::TexturedCube(
     // Input Layout
     const std::vector<D3D11_INPUT_ELEMENT_DESC> inputLayout =
     {
-        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
+        {"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{"Normal", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        {"TexCoord", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0}
     };
 
 	AddSharedBindable<InputLayout>(gfx, "textured_cube_input_layout" + std::to_string(size), inputLayout, vertexShaderByteCode);
@@ -42,6 +42,16 @@ TexturedCube::TexturedCube(
 
     // Topology
 	AddSharedBindable<Topology>(gfx, "triangle_list", D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    struct PSMaterialConstant
+    {
+        float specularIntensity = 0.6f;
+        float specularPower = 30.0f;
+        float padding[2];
+    } colorConst;
+
+	// Binding the material constant buffer
+	AddUniqueBindable(std::make_unique<PixelConstantBuffer<PSMaterialConstant>>(gfx, colorConst, 1));
 
     // Transform Constant Buffer
 	AddUniqueBindable(std::make_unique<TransformConstantBuffer>(gfx, *this));

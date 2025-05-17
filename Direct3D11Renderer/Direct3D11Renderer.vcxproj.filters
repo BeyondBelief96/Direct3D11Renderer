@@ -333,5 +333,7 @@
     <FxCompile Include="shaders\PhongPS.hlsl" />
     <FxCompile Include="shaders\SolidVS.hlsl" />
     <FxCompile Include="shaders\SolidPS.hlsl" />
+    <FxCompile Include="shaders\TexturedPhongVS.hlsl" />
+    <FxCompile Include="shaders\TexturedPhongPS.hlsl" />
   </ItemGroup>
 </Project>

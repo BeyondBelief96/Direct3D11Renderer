@@ -34,7 +34,7 @@ TexturedCube::TexturedCube(
         {"TexCoord", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0}
     };
 
-	AddSharedBindable<InputLayout>(gfx, "textured_cube_input_layout" + std::to_string(size), inputLayout, vertexShaderByteCode);
+	AddSharedBindable<InputLayout>(gfx, "position_normal_texture_layout" + std::to_string(size), inputLayout, vertexShaderByteCode);
 
     // Add Texture and Sampler
 	AddSharedBindable<Texture>(gfx, "box_texture" , textureFilename);

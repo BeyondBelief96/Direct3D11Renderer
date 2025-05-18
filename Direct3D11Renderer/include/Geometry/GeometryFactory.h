@@ -354,7 +354,7 @@ public:
         std::vector<VertexType> vertices;
 
         // Create rings of vertices around the sphere (excluding poles)
-        for (int iLat = 1; iLat < latDiv; iLat++)
+        for (int iLat = 0; iLat <= latDiv; iLat++)
         {
             // Calculate the angle from the pole for this latitude ring
             const float phi = (PI * iLat) / latDiv;
@@ -378,8 +378,8 @@ public:
                 // Add any other vertex attributes here as needed
                 // For example, calculate normals by normalizing the position
                 if constexpr (has_normal_member<VertexType>::value) {
-                    // Normalize position to get normal
-                    float len = std::sqrt(x * x + y * y + z * z);
+                    // Normalize position to get normal - this ensures correct outward-facing normals
+                    float len = radius; // Since we're creating a sphere, the length should always be the radius
                     vertex.normal = { x / len, y / len, z / len };
                 }
 
@@ -387,78 +387,30 @@ public:
             }
         }
 
-        // Add the poles as separate vertices
-        const auto iNorthPole = static_cast<unsigned short>(vertices.size());
-        VertexType northPole;
-        northPole.position = { 0.0f, radius, 0.0f };
-        if constexpr (has_normal_member<VertexType>::value) {
-            northPole.normal = { 0.0f, 1.0f, 0.0f };
-        }
-        vertices.push_back(northPole);
-
-        const auto iSouthPole = static_cast<unsigned short>(vertices.size());
-        VertexType southPole;
-        southPole.position = { 0.0f, -radius, 0.0f };
-        if constexpr (has_normal_member<VertexType>::value) {
-            southPole.normal = { 0.0f, -1.0f, 0.0f };
-        }
-        vertices.push_back(southPole);
-
-        // Helper function to calculate vertex indices
-        const auto calcIdx = [longDiv](unsigned short iLat, unsigned short iLong) -> unsigned short {
-            return iLat * longDiv + iLong;
-            };
-
         std::vector<unsigned short> indices;
 
-        // Create indices for the main body of the sphere (non-pole regions)
-        for (unsigned short iLat = 0; iLat < latDiv - 2; iLat++)
+        // Create indices for the main body of the sphere (connecting latitude rings)
+        for (unsigned short iLat = 0; iLat < latDiv; iLat++)
         {
-            for (unsigned short iLong = 0; iLong < longDiv - 1; iLong++)
+            for (unsigned short iLong = 0; iLong < longDiv; iLong++)
             {
+                // Calculate indices for the two triangles of each quad
+                unsigned short i1 = iLat * longDiv + iLong;
+                unsigned short i2 = i1 + longDiv;
+                unsigned short i3 = (iLat * longDiv) + ((iLong + 1) % longDiv);
+                unsigned short i4 = i3 + longDiv;
+
                 // First triangle
-                indices.push_back(calcIdx(iLat, iLong));
-                indices.push_back(calcIdx(iLat + 1, iLong));
-                indices.push_back(calcIdx(iLat, iLong + 1));
+                indices.push_back(i1);
+                indices.push_back(i3);
+                indices.push_back(i2);
 
                 // Second triangle
-                indices.push_back(calcIdx(iLat, iLong + 1));
-                indices.push_back(calcIdx(iLat + 1, iLong));
-                indices.push_back(calcIdx(iLat + 1, iLong + 1));
+                indices.push_back(i2);
+                indices.push_back(i3);
+                indices.push_back(i4);
             }
-
-            // Handle the seam where the sphere wraps around
-            indices.push_back(calcIdx(iLat, longDiv - 1));
-            indices.push_back(calcIdx(iLat + 1, longDiv - 1));
-            indices.push_back(calcIdx(iLat, 0));
-
-            indices.push_back(calcIdx(iLat, 0));
-            indices.push_back(calcIdx(iLat + 1, longDiv - 1));
-            indices.push_back(calcIdx(iLat + 1, 0));
         }
-
-        // Create indices for the pole caps
-        for (unsigned short iLong = 0; iLong < longDiv - 1; iLong++)
-        {
-            // North pole triangles
-            indices.push_back(iNorthPole);
-            indices.push_back(calcIdx(0, iLong));
-            indices.push_back(calcIdx(0, iLong + 1));
-
-            // South pole triangles
-            indices.push_back(calcIdx(latDiv - 2, iLong + 1));
-            indices.push_back(calcIdx(latDiv - 2, iLong));
-            indices.push_back(iSouthPole);
-        }
-
-        // Connect the last triangles at the seam for both poles
-        indices.push_back(iNorthPole);
-        indices.push_back(calcIdx(0, longDiv - 1));
-        indices.push_back(calcIdx(0, 0));
-
-        indices.push_back(calcIdx(latDiv - 2, 0));
-        indices.push_back(calcIdx(latDiv - 2, longDiv - 1));
-        indices.push_back(iSouthPole);
 
         return GeometryMesh<VertexType>(std::move(vertices), std::move(indices));
     }

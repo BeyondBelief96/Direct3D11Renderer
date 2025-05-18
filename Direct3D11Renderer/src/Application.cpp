@@ -2,6 +2,7 @@
 #include "Renderable/Cube.h"
 #include "Renderable/Sphere.h"
 #include "Renderable/TexturedCube.h"
+#include "Renderable/Pyramid.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
@@ -24,8 +25,9 @@ Application::Application()
     std::uniform_real_distribution<float> zdist(10.0f, 50.0f);
     // Distribution for X and Y positions (both positive and negative)
     std::uniform_real_distribution<float> xydist(-20.0f, 20.0f);
+
     // Create a mix of geometry types
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < 7; i++)
     {
         // Randomize the material color
         DirectX::XMFLOAT3 materialColor(
@@ -44,6 +46,41 @@ Application::Application()
             bdist,
             materialColor);
 
+        renderables.push_back(std::move(cube));
+
+        // Add a sphere
+        auto sphere = std::make_unique<Sphere>(
+            wnd.Gfx(),
+            rng,
+            adist,
+            ddist,
+            odist,
+            rdist,
+            1.0f,     // radius
+            16        // tessellation
+        );
+
+        renderables.push_back(std::move(sphere));
+
+        // Add a pyramid
+        auto pyramid = std::make_unique<Pyramid>(
+            wnd.Gfx(),
+            rng,
+            adist,
+            ddist,
+            odist,
+            rdist,
+            1.0f,     // radius
+            2.0f,     // height
+            4         // sides (square base)
+        );
+
+        renderables.push_back(std::move(pyramid));
+    }
+
+    // Add a few textured cubes
+    for (int i = 0; i < 5; i++)
+    {
         auto texturedCube = std::make_unique<TexturedCube>(
             wnd.Gfx(),
             rng,
@@ -55,10 +92,10 @@ Application::Application()
             L"assets/kappa50.png"
         );
 
-        renderables.push_back(std::move(cube));
-		renderables.push_back(std::move(texturedCube));
+        renderables.push_back(std::move(texturedCube));
     }
-	wnd.Gfx().SetProjection(freeCamera.GetProjectionMatrix(45.0f, 16.0f/9.0f, 0.5f, 100.0f));
+
+    wnd.Gfx().SetProjection(freeCamera.GetProjectionMatrix(45.0f, 16.0f / 9.0f, 0.5f, 100.0f));
 }
 
 int Application::Run()

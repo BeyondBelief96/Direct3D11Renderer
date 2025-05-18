@@ -416,121 +416,120 @@ public:
     }
 
     template<typename VertexType>
-    static GeometryMesh<VertexType> CreatePrism(float radius = 1.0f, float height = 2.0f, int longDiv = 24)
+    static GeometryMesh<VertexType> CreatePyramid(float radius = 1.0f, float height = 2.0f, int sides = 4)
     {
         namespace dx = DirectX;
 
-        // Ensure minimum divisions
-        longDiv = std::max(3, longDiv);
+        // Ensure minimum sides
+        sides = std::max(3, sides);
 
         std::vector<VertexType> vertices;
         std::vector<unsigned short> indices;
 
         // Calculate constants
         const float halfHeight = height / 2.0f;
-        const float longitudeAngle = 2.0f * PI / longDiv;
+        const float angleStep = 2.0f * PI / sides;
 
-        // Add center vertices for each cap
-        // Near center (bottom)
-        VertexType centerNear;
-        centerNear.position = { 0.0f, 0.0f, -halfHeight };
-        vertices.push_back(centerNear);
-        const auto iCenterNear = static_cast<unsigned short>(0);
-
-        // Far center (top)
-        VertexType centerFar;
-        centerFar.position = { 0.0f, 0.0f, halfHeight };
-        vertices.push_back(centerFar);
-        const auto iCenterFar = static_cast<unsigned short>(1);
-
-        // Add perimeter vertices
-        for (int iLong = 0; iLong < longDiv; iLong++)
+        // First, create the base vertices
+        for (int i = 0; i < sides; i++)
         {
-            const float theta = longitudeAngle * iLong;
-            const float x = radius * std::cos(theta);
-            const float y = radius * std::sin(theta);
+            float angle = i * angleStep;
 
-            // Near (bottom) perimeter vertex
-            VertexType nearVertex;
-            nearVertex.position = { x, y, -halfHeight };
+            // Create base vertex
+            VertexType baseVertex;
+            baseVertex.position = {
+                radius * std::cos(angle),
+                radius * std::sin(angle),
+                -halfHeight
+            };
 
-            // Far (top) perimeter vertex
-            VertexType farVertex;
-            farVertex.position = { x, y, halfHeight };
-
-            // Add optional normal if vertex type supports it
             if constexpr (has_normal_member<VertexType>::value) {
-                // Compute normals for side faces (pointing outward)
-                float nx = x / radius;
-                float ny = y / radius;
-                nearVertex.normal = { nx, ny, 0.0f };
-                farVertex.normal = { nx, ny, 0.0f };
-
-                // Update normals for caps
-                if (iLong == 0) {
-                    centerNear.normal = { 0.0f, 0.0f, -1.0f };
-                    centerFar.normal = { 0.0f, 0.0f, 1.0f };
-                    vertices[iCenterNear] = centerNear;
-                    vertices[iCenterFar] = centerFar;
-                }
+                baseVertex.normal = { 0.0f, 0.0f, -1.0f }; // Base normal points down
             }
 
-            vertices.push_back(nearVertex);  // Index: 2 + iLong*2
-            vertices.push_back(farVertex);   // Index: 2 + iLong*2 + 1
+            vertices.push_back(baseVertex);
         }
 
-        // Create indices for the side faces (quads as two triangles)
-        for (unsigned short iLong = 0; iLong < longDiv; iLong++)
-        {
-            const auto i = iLong * 2;
-            const auto mod = longDiv * 2;
-
-            // Current near vertex
-            const unsigned short currNear = 2 + i;
-            // Current far vertex
-            const unsigned short currFar = currNear + 1;
-            // Next near vertex (with wrap around)
-            const unsigned short nextNear = 2 + ((i + 2) % mod);
-            // Next far vertex
-            const unsigned short nextFar = nextNear + 1;
-
-            // First triangle of quad (currNear, nextNear, currFar)
-            indices.push_back(currNear);
-            indices.push_back(nextNear);
-            indices.push_back(currFar);
-
-            // Second triangle of quad (nextNear, nextFar, currFar)
-            indices.push_back(nextNear);
-            indices.push_back(nextFar);
-            indices.push_back(currFar);
+        // Add base center point
+        VertexType baseCenter;
+        baseCenter.position = { 0.0f, 0.0f, -halfHeight };
+        if constexpr (has_normal_member<VertexType>::value) {
+            baseCenter.normal = { 0.0f, 0.0f, -1.0f }; // Base normal points down
         }
 
-        // Create indices for the bottom cap (fan)
-        for (unsigned short iLong = 0; iLong < longDiv; iLong++)
+        unsigned short baseCenterIndex = static_cast<unsigned short>(vertices.size());
+        vertices.push_back(baseCenter);
+
+        // Add apex of pyramid
+        VertexType apex;
+        apex.position = { 0.0f, 0.0f, halfHeight };
+        unsigned short apexIndex = static_cast<unsigned short>(vertices.size());
+        vertices.push_back(apex);
+
+        // Now create the base triangles (clockwise winding when viewed from -Z)
+        for (int i = 0; i < sides; i++)
         {
-            const auto i = iLong * 2;
-            const auto mod = longDiv * 2;
-
-            const unsigned short currNear = 2 + i;
-            const unsigned short nextNear = 2 + ((i + 2) % mod);
-
-            indices.push_back(currNear);
-            indices.push_back(iCenterNear);
-            indices.push_back(nextNear);
+            indices.push_back(baseCenterIndex); // center
+            indices.push_back(i);               // current
+            indices.push_back((i + 1) % sides); // next
         }
 
-        // Create indices for the top cap (fan)
-        for (unsigned short iLong = 0; iLong < longDiv; iLong++)
+        // Now create side faces
+        for (int i = 0; i < sides; i++)
         {
-            const auto i = iLong * 2;
-            const auto mod = longDiv * 2;
+            int nextI = (i + 1) % sides;
 
-            const unsigned short currFar = 2 + i + 1;
-            const unsigned short nextFar = 2 + ((i + 2) % mod) + 1;
+            // Get the base vertex positions
+            dx::XMFLOAT3 currentPos = vertices[i].position;
+            dx::XMFLOAT3 nextPos = vertices[nextI].position;
+            dx::XMFLOAT3 apexPos = vertices[apexIndex].position;
 
-            indices.push_back(iCenterFar);
-            indices.push_back(currFar);
-            indices.push_back(nextFar);
+            // Calculate two vectors along the face
+            dx::XMVECTOR v1 = dx::XMVectorSubtract(
+                dx::XMLoadFloat3(&nextPos),
+                dx::XMLoadFloat3(&apexPos)
+            );
+
+            dx::XMVECTOR v2 = dx::XMVectorSubtract(
+                dx::XMLoadFloat3(&currentPos),
+                dx::XMLoadFloat3(&apexPos)
+            );
+
+            // Calculate the face normal using cross product
+            // Using vector order to ensure normal points outward (for clockwise winding)
+            dx::XMVECTOR faceNormalVec = dx::XMVector3Normalize(
+                dx::XMVector3Cross(v1, v2)
+            );
+
+            // Store the normal
+            dx::XMFLOAT3 faceNormal;
+            dx::XMStoreFloat3(&faceNormal, faceNormalVec);
+
+            // Create copies of vertices for the side face with the correct normal
+            VertexType currentVertexSide = vertices[i]; // Copy base vertex
+            VertexType nextVertexSide = vertices[nextI]; // Copy next base vertex
+            VertexType apexVertexSide = vertices[apexIndex]; // Copy apex
+
+            if constexpr (has_normal_member<VertexType>::value) {
+                currentVertexSide.normal = faceNormal;
+                nextVertexSide.normal = faceNormal;
+                apexVertexSide.normal = faceNormal;
+            }
+
+            // Add these vertices to the array
+            unsigned short currentSideIndex = static_cast<unsigned short>(vertices.size());
+            vertices.push_back(currentVertexSide);
+
+            unsigned short nextSideIndex = static_cast<unsigned short>(vertices.size());
+            vertices.push_back(nextVertexSide);
+
+            unsigned short apexSideIndex = static_cast<unsigned short>(vertices.size());
+            vertices.push_back(apexVertexSide);
+
+            // Add indices for the side triangle (clockwise winding when viewed from outside)
+            indices.push_back(currentSideIndex);
+            indices.push_back(apexSideIndex);
+            indices.push_back(nextSideIndex);
         }
 
         return GeometryMesh<VertexType>(std::move(vertices), std::move(indices));

@@ -239,6 +239,7 @@
     <ClInclude Include="include\Renderable\Sphere.h" />
     <ClInclude Include="include\Renderable\TexturedCube.h" />
     <ClInclude Include="include\resource.h" />
+    <ClInclude Include="include\Utilities\MathUtils.h" />
     <ClInclude Include="include\WICFactory.h" />
     <ClInclude Include="include\Window.h" />
   </ItemGroup>

@@ -305,6 +305,9 @@
     <ClInclude Include="include\Renderable\RenderableTestObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Utilities\MathUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Direct3D11Renderer.rc">

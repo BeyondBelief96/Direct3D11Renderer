@@ -25,4 +25,5 @@ private:
 	float speed_factor = 1.0f;
 	PointLight light;
 	std::vector<std::unique_ptr<class Renderable>> renderables;
+	std::vector<class Cube*> cubes;
 };

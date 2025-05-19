@@ -95,6 +95,15 @@ Application::Application()
         renderables.push_back(std::move(texturedCube));
     }
 
+    // Initialize vector of non-owning pointers to cubes
+    for (auto& renderable : renderables)
+    {
+        if (auto cp = dynamic_cast<Cube*>(renderable.get()))
+        {
+            cubes.push_back(cp);
+        }
+    }
+
     wnd.Gfx().SetProjection(freeCamera.GetProjectionMatrix(45.0f, 16.0f / 9.0f, 0.5f, 100.0f));
 }
 
@@ -162,6 +171,7 @@ void Application::ProcessFrame()
         ImGui::Text("Status: %s", wnd.kbd.KeyIsPressed(VK_SPACE) ? "PAUSED" : "RUNNING (hold spacebar to pause)");
     }
     light.SpawnControlWindow();
+    cubes.front()->SpawnControlWindow(0, wnd.Gfx());
     ImGui::End();
 
     wnd.Gfx().EndFrame();

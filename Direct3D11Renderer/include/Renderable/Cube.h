@@ -16,7 +16,20 @@ public:
         DirectX::XMFLOAT3 materialColor
     );
 
+    DirectX::XMMATRIX GetTransformXM() const noexcept override;
+
+    bool SpawnControlWindow(int id, Graphics& gfx) noexcept;
 private:
+    void SyncMaterial(Graphics& gfx) noexcept (!_DEBUG);
+
+private:
+    struct PSMaterialConstantBuffer
+    {
+        DirectX::XMFLOAT3 color;
+        float specularIntensity = 128.0f;
+        float specularPower = 30.0f;
+        float padding[3] = { 0.0f, 0.0f, 0.0f };
+    } materialConstantBuffer;
     // Model Transform matrix for special deformation
     DirectX::XMFLOAT3X3 mt;
 };

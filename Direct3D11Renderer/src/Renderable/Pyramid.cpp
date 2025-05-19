@@ -47,7 +47,7 @@ Pyramid::Pyramid(
         alignas(16) DirectX::XMFLOAT3 materialColor;
         float specularIntensity = 0.6f;
         float specularPower = 30.0f;
-        float padding[2] = {};
+        float padding[2] = {0.0f, 0.0f};
     } objectConstantBuffer;
 
     // Generate a solid color for the pyramid

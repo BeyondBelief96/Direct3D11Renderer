@@ -1,4 +1,4 @@
-#include "Application.h"
+#include "Core/Application.h"
 #include "Renderable/Cube.h"
 #include "Renderable/Sphere.h"
 #include "Renderable/TexturedCube.h"

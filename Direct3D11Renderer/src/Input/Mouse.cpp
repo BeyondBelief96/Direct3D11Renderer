@@ -1,6 +1,6 @@
 #pragma once
-#include "Mouse.h"
-#include "ChiliWin.h"
+#include "Input/Mouse.h"
+#include "Utilities/ChiliWin.h"
 
 Mouse::Mouse() : x(0), y(0), deltaX(0), deltaY(0)
 {

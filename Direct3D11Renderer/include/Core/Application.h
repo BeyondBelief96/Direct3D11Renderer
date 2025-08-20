@@ -1,8 +1,9 @@
 #pragma once
 #include "Window.h"
-#include "D3Timer.h"
+#include "Utilities/D3Timer.h"
 #include "Renderable/Renderable.h"
-#include "ImGuiManager.h"
+#include "Renderable/Cube.h"
+#include "Utilities/ImGuiManager.h"
 #include "Camera/FixedCamera.h"
 #include "Camera/FreeFlyCamera.h"
 #include "Lights/PointLight.h"
@@ -22,7 +23,6 @@ private:
 	void SpawnCubeWindows() noexcept;
 
 	ImGuiManager imgui;
-	//FixedCamera camera;
 	FreeFlyCamera freeCamera;
 	Window wnd;
 	D3Timer timer;
@@ -30,8 +30,8 @@ private:
 	float speed_factor = 1.0f;
 	PointLight light;
 
-	std::vector<std::unique_ptr<class Renderable>> renderables;
-	std::vector<class Cube*> cubes;
+	std::vector<std::unique_ptr<Renderable>> renderables;
+	std::vector<Cube*> cubes;
 	static constexpr size_t nRenderables = 180;
 
 	std::optional<int> comboBoxIndex;

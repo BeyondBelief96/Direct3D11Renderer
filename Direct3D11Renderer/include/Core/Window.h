@@ -1,8 +1,8 @@
 #pragma once
-#include "ChiliWin.h"
-#include "Keyboard.h"
-#include "Mouse.h"
-#include "Graphics.h"
+#include "Utilities/ChiliWin.h"
+#include "Input/Keyboard.h"
+#include "Input/Mouse.h"
+#include "Graphics/Graphics.h"
 #include <optional>
 #include <memory>
 

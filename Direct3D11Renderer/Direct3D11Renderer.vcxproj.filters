@@ -18,31 +18,31 @@
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Window.cpp">
+    <ClCompile Include="src\Core\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Exceptions\D3Exception.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Keyboard.cpp">
+    <ClCompile Include="src\Input\Keyboard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Mouse.cpp">
+    <ClCompile Include="src\Input\Mouse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Application.cpp">
+    <ClCompile Include="src\Core\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics.cpp">
+    <ClCompile Include="src\Graphics\Graphics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\D3Timer.cpp">
+    <ClCompile Include="src\Utilities\D3Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\D3Utils.cpp">
+    <ClCompile Include="src\Utilities\D3Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DxgiInfoManager.cpp">
+    <ClCompile Include="src\Utilities\DxgiInfoManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Exceptions\GraphicsExceptions.cpp">
@@ -129,7 +129,7 @@
     <ClCompile Include="src\imgui\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ImGuiManager.cpp">
+    <ClCompile Include="src\Utilities\ImGuiManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Camera\FixedCamera.cpp">
@@ -149,10 +149,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ChiliWin.h">
+    <ClInclude Include="include\Utilities\ChiliWin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Window.h">
+    <ClInclude Include="include\Core\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Exceptions\D3Exception.h">
@@ -161,25 +161,25 @@
     <ClInclude Include="include\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Keyboard.h">
+    <ClInclude Include="include\Input\Keyboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Mouse.h">
+    <ClInclude Include="include\Input\Mouse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Application.h">
+    <ClInclude Include="include\Core\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Graphics.h">
+    <ClInclude Include="include\Graphics\Graphics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\D3Timer.h">
+    <ClInclude Include="include\Utilities\D3Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\D3Utils.h">
+    <ClInclude Include="include\Utilities\D3Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\DxgiInfoManager.h">
+    <ClInclude Include="include\Utilities\DxgiInfoManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Exceptions\GraphicsExceptions.h">
@@ -254,7 +254,7 @@
     <ClInclude Include="include\Bindable\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\WICFactory.h">
+    <ClInclude Include="include\Utilities\WICFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Bindable\Sampler.h">
@@ -287,7 +287,7 @@
     <ClInclude Include="include\imgui\imstb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ImGuiManager.h">
+    <ClInclude Include="include\Utilities\ImGuiManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Camera\FixedCamera.h">
@@ -326,17 +326,17 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders\VertexShader.hlsl" />
-    <FxCompile Include="shaders\PixelShader.hlsl" />
-    <FxCompile Include="shaders\ColorIndexVS.hlsl" />
-    <FxCompile Include="shaders\ColorIndexPS.hlsl" />
-    <FxCompile Include="shaders\TextureVS.hlsl" />
-    <FxCompile Include="shaders\TexturePS.hlsl" />
-    <FxCompile Include="shaders\PhongVS.hlsl" />
-    <FxCompile Include="shaders\PhongPS.hlsl" />
-    <FxCompile Include="shaders\SolidVS.hlsl" />
-    <FxCompile Include="shaders\SolidPS.hlsl" />
-    <FxCompile Include="shaders\TexturedPhongVS.hlsl" />
-    <FxCompile Include="shaders\TexturedPhongPS.hlsl" />
+    <FxCompile Include="Shaders\VertexShader.hlsl" />
+    <FxCompile Include="Shaders\PixelShader.hlsl" />
+    <FxCompile Include="Shaders\ColorIndexVS.hlsl" />
+    <FxCompile Include="Shaders\ColorIndexPS.hlsl" />
+    <FxCompile Include="Shaders\TextureVS.hlsl" />
+    <FxCompile Include="Shaders\TexturePS.hlsl" />
+    <FxCompile Include="Shaders\PhongVS.hlsl" />
+    <FxCompile Include="Shaders\PhongPS.hlsl" />
+    <FxCompile Include="Shaders\SolidVS.hlsl" />
+    <FxCompile Include="Shaders\SolidPS.hlsl" />
+    <FxCompile Include="Shaders\TexturedPhongVS.hlsl" />
+    <FxCompile Include="Shaders\TexturedPhongPS.hlsl" />
   </ItemGroup>
 </Project>

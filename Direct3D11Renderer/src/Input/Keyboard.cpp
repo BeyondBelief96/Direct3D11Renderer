@@ -1,4 +1,4 @@
-#include "Keyboard.h"
+#include "Input/Keyboard.h"
 
 bool Keyboard::KeyIsPressed(unsigned char keycode) const noexcept
 {

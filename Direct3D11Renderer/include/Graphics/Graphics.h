@@ -1,12 +1,12 @@
 #pragma once
-#include "ChiliWin.h"
+#include "Utilities/ChiliWin.h"
 #include "Exceptions/GraphicsExceptions.h" 
 #include <d3d11.h>
 #include <vector>
 #include <wrl.h>
 #include <DirectXMath.h>
 #ifdef _DEBUG
-#include "DxgiInfoManager.h"
+#include "Utilities/DxgiInfoManager.h"
 #endif
 
 class Graphics

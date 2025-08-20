@@ -1,6 +1,6 @@
 #include "Bindable/Texture.h"
 #include "Exceptions/GraphicsExceptions.h"
-#include "WICFactory.h"
+#include "Utilities/WICFactory.h"
 
 Texture::Texture(Graphics& gfx, const std::wstring& path)
 {

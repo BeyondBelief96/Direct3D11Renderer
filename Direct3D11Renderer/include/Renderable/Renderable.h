@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics.h"
+#include "Graphics/Graphics.h"
 #include "Bindable/Bindable.h"
 #include "Bindable/IndexBuffer.h"
 #include "Bindable/BindableCache.h"

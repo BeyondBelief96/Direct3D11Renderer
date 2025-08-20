@@ -1,5 +1,5 @@
-#include "Application.h"
-#include "D3Utils.h"
+#include "Core/Application.h"
+#include "Utilities/D3Utils.h"
 #include <sstream>
 
 

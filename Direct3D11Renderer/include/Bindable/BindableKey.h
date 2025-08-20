@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Bindable.h"
-#include "Graphics.h"
+#include "Graphics/Graphics.h"
 #include <memory>
 #include <unordered_map>
 #include <string>

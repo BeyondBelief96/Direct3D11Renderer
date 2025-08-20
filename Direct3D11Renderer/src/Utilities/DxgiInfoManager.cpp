@@ -1,6 +1,6 @@
-#include "DxgiInfoManager.h"
+#include "Utilities/DxgiInfoManager.h"
 #include "Exceptions/GraphicsExceptions.h" 
-#include "D3Utils.h"
+#include "Utilities/D3Timer.h"
 #include <memory>
 #include <dxgidebug.h>
 

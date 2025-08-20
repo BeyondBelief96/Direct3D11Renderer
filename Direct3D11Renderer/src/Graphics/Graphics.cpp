@@ -1,5 +1,5 @@
-#include "Graphics.h"
-#include "D3Utils.h"
+#include "Graphics/Graphics.h"
+#include "Utilities/D3Utils.h"
 #include <sstream>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>

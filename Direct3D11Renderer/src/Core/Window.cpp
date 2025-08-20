@@ -1,5 +1,5 @@
 #pragma once
-#include "Window.h"
+#include "Core/Window.h"
 #include "Exceptions/WindowExceptions.h"
 #include <sstream>
 #include "resource.h"

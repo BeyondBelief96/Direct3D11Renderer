@@ -1,8 +1,8 @@
 #pragma once
-#include "ChiliWin.h"
-#include "Window.h"
-#include "Mouse.h"
-#include "Keyboard.h"
+#include "Utilities/ChiliWin.h"
+#include "Core/Window.h"
+#include "Input/Mouse.h"
+#include "Input/Keyboard.h"
 #include <DirectXMath.h>
 
 enum class CameraDirection

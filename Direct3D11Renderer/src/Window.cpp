@@ -201,7 +201,7 @@ LRESULT Window::HandleMsgSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 	// all other messages are forwarded to the default window procedure
 	return DefWindowProc(hwnd, msg, wParam, lParam);
-}
+} 
 
 LRESULT Window::HandleMsgThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {

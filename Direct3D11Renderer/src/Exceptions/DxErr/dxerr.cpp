@@ -10,7 +10,7 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
 //--------------------------------------------------------------------------------------
-#include "dxerr.h"
+#include "Exceptions/dxerr.h"
 
 #include <stdio.h>
 #include <algorithm>

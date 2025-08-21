@@ -145,7 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\Exceptions\dxerr.cpp" />
+    <ClCompile Include="src\Exceptions\DxErr\dxerr.cpp" />
     <ClCompile Include="src\Core\Application.cpp" />
     <ClCompile Include="src\Bindable\Bindable.cpp" />
     <ClCompile Include="src\Bindable\BindableKey.cpp" />
@@ -189,7 +189,6 @@
     <ClCompile Include="src\Renderable\Sphere.cpp" />
     <ClCompile Include="src\Renderable\TexturedCube.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
-    <ClCompile Include="src\Utilities\DxgiInfoManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Application.h" />
@@ -242,7 +241,6 @@
     <ClInclude Include="include\Renderable\Sphere.h" />
     <ClInclude Include="include\Renderable\TexturedCube.h" />
     <ClInclude Include="include\resource.h" />
-    <ClInclude Include="include\Utilities\DxgiInfoManager.h" />
     <ClInclude Include="include\Utilities\MathUtils.h" />
     <ClInclude Include="include\Utilities\WICFactory.h" />
     <ClInclude Include="include\Core\Window.h" />
@@ -377,9 +375,9 @@
     <None Include="..\..\..\..\Downloads\DXGetErrorDescription.inl" />
     <None Include="..\..\..\..\Downloads\DXGetErrorString.inl" />
     <None Include="..\..\..\..\Downloads\DXTrace.inl" />
-    <None Include="include\Exceptions\DXGetErrorDescription.inl" />
-    <None Include="include\Exceptions\DXGetErrorString.inl" />
-    <None Include="include\Exceptions\DXTrace.inl" />
+    <None Include="src\Exceptions\DxErr\DXGetErrorDescription.inl" />
+    <None Include="src\Exceptions\DxErr\DXGetErrorString.inl" />
+    <None Include="src\Exceptions\DxErr\DXTrace.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

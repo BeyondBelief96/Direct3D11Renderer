@@ -144,10 +144,7 @@
     <ClCompile Include="src\Renderable\RenderableTestObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\Exceptions\dxerr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Utilities\ImGuiManager.cpp">
+    <ClCompile Include="src\Exceptions\DxErr\dxerr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -311,9 +308,6 @@
     <ClInclude Include="include\Exceptions\dxerr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Utilities\ImGuiManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Direct3D11Renderer.rc">
@@ -355,13 +349,13 @@
     <None Include="..\..\..\..\Downloads\DXGetErrorDescription.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="include\Exceptions\DXGetErrorDescription.inl">
+    <None Include="src\Exceptions\DxErr\DXGetErrorDescription.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="include\Exceptions\DXGetErrorString.inl">
+    <None Include="src\Exceptions\DxErr\DXGetErrorString.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="include\Exceptions\DXTrace.inl">
+    <None Include="src\Exceptions\DxErr\DXTrace.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

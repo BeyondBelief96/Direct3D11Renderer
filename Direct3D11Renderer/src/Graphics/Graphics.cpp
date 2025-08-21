@@ -107,13 +107,11 @@ Graphics::Graphics(HWND hwnd, int width, int height)
     vp.TopLeftY = 0.0f;
     pContext->RSSetViewports(1u, &vp);
 
+	// Intialize ImGui
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
-
-    // Initialize ImGui
     ImGui_ImplWin32_Init(hwnd);
-    // init imgui d3d impl
     ImGui_ImplDX11_Init(pDevice.Get(), pContext.Get());
 }
 

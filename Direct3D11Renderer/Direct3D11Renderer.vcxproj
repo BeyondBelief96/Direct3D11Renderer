@@ -189,7 +189,7 @@
     <ClCompile Include="src\Renderable\Sphere.cpp" />
     <ClCompile Include="src\Renderable\TexturedCube.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
-    <ClCompile Include="src\Utilities\ImGuiManager.cpp" />
+    <ClCompile Include="src\Utilities\DxgiInfoManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Application.h" />
@@ -242,7 +242,7 @@
     <ClInclude Include="include\Renderable\Sphere.h" />
     <ClInclude Include="include\Renderable\TexturedCube.h" />
     <ClInclude Include="include\resource.h" />
-    <ClInclude Include="include\Utilities\ImGuiManager.h" />
+    <ClInclude Include="include\Utilities\DxgiInfoManager.h" />
     <ClInclude Include="include\Utilities\MathUtils.h" />
     <ClInclude Include="include\Utilities\WICFactory.h" />
     <ClInclude Include="include\Core\Window.h" />

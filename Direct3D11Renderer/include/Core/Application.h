@@ -3,7 +3,6 @@
 #include "Utilities/D3Timer.h"
 #include "Renderable/Renderable.h"
 #include "Renderable/Cube.h"
-#include "Utilities/ImGuiManager.h"
 #include "Camera/FixedCamera.h"
 #include "Camera/FreeFlyCamera.h"
 #include "Lights/PointLight.h"
@@ -22,7 +21,6 @@ private:
 	void SpawnCubeWindowSelector() noexcept;
 	void SpawnCubeWindows() noexcept;
 
-	ImGuiManager imgui;
 	FreeFlyCamera freeCamera;
 	Window wnd;
 	D3Timer timer;

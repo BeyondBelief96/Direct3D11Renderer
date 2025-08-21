@@ -107,13 +107,21 @@ Graphics::Graphics(HWND hwnd, int width, int height)
     vp.TopLeftY = 0.0f;
     pContext->RSSetViewports(1u, &vp);
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+
+    // Initialize ImGui
+    ImGui_ImplWin32_Init(hwnd);
     // init imgui d3d impl
     ImGui_ImplDX11_Init(pDevice.Get(), pContext.Get());
 }
 
 Graphics::~Graphics()
 {
+    ImGui_ImplWin32_Shutdown();
     ImGui_ImplDX11_Shutdown();
+    ImGui::DestroyContext();
 }
 
 void Graphics::BeginFrame(float red, float green, float blue)

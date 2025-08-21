@@ -81,16 +81,12 @@ Window::Window(int width, int height, const WCHAR* name)
 
 	ShowWindow(hwnd, SW_SHOW);
 
-	// Initialize ImGui
-	ImGui_ImplWin32_Init(hwnd);
-
 	// Create graphics object
 	pGraphics = std::make_unique<Graphics>(hwnd, width, height);
 }
 
 Window::~Window()
 {
-	ImGui_ImplWin32_Shutdown();
 	DestroyWindow(hwnd);
 }
 

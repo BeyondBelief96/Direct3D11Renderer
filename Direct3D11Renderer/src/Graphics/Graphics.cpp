@@ -215,7 +215,7 @@ ID3D11Device* const Graphics::GetDevice() noexcept
 }
 
 #ifdef _DEBUG
-DxgiInfoManager& Graphics::GetInfoManager() noexcept
+DxgiDebugManager& Graphics::GetInfoManager() noexcept
 {
     return infoManager;
 }

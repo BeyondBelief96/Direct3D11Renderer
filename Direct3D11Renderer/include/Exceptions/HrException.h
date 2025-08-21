@@ -3,10 +3,10 @@
 #include "Utilities/ChiliWin.h"
 #include <vector>
 
-// Static helper for error code translation
 class HrHelper
 {
 public:
+    // Static helper for error code translation
     static std::string TranslateErrorCode(HRESULT hr) noexcept;
 };
 

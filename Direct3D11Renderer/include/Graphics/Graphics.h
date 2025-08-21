@@ -6,7 +6,7 @@
 #include <wrl.h>
 #include <DirectXMath.h>
 #ifdef _DEBUG
-#include "Utilities/DxgiInfoManager.h"
+#include "Exceptions/DxgiDebugManager.h"
 #endif
 
 class Graphics
@@ -36,7 +36,7 @@ public:
 	ID3D11DeviceContext* const GetContext() noexcept;
     ID3D11Device* const GetDevice() noexcept;
 #ifdef _DEBUG
-	DxgiInfoManager& GetInfoManager() noexcept;
+	DxgiDebugManager& GetInfoManager() noexcept;
 #endif
 
 private:
@@ -46,7 +46,7 @@ private:
     DirectX::XMMATRIX projection;
     DirectX::XMMATRIX view;
 #ifdef _DEBUG
-    DxgiInfoManager infoManager;
+    DxgiDebugManager infoManager;
 #endif
     Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
     Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain;

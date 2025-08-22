@@ -11,7 +11,7 @@ public:
 	ConstantBuffer(Graphics& gfx, const C& constBufferData, UINT slot = 0u)
 		: slot(slot)
 	{
-		INFOMAN(gfx);
+		DEBUGMANAGER(gfx);
 		D3D11_BUFFER_DESC bufferDesc{};
 		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -25,7 +25,7 @@ public:
 	}
 	ConstantBuffer(Graphics& gfx, UINT slot = 0u) : slot(slot)
 	{
-		INFOMAN(gfx);
+		DEBUGMANAGER(gfx);
 		D3D11_BUFFER_DESC bufferDesc{};
 		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -37,7 +37,7 @@ public:
 	}
 	void Update(Graphics& gfx, const C& constBufferData)
 	{
-		INFOMAN(gfx);
+		DEBUGMANAGER(gfx);
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		GFX_THROW_INFO(GetContext(gfx)->Map(pConstantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedResource));
 		memcpy(mappedResource.pData, &constBufferData, sizeof(C));

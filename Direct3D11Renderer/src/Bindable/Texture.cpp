@@ -4,7 +4,7 @@
 
 Texture::Texture(Graphics& gfx, const std::wstring& path)
 {
-	INFOMAN(gfx);
+	DEBUGMANAGER(gfx);
 
 	// Load image using WIC
 	Microsoft::WRL::ComPtr<IWICBitmapDecoder> pDecoder;

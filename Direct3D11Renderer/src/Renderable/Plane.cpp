@@ -23,11 +23,11 @@ Plane::Plane(
     AddSharedBindable<Sampler>(gfx, "plane_sampler");
 
     // Bind vertex shader
-    auto vs = AddSharedBindable<VertexShader>(gfx, "vs_plane", L"TextureVS.cso");
+    auto vs = AddSharedBindable<VertexShader>(gfx, "vs_plane", L"shaders/Output/TextureVS.cso");
     auto pvs = vs->GetByteCode();
 
     // Bind Pixel Shader
-    auto ps = AddSharedBindable<PixelShader>(gfx, "ps_plane", L"TexturePS.cso");
+    auto ps = AddSharedBindable<PixelShader>(gfx, "ps_plane", L"shaders/Output/TexturePS.cso");
 
     // Bind Vertex Buffer
     std::string vbKey = "plane_vertices_" + std::to_string(divisionsX) + "_" + std::to_string(divisionsY);

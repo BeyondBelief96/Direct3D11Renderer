@@ -4,7 +4,7 @@
 
 PixelShader::PixelShader(Graphics& gfx, const std::wstring& path)
 {
-	INFOMAN(gfx);
+	DEBUGMANAGER(gfx);
 
 	Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
 	GFX_THROW_INFO(D3DReadFileToBlob(path.c_str(), &pBlob));

@@ -51,5 +51,5 @@ private:
 #ifdef NDEBUG
 #define INFOMAN(gfx) HRESULT hr
 #else
-#define INFOMAN(gfx) HRESULT hr; DxgiDebugManager& infoManager = GetInfoManager((gfx))
+#define DEBUGMANAGER(gfx) HRESULT hr; DxgiDebugManager& infoManager = GetInfoManager((gfx))
 #endif

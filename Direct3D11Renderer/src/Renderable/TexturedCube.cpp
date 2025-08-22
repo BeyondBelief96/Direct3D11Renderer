@@ -14,11 +14,11 @@ TexturedCube::TexturedCube(
     // Create a cube mesh with texture coordinates
     auto cubeMesh = GeometryFactory::CreateIndependentTexturedCube<VertexPositionNormalTexture>(size);
     // Vertex Shader
-    auto vertexShader = AddSharedBindable<VertexShader>(gfx, "textured_vs", L"TexturedPhongVS.cso");
+    auto vertexShader = AddSharedBindable<VertexShader>(gfx, "textured_vs", L"shaders/Output/TexturedPhongVS.cso");
     auto vertexShaderByteCode = vertexShader->GetByteCode();
 
     // Pixel Shader
-    AddSharedBindable<PixelShader>(gfx, "textured_ps", L"TexturedPhongPS.cso");
+    AddSharedBindable<PixelShader>(gfx, "textured_ps", L"shaders/Output/TexturedPhongPS.cso");
 
     // Vertex Buffer
     AddSharedBindable<VertexBuffer>(gfx, "textured_cube_vb" + std::to_string(size), cubeMesh.vertices);

@@ -16,11 +16,11 @@ Pyramid::Pyramid(
     auto pyramidMesh = GeometryFactory::CreatePyramid<VertexPositionNormal>(radius, height, sides);
 
     // Bind vertex shader
-    auto vs = AddSharedBindable<VertexShader>(gfx, "vs_pyramid_phong", L"PhongVS.cso");
+    auto vs = AddSharedBindable<VertexShader>(gfx, "vs_pyramid_phong", L"shaders/Output/PhongVS.cso");
     auto pvs = vs->GetByteCode();
 
     // Bind Pixel Shader
-    AddSharedBindable<PixelShader>(gfx, "ps_pyramid_phong", L"PhongPS.cso");
+    AddSharedBindable<PixelShader>(gfx, "ps_pyramid_phong", L"shaders/Output/PhongPS.cso");
 
     // Bind Vertex Buffer
     std::string vbKey = "pyramid_vertices_phong_" + std::to_string(sides) + "_" + std::to_string(radius);

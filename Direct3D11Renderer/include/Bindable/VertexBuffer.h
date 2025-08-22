@@ -12,7 +12,7 @@ public:
 	VertexBuffer(Graphics& gfx, const std::vector<V> vertices)
 		: stride(sizeof(V))
 	{
-		INFOMAN(gfx);
+		DEBUGMANAGER(gfx);
 		D3D11_BUFFER_DESC vertexBufferDesc{};
 		vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;

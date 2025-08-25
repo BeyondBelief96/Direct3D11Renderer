@@ -46,6 +46,14 @@ struct has_normal_member<T,
     std::void_t<decltype(std::declval<T>().normal)>>
     : std::true_type {};
 
+template <typename T, typename = void>
+struct has_position_member : std::false_type {};
+
+template <typename T>
+struct has_position_member<T,
+	std::void_t<decltype(std::declval<T>().position)>>
+	: std::true_type {};
+
 template<typename VertexType>
 class GeometryMesh
 {
@@ -60,14 +68,17 @@ public:
 		assert(this->indices.size() % 3 == 0 && "Mesh indices must be a multiple of 3.");
 	}
 
-	void Transform(DirectX::FXMMATRIX matrix)
-	{
-		for (auto& vertex : vertices)
-		{
-			const DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&vertex.position);
-			DirectX::XMStoreFloat3(&vertex.position, DirectX::XMVector3Transform(position, matrix));
-		}
-	}
+    void Transform(DirectX::FXMMATRIX matrix)
+    {
+        if constexpr (has_position_member<VertexType>::value)
+        {
+            for (auto& vertex : vertices)
+            {
+                const DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&vertex.position);
+                DirectX::XMStoreFloat3(&vertex.position, DirectX::XMVector3Transform(position, matrix));
+            }
+        }
+    }
 
     void SetFlatNormals() noexcept(!_DEBUG)
     {

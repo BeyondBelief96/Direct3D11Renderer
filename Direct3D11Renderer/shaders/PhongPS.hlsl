@@ -43,7 +43,7 @@ float4 main(float3 posViewSpace: Position, float3 normal : Normal) : SV_TARGET
     // Reflect expects the first vector to point from light to surface
     float3 reflectionVector = reflect(-lightDirection, normal);
     float specularFactor = pow(max(0.0f, dot(reflectionVector, viewDirection)), specularPower);
-    float3 specular = attenuation * diffuseColor * specularFactor * specularIntensity;
+    float3 specular = diffuseColor * specularFactor * specularIntensity;
     
     // Attenuation
     ambient *= attenuation;

@@ -96,7 +96,7 @@ Texture::Texture(Graphics& gfx, const std::wstring& path)
 	GFX_THROW_INFO(GetDevice(gfx)->CreateTexture2D(
 		&textureDesc,
 		&subresourceData,
-		&pTexture
+		pTexture.ReleaseAndGetAddressOf()
 	));
 
 	// Create shader resource view

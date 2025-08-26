@@ -23,9 +23,9 @@ void PointLight::SpawnControlWindow() noexcept
 		ImGui::ColorEdit3("Ambient", &lightConstantBuffer.ambientColor.x);
 
 		ImGui::Text("Falloff");
-		ImGui::SliderFloat("Constant", &lightConstantBuffer.attConstant, 0.05f, 10.0f, "%.2f");
-		ImGui::SliderFloat("Linear", &lightConstantBuffer.attLinear, 0.0001f, 4.0f, "%.4f", ImGuiSliderFlags_Logarithmic);
-		ImGui::SliderFloat("Quadratic", &lightConstantBuffer.attQuadratic, 0.0000001f, 10.0f, "%.7f", ImGuiSliderFlags_Logarithmic);
+		ImGui::SliderFloat("Constant", &lightConstantBuffer.attConstant, 1.0f, 2.0f, "%.2f");
+		ImGui::SliderFloat("Linear", &lightConstantBuffer.attLinear, 0.05f, 0.3f, "%.4f", ImGuiSliderFlags_Logarithmic);
+		ImGui::SliderFloat("Quadratic", &lightConstantBuffer.attQuadratic, 0.01f, 0.1f, "%.5f", ImGuiSliderFlags_Logarithmic);
 
 		if (ImGui::Button("Reset"))
 		{

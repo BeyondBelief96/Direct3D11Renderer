@@ -4,6 +4,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "Geometry/Vertex.h"
 
 ModelTest::ModelTest(Graphics& gfx, std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist, float scale)
 	: RenderableTestObject(rng, adist, ddist, odist, rdist)
@@ -13,15 +14,17 @@ ModelTest::ModelTest(Graphics& gfx, std::mt19937& rng, std::uniform_real_distrib
 		aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
 
 	const auto pMesh = pModel->mMeshes[0];
-	std::vector<VertexPositionNormal> vertices;
-	vertices.reserve(pMesh->mNumVertices);
+	// Build dynamic vertex buffer with layout Position3D + Normal
+	D3::VertexLayout dynLayout;
+	dynLayout.Append(D3::VertexLayout::Position3D)
+			 .Append(D3::VertexLayout::Normal);
+	D3::VertexBuffer dynVbuf(std::move(dynLayout));
 	for (unsigned int i = 0; i < pMesh->mNumVertices; i++)
 	{
-		vertices.push_back(
-			{
-				{pMesh->mVertices[i].x * scale, pMesh->mVertices[i].y * scale, pMesh->mVertices[i].z * scale},
-				*reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mNormals[i]) 
-			});
+		dynVbuf.EmplaceBack(
+			DirectX::XMFLOAT3{ pMesh->mVertices[i].x * scale, pMesh->mVertices[i].y * scale, pMesh->mVertices[i].z * scale },
+			*reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mNormals[i])
+		);
 	}
 
 	std::vector<unsigned short> indices;
@@ -38,15 +41,12 @@ ModelTest::ModelTest(Graphics& gfx, std::mt19937& rng, std::uniform_real_distrib
 	auto vs = AddSharedBindable<VertexShader>(gfx, "vs_phong", L"shaders/Output/PhongVS.cso");
 	const auto shaderByteCode = vs->GetByteCode();
 	AddSharedBindable<PixelShader>(gfx, "ps_phong", L"shaders/Output/PhongPS.cso");
-	AddSharedBindable<VertexBuffer>(gfx, "suzanne_vb", vertices);
+	// Upload dynamic vertex buffer to GPU using CPU dynamic buffer overload
+	AddSharedBindable<VertexBuffer>(gfx, "suzanne_vb", dynVbuf);
 	AddSharedBindable<IndexBuffer>(gfx, "suzzane_ib", indices);
 
-	const std::vector<D3D11_INPUT_ELEMENT_DESC> layout =
-	{
-		{ "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "Normal", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-	AddSharedBindable<InputLayout>(gfx, "position_normal_layout", layout, shaderByteCode);
+	// Create InputLayout from dynamic layout
+	AddSharedBindable<InputLayout>(gfx, "position_normal_layout", dynVbuf.GetLayout().GetD3DLayout(), shaderByteCode);
 	AddUniqueBindable(std::make_unique<PixelConstantBuffer<PSMaterialConstantBuffer>>(gfx, materialConstantBuffer, 1u));
 	AddSharedBindable<Topology>(gfx, "triangle_list", D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	AddUniqueBindable(std::make_unique<TransformConstantBuffer>(gfx, *this));

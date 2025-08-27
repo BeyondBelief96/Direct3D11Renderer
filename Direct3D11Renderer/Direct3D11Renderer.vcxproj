@@ -162,6 +162,7 @@
     <ClCompile Include="src\Camera\FreeFlyCamera.cpp" />
     <ClCompile Include="src\Renderable\ModelTest.cpp" />
     <ClCompile Include="src\Renderable\Pyramid.cpp" />
+    <ClCompile Include="src\Renderable\SolidSphere.cpp" />
     <ClCompile Include="src\Utilities\D3Timer.cpp" />
     <ClCompile Include="src\Exceptions\BindableLookupException.cpp" />
     <ClCompile Include="src\Exceptions\D3Exception.cpp" />
@@ -185,7 +186,6 @@
     <ClCompile Include="src\Renderable\Cube.cpp" />
     <ClCompile Include="src\Renderable\Renderable.cpp" />
     <ClCompile Include="src\Renderable\RenderableTestObject.cpp" />
-    <ClCompile Include="src\Renderable\SolidSphere.cpp" />
     <ClCompile Include="src\Renderable\Sphere.cpp" />
     <ClCompile Include="src\Renderable\TexturedCube.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
@@ -209,8 +209,10 @@
     <ClInclude Include="include\Camera\FixedCamera.h" />
     <ClInclude Include="include\Camera\FreeFlyCamera.h" />
     <ClInclude Include="include\Exceptions\dxerr.h" />
+    <ClInclude Include="include\Geometry\Vertex.h" />
     <ClInclude Include="include\Renderable\ModelTest.h" />
     <ClInclude Include="include\Renderable\Pyramid.h" />
+    <ClInclude Include="include\Renderable\SolidSphere.h" />
     <ClInclude Include="include\Utilities\D3Timer.h" />
     <ClInclude Include="include\Utilities\ChiliWin.h" />
     <ClInclude Include="include\Exceptions\BindableLookupException.h" />
@@ -237,7 +239,6 @@
     <ClInclude Include="include\Renderable\Cube.h" />
     <ClInclude Include="include\Renderable\Renderable.h" />
     <ClInclude Include="include\Renderable\RenderableTestObject.h" />
-    <ClInclude Include="include\Renderable\SolidSphere.h" />
     <ClInclude Include="include\Renderable\Sphere.h" />
     <ClInclude Include="include\Renderable\TexturedCube.h" />
     <ClInclude Include="include\resource.h" />

@@ -2,6 +2,7 @@
 
 #include "Bindable.h"
 #include "Exceptions/GraphicsExceptions.h"
+#include "Geometry/Vertex.h"
 #include <vector>
 #include <wrl.h>
 
@@ -24,6 +25,8 @@ public:
 		vertexBufferData.pSysMem = vertices.data();
 		GFX_THROW_INFO(GetDevice(gfx)->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &pVertexBuffer));
 	}
+
+	VertexBuffer(Graphics& gfx, const D3::VertexBuffer& vbuf) noexcept(!_DEBUG);
 
 	void Bind(Graphics& gfx) noexcept override;
 protected:

@@ -12,27 +12,32 @@ void PointLight::SpawnControlWindow() noexcept
 {
 	if (ImGui::Begin("Light"))
 	{
-		ImGui::Text("Position");
-		ImGui::SliderFloat("World X (+Right)", &lightConstantBuffer.lightPos.x, -60.0f, 60.0f, "%.1f");
-		ImGui::SliderFloat("World Y (+Up)", &lightConstantBuffer.lightPos.y, -60.0f, 60.0f, "%.1f");
-		ImGui::SliderFloat("World Z (+Forward)", &lightConstantBuffer.lightPos.z, -60.0f, 60.0f, "%.1f");
-
-		ImGui::Text("Intensity/Color");
-		ImGui::SliderFloat("Intensity", &lightConstantBuffer.diffuseIntensity, 0.01f, 2.0f, "%.2f");
-		ImGui::ColorEdit3("Diffuse Color", &lightConstantBuffer.diffuseColor.x);
-		ImGui::ColorEdit3("Ambient", &lightConstantBuffer.ambientColor.x);
-
-		ImGui::Text("Falloff");
-		ImGui::SliderFloat("Constant", &lightConstantBuffer.attConstant, 1.0f, 2.0f, "%.2f");
-		ImGui::SliderFloat("Linear", &lightConstantBuffer.attLinear, 0.05f, 0.3f, "%.4f", ImGuiSliderFlags_Logarithmic);
-		ImGui::SliderFloat("Quadratic", &lightConstantBuffer.attQuadratic, 0.01f, 0.1f, "%.5f", ImGuiSliderFlags_Logarithmic);
-
-		if (ImGui::Button("Reset"))
-		{
-			Reset();
-		}
+		DrawControlsInline();
 	}
 	ImGui::End();
+}
+
+void PointLight::DrawControlsInline() noexcept
+{
+	ImGui::Text("Position");
+	ImGui::SliderFloat("World X (+Right)", &lightConstantBuffer.lightPos.x, -60.0f, 60.0f, "%.1f");
+	ImGui::SliderFloat("World Y (+Up)", &lightConstantBuffer.lightPos.y, -60.0f, 60.0f, "%.1f");
+	ImGui::SliderFloat("World Z (+Forward)", &lightConstantBuffer.lightPos.z, -60.0f, 60.0f, "%.1f");
+
+	ImGui::Text("Intensity/Color");
+	ImGui::SliderFloat("Intensity", &lightConstantBuffer.diffuseIntensity, 0.01f, 2.0f, "%.2f");
+	ImGui::ColorEdit3("Diffuse Color", &lightConstantBuffer.diffuseColor.x);
+	ImGui::ColorEdit3("Ambient", &lightConstantBuffer.ambientColor.x);
+
+	ImGui::Text("Falloff");
+	ImGui::SliderFloat("Constant", &lightConstantBuffer.attConstant, 1.0f, 2.0f, "%.2f");
+	ImGui::SliderFloat("Linear", &lightConstantBuffer.attLinear, 0.05f, 0.3f, "%.4f", ImGuiSliderFlags_Logarithmic);
+	ImGui::SliderFloat("Quadratic", &lightConstantBuffer.attQuadratic, 0.01f, 0.1f, "%.5f", ImGuiSliderFlags_Logarithmic);
+
+	if (ImGui::Button("Reset"))
+	{
+		Reset();
+	}
 }
 
 void PointLight::Reset() noexcept

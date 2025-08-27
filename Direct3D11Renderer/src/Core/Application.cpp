@@ -1,9 +1,4 @@
 #include "Core/Application.h"
-#include "Renderable/Cube.h"
-#include "Renderable/Sphere.h"
-#include "Renderable/TexturedCube.h"
-#include "Renderable/ModelTest.h"
-#include "Renderable/Pyramid.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
@@ -16,106 +11,9 @@
      light(wnd.Gfx())
  {
      std::mt19937 rng(std::random_device{}());
-     std::uniform_real_distribution<float> adist(0.0f, 3.1415f * 2.0f);
-     std::uniform_real_distribution<float> ddist(0.0f, 3.1415f * 2.0f);
-     std::uniform_real_distribution<float> odist(0.0f, 3.1415f * 0.3f);
-     std::uniform_real_distribution<float> rdist(6.0f, 20.0f);
-     std::uniform_real_distribution<float> bdist(0.0f, 1.0f);
-     std::uniform_real_distribution<float> color_dist(0.0f, 1.0f);
 
-     // Distribution for Z positions (positive values)
-     std::uniform_real_distribution<float> zdist(10.0f, 50.0f);
-     // Distribution for X and Y positions (both positive and negative)
-     std::uniform_real_distribution<float> xydist(-20.0f, 20.0f);
-
-     // Create a mix of geometry types
-     for (int i = 0; i < nShapes; i++)
-     {
-         // Randomize the material color
-         DirectX::XMFLOAT3 materialColor(
-             color_dist(rng),
-             color_dist(rng),
-             color_dist(rng));
-
-         // Create boxes with explicit position control
-         auto cube = std::make_unique<Cube>(
-             wnd.Gfx(),
-             rng,
-             adist,
-             ddist,
-             odist,
-             rdist,
-             bdist,
-             materialColor);
-
-         renderables.push_back(std::move(cube));
-
-         // Add a sphere
-         auto sphere = std::make_unique<Sphere>(
-             wnd.Gfx(),
-             rng,
-             adist,
-             ddist,
-             odist,
-             rdist,
-             1.0f,     // radius
-             16        // tessellation
-         );
-
-         renderables.push_back(std::move(sphere));
-
-         auto texturedCube = std::make_unique<TexturedCube>(
-             wnd.Gfx(),
-             rng,
-             adist,
-             ddist,
-             odist,
-             rdist,
-             1.0f,
-             L"assets/kappa50.png"
-         );
-
-         renderables.push_back(std::move(texturedCube));
-
-         std::uniform_real_distribution<float> pyradist(0.8f, 1.5f);  // Radius distribution
-         std::uniform_real_distribution<float> pyhdist(1.5f, 3.0f);   // Height distribution
-         std::uniform_int_distribution<int> pysidesdist(3, 8);        // Sides distribution
-
-         auto pyramid = std::make_unique<Pyramid>(
-             wnd.Gfx(),
-             rng,
-             adist,
-             ddist,
-             odist,
-             rdist,
-             pyradist(rng),    // randomized radius
-             pyhdist(rng),     // randomized height
-             pysidesdist(rng)  // randomized number of sides
-         );
-
-         renderables.push_back(std::move(pyramid));
-
-         auto suzanne = std::make_unique<ModelTest>(
-             wnd.Gfx(),
-             rng,
-             adist,
-             ddist,
-             odist,
-             rdist,
-             1.0f
-         );
-
-         renderables.push_back(std::move(suzanne));
-     }
-
-     // Initialize vector of non-owning pointers to cubes
-     for (auto& renderable : renderables)
-     {
-         if (auto cp = dynamic_cast<Cube*>(renderable.get()))
-         {
-             cubes.push_back(cp);
-         }
-     }
+     // Load a single model (adjust path as needed)
+     model = std::make_unique<Model>(wnd.Gfx(), "assets/models/nanosuit.obj");
 
      wnd.Gfx().SetProjection(freeCamera.GetProjectionMatrix(45.0f, 16.0f / 9.0f, 0.5f, 100.0f));
  }
@@ -135,14 +33,13 @@ int Application::Run()
 
 void Application::ProcessFrame()
 {
-    // Check if space is pressed and update speed_factor accordingly
     if (wnd.kbd.KeyIsPressed(VK_SPACE))
     {
-        speed_factor = 0.0f; // Set to 0 when space is pressed
+        speed_factor = 0.0f;
     }
     else
     {
-        speed_factor = ui_speed_factor; // Restore to UI value when not pressed
+        speed_factor = ui_speed_factor;
     }
 
     auto dt = timer.Mark();
@@ -152,22 +49,26 @@ void Application::ProcessFrame()
     wnd.Gfx().SetProjection(freeCamera.GetProjectionMatrix(45.0f, 16.0f / 9.0f, 0.5f, 100.0f));
     wnd.Gfx().SetView(freeCamera.GetViewMatrix());
     wnd.Gfx().BeginFrame(0.07f, 0.0f, 0.12f);
-    light.Bind(wnd.Gfx());
 
+    using namespace DirectX;
+    const auto modelTransform = XMMatrixRotationRollPitchYaw(modelPose.pitch, modelPose.yaw, modelPose.roll) *
+        XMMatrixTranslation(modelPose.x, modelPose.y, modelPose.z);
 
-    for (auto& box : renderables)
-    {
-        box->Update(dt * speed_factor);
-        box->Render(wnd.Gfx());
-    }
-	light.Render(wnd.Gfx());
-
-    static char buffer[1024];
-
+    // UI
     SpawnSimulationWindow();
-    light.SpawnControlWindow();
-    SpawnCubeWindowSelector();
-    SpawnCubeWindows();
+    SpawnModelWindow();
+
+    // Apply light controls
+    light.SetPosition({ lightControls.x, lightControls.y, lightControls.z });
+    light.SetAmbient({ lightControls.ambient[0], lightControls.ambient[1], lightControls.ambient[2] });
+    light.SetDiffuse({ lightControls.diffuse[0], lightControls.diffuse[1], lightControls.diffuse[2] });
+    light.SetDiffuseIntensity(lightControls.diffuseIntensity);
+    light.SetAttenuation(lightControls.attConstant, lightControls.attLinear, lightControls.attQuadratic);
+
+    // Bind and render
+    light.Bind(wnd.Gfx());
+    model->Draw(wnd.Gfx(), modelTransform);
+    light.Render(wnd.Gfx());
 
     wnd.Gfx().EndFrame();
 }
@@ -178,7 +79,6 @@ void Application::SpawnSimulationWindow() noexcept
     {
         if (ImGui::SliderFloat("Speed Factor", &ui_speed_factor, 0.0f, 4.0f))
         {
-            // Only update the actual speed factor if space is not pressed
             if (!wnd.kbd.KeyIsPressed(VK_SPACE))
             {
                 speed_factor = ui_speed_factor;
@@ -192,71 +92,33 @@ void Application::SpawnSimulationWindow() noexcept
     ImGui::End();
 }
 
-void Application::SpawnCubeWindowSelector() noexcept
+void Application::SpawnModelWindow() noexcept
 {
-    if (ImGui::Begin("Boxes"))
+    if (ImGui::Begin("Model"))
     {
-        using namespace std::string_literals;
+        ImGui::Text("Orientation");
+        ImGui::SliderAngle("Roll", &modelPose.roll, -180.0f, 180.0f);
+        ImGui::SliderAngle("Pitch", &modelPose.pitch, -180.0f, 180.0f);
+        ImGui::SliderAngle("Yaw", &modelPose.yaw, -180.0f, 180.0f);
 
-        // Create a safe preview text that doesn't access the optional when it's empty
-        const std::string preview = comboBoxIndex.has_value()
-            ? std::to_string(comboBoxIndex.value())
-            : "Choose a box..."s;
+        ImGui::Text("Position");
+        ImGui::SliderFloat("X", &modelPose.x, -20.0f, 20.0f, "%.2f");
+        ImGui::SliderFloat("Y", &modelPose.y, -20.0f, 20.0f, "%.2f");
+        ImGui::SliderFloat("Z", &modelPose.z, -20.0f, 20.0f, "%.2f");
 
-        if (ImGui::BeginCombo("Box Number", preview.c_str()))
-        {
-            for (int i = 0; i < cubes.size(); i++)
-            {
-                // Check if comboBoxIndex has a value before comparing
-                const bool selected = comboBoxIndex.has_value() && comboBoxIndex.value() == i;
-
-                if (ImGui::Selectable(std::to_string(i).c_str(), selected))
-                {
-                    comboBoxIndex = i;
-                }
-
-                if (selected)
-                {
-                    ImGui::SetItemDefaultFocus();
-                }
-            }
-            ImGui::EndCombo();
-        }
-
-        // Only enable the button if comboBoxIndex has a value
-        if (comboBoxIndex.has_value())
-        {
-            if (ImGui::Button("Spawn Control Window"))
-            {
-                boxControlIds.insert(comboBoxIndex.value());
-                comboBoxIndex.reset();
-            }
-        }
-        else
-        {
-            // Disabled button when no box is selected
-            ImGui::BeginDisabled();
-            ImGui::Button("Spawn Control Window");
-            ImGui::EndDisabled();
-            ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "Select a box first");
-        }
+        ImGui::Separator();
+        ImGui::Text("Light");
+        ImGui::SliderFloat("Light X", &lightControls.x, -50.0f, 50.0f, "%.2f");
+        ImGui::SliderFloat("Light Y", &lightControls.y, -50.0f, 50.0f, "%.2f");
+        ImGui::SliderFloat("Light Z", &lightControls.z, -50.0f, 50.0f, "%.2f");
+        ImGui::ColorEdit3("Ambient", lightControls.ambient);
+        ImGui::ColorEdit3("Diffuse", lightControls.diffuse);
+        ImGui::SliderFloat("Intensity", &lightControls.diffuseIntensity, 0.0f, 4.0f);
+        ImGui::SliderFloat("Att C", &lightControls.attConstant, 0.0f, 2.0f);
+        ImGui::SliderFloat("Att L", &lightControls.attLinear, 0.0f, 1.0f);
+        ImGui::SliderFloat("Att Q", &lightControls.attQuadratic, 0.0f, 1.0f);
     }
     ImGui::End();
-}
-
-void Application::SpawnCubeWindows() noexcept
-{
-    for (auto i = boxControlIds.begin(); i != boxControlIds.end(); )
-    {
-        if (!cubes[*i]->SpawnControlWindow(*i, wnd.Gfx()))
-        {
-            i = boxControlIds.erase(i);
-        }
-        else
-        {
-            i++;
-        }
-    }
 }
 
 

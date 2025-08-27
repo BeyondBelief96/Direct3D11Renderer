@@ -2,7 +2,7 @@
 #include "Window.h"
 #include "Utilities/D3Timer.h"
 #include "Renderable/Renderable.h"
-#include "Renderable/Cube.h"
+#include "Renderable/Model/Model.h"
 #include "Camera/FixedCamera.h"
 #include "Camera/FreeFlyCamera.h"
 #include "Lights/PointLight.h"
@@ -18,8 +18,7 @@ public:
 private:
 	void ProcessFrame();
 	void SpawnSimulationWindow() noexcept;
-	void SpawnCubeWindowSelector() noexcept;
-	void SpawnCubeWindows() noexcept;
+	void SpawnModelWindow() noexcept;
 
 	FreeFlyCamera freeCamera;
 	Window wnd;
@@ -28,11 +27,26 @@ private:
 	float speed_factor = 1.0f;
 	PointLight light;
 
-	std::vector<std::unique_ptr<Renderable>> renderables;
-	std::vector<Cube*> cubes;
-	static constexpr size_t nRenderables = 180;
-	static constexpr size_t nShapes = 10;
-
-	std::optional<int> comboBoxIndex;
-	std::set<int> boxControlIds;
+	std::unique_ptr<Model> model;
+	struct
+	{
+		float roll = 0.0f;
+		float pitch = 0.0f;
+		float yaw = 0.0f;
+		float x = 0.0f;
+		float y = 0.0f;
+		float z = 0.0f;
+	} modelPose;
+	struct
+	{
+		float x = 0.0f;
+		float y = 0.0f;
+		float z = 0.0f;
+		float ambient[3] = { 0.05f, 0.05f, 0.05f };
+		float diffuse[3] = { 1.0f, 1.0f, 1.0f };
+		float diffuseIntensity = 1.0f;
+		float attConstant = 1.0f;
+		float attLinear = 0.045f;
+		float attQuadratic = 0.0075f;
+	} lightControls;
 };

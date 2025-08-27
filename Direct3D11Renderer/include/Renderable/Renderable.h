@@ -122,7 +122,7 @@ public:
     }
 
     virtual DirectX::XMMATRIX GetTransformXM() const noexcept = 0;
-    virtual void Update(float dt) noexcept = 0;
+    virtual void Update(float dt) noexcept {};
 
 private:
     const IndexBuffer* pIndexBuffer = nullptr;

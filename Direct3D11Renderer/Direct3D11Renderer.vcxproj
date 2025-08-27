@@ -377,6 +377,10 @@
     <None Include="src\Exceptions\DxErr\DXGetErrorString.inl" />
     <None Include="src\Exceptions\DxErr\DXTrace.inl" />
   </ItemGroup>
+  <ItemGroup>
+    <Object Include="assets\models\nanosuit.obj" />
+    <Object Include="assets\models\suzanne.obj" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>

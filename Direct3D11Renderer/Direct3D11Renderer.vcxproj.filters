@@ -353,4 +353,8 @@
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Object Include="assets\models\nanosuit.obj" />
+    <Object Include="assets\models\suzanne.obj" />
+  </ItemGroup>
 </Project>

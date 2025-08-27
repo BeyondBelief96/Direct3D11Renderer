@@ -19,11 +19,11 @@ Cube::Cube(
     auto cubeMesh = GeometryFactory::CreateIndependentCube<VertexPositionNormal>();
 
     // Vertex Shader - shared
-    auto vs = AddSharedBindable<VertexShader>(gfx, "box_vs", L"shaders/Output/PhongVS.cso");
+    auto vs = AddSharedBindable<VertexShader>(gfx, "vs_phong", L"shaders/Output/PhongVS.cso");
     auto pvsbc = vs->GetByteCode();
 
     // Pixel Shader - shared
-    AddSharedBindable<PixelShader>(gfx, "box_ps", L"shaders/Output/PhongPS.cso");
+    AddSharedBindable<PixelShader>(gfx, "ps_phong", L"shaders/Output/PhongPS.cso");
 
     // Vertex Buffer - shared
     AddSharedBindable<VertexBuffer>(gfx, "box_vb", cubeMesh.vertices);

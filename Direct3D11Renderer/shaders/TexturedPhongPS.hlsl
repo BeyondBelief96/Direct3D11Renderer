@@ -1,6 +1,6 @@
 cbuffer Light
 {
-    float3 lightPosViewSpace; // Light position in view/camera space
+    float3 lightPosViewSpace;
     float3 ambientColor;
     float3 diffuseColor;
     float diffuseIntensity;

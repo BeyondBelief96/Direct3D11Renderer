@@ -1,4 +1,5 @@
 #include "Renderable/Sphere.h"
+#include "Geometry/Vertex.h"
 
 Sphere::Sphere(
     Graphics& gfx,
@@ -13,6 +14,15 @@ Sphere::Sphere(
     // Create a sphere mesh with normals
     auto sphereMesh = GeometryFactory::CreateSphere<VertexPositionNormal>(radius, tessellation);
 
+    D3::VertexLayout dynLayout;
+    dynLayout.Append(D3::VertexLayout::Position3D)
+             .Append(D3::VertexLayout::Normal);
+    D3::VertexBuffer dynVbuf(std::move(dynLayout));
+    for (const auto& v : sphereMesh.vertices)
+    {
+        dynVbuf.EmplaceBack(v.position, v.normal);
+    }
+
     // Bind vertex shader
     auto vs = AddSharedBindable<VertexShader>(gfx, "vs_phong", L"shaders/Output/PhongVS.cso");
     auto pvs = vs->GetByteCode();
@@ -22,19 +32,14 @@ Sphere::Sphere(
 
     // Bind Vertex Buffer
     std::string vbKey = "sphere_vertices_phong_" + std::to_string(tessellation);
-    AddSharedBindable<VertexBuffer>(gfx, vbKey, sphereMesh.vertices);
+    AddSharedBindable<VertexBuffer>(gfx, vbKey, dynVbuf);
 
     // Bind Index Buffer
     std::string ibKey = "sphere_indices_phong_" + std::to_string(tessellation);
     AddSharedBindable<IndexBuffer>(gfx, ibKey, sphereMesh.indices);
 
     // Create input layout for position and normal
-    const std::vector<D3D11_INPUT_ELEMENT_DESC> layout =
-    {
-        { "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "Normal", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    };
-    AddSharedBindable<InputLayout>(gfx, "position_normal_layout", layout, pvs);
+    AddSharedBindable<InputLayout>(gfx, "position_normal_layout", dynVbuf.GetLayout().GetD3DLayout(), pvs);
 
     // Create topology
     AddSharedBindable<Topology>(gfx, "triangle_list", D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

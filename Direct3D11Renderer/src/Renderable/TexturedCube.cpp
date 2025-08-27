@@ -1,5 +1,6 @@
 #include "Renderable/TexturedCube.h"
 #include "Bindable/BindableCommon.h"
+#include "Geometry/Vertex.h"
 
 TexturedCube::TexturedCube(
     Graphics& gfx,
@@ -13,6 +14,17 @@ TexturedCube::TexturedCube(
 {
     // Create a cube mesh with texture coordinates
     auto cubeMesh = GeometryFactory::CreateIndependentTexturedCube<VertexPositionNormalTexture>(size);
+
+    D3::VertexLayout dynLayout;
+    dynLayout.Append(D3::VertexLayout::Position3D)
+             .Append(D3::VertexLayout::Normal)
+             .Append(D3::VertexLayout::Texture2D);
+    D3::VertexBuffer dynVbuf(std::move(dynLayout));
+    for (const auto& v : cubeMesh.vertices)
+    {
+        dynVbuf.EmplaceBack(v.position, v.normal, v.texCoord);
+    }
+
     // Vertex Shader
     auto vertexShader = AddSharedBindable<VertexShader>(gfx, "textured_vs", L"shaders/Output/TexturedPhongVS.cso");
     auto vertexShaderByteCode = vertexShader->GetByteCode();
@@ -21,27 +33,20 @@ TexturedCube::TexturedCube(
     AddSharedBindable<PixelShader>(gfx, "textured_ps", L"shaders/Output/TexturedPhongPS.cso");
 
     // Vertex Buffer
-    AddSharedBindable<VertexBuffer>(gfx, "textured_cube_vb" + std::to_string(size), cubeMesh.vertices);
+    AddSharedBindable<VertexBuffer>(gfx, "textured_cube_vb" + std::to_string(size), dynVbuf);
 
     // Index Buffer
     AddSharedBindable<IndexBuffer>(gfx, "textured_cube_ib" + std::to_string(size), cubeMesh.indices);
 
     // Input Layout
-    const std::vector<D3D11_INPUT_ELEMENT_DESC> inputLayout =
-    {
-        {"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{"Normal", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        {"TexCoord", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0}
-    };
-
-	AddSharedBindable<InputLayout>(gfx, "position_normal_texture_layout" + std::to_string(size), inputLayout, vertexShaderByteCode);
+    AddSharedBindable<InputLayout>(gfx, "position_normal_texture_layout" + std::to_string(size), dynVbuf.GetLayout().GetD3DLayout(), vertexShaderByteCode);
 
     // Add Texture and Sampler
-	AddSharedBindable<Texture>(gfx, "box_texture" , textureFilename);
-	AddSharedBindable<Sampler>(gfx, "box_sampler");
+    AddSharedBindable<Texture>(gfx, "box_texture" , textureFilename);
+    AddSharedBindable<Sampler>(gfx, "box_sampler");
 
     // Topology
-	AddSharedBindable<Topology>(gfx, "triangle_list", D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    AddSharedBindable<Topology>(gfx, "triangle_list", D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     struct PSMaterialConstant
     {

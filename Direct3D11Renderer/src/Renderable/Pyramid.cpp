@@ -1,5 +1,6 @@
 #include "Renderable/Pyramid.h"
 #include "Geometry/GeometryFactory.h"
+#include "Geometry/Vertex.h"
 #include "Bindable/BindableCommon.h"
 
 Pyramid::Pyramid(
@@ -17,6 +18,15 @@ Pyramid::Pyramid(
     // Create a pyramid mesh with normals using the cone geometry
     auto pyramidMesh = GeometryFactory::CreateCone<VertexPositionNormal>(radius, height, sides);
 
+    D3::VertexLayout dynLayout;
+    dynLayout.Append(D3::VertexLayout::Position3D)
+             .Append(D3::VertexLayout::Normal);
+    D3::VertexBuffer dynVbuf(std::move(dynLayout));
+    for (const auto& v : pyramidMesh.vertices)
+    {
+        dynVbuf.EmplaceBack(v.position, v.normal);
+    }
+
     // Bind vertex shader
     auto vs = AddSharedBindable<VertexShader>(gfx, "vs_phong", L"shaders/Output/PhongVS.cso");
     auto pvs = vs->GetByteCode();
@@ -26,19 +36,14 @@ Pyramid::Pyramid(
 
     // Bind Vertex Buffer
     std::string vbKey = "pyramid_vertices_phong_" + std::to_string(sides);
-    AddSharedBindable<VertexBuffer>(gfx, vbKey, pyramidMesh.vertices);
+    AddSharedBindable<VertexBuffer>(gfx, vbKey, dynVbuf);
 
     // Bind Index Buffer
     std::string ibKey = "pyramid_indices_phong_" + std::to_string(sides);
     AddSharedBindable<IndexBuffer>(gfx, ibKey, pyramidMesh.indices);
 
     // Create input layout for position and normal
-    const std::vector<D3D11_INPUT_ELEMENT_DESC> layout =
-    {
-        { "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "Normal", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    };
-    AddSharedBindable<InputLayout>(gfx, "position_normal_layout", layout, pvs);
+    AddSharedBindable<InputLayout>(gfx, "position_normal_layout", dynVbuf.GetLayout().GetD3DLayout(), pvs);
 
     // Create topology
     AddSharedBindable<Topology>(gfx, "triangle_list", D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

@@ -2,6 +2,7 @@
 #include "Bindable/BindableCommon.h"
 #include "Bindable/BindableCache.h"
 #include "Geometry/GeometryFactory.h"
+#include "Geometry/Vertex.h"
 #include "imgui/imgui.h"
 #include <memory>
 
@@ -18,6 +19,15 @@ Cube::Cube(
 {
     auto cubeMesh = GeometryFactory::CreateIndependentCube<VertexPositionNormal>();
 
+    D3::VertexLayout dynLayout;
+    dynLayout.Append(D3::VertexLayout::Position3D)
+             .Append(D3::VertexLayout::Normal);
+    D3::VertexBuffer dynVbuf(std::move(dynLayout));
+    for (const auto& v : cubeMesh.vertices)
+    {
+        dynVbuf.EmplaceBack(v.position, v.normal);
+    }
+
     // Vertex Shader - shared
     auto vs = AddSharedBindable<VertexShader>(gfx, "vs_phong", L"shaders/Output/PhongVS.cso");
     auto pvsbc = vs->GetByteCode();
@@ -25,19 +35,14 @@ Cube::Cube(
     // Pixel Shader - shared
     AddSharedBindable<PixelShader>(gfx, "ps_phong", L"shaders/Output/PhongPS.cso");
 
-    // Vertex Buffer - shared
-    AddSharedBindable<VertexBuffer>(gfx, "box_vb", cubeMesh.vertices);
+    // Vertex Buffer - shared (from dynamic buffer)
+    AddSharedBindable<VertexBuffer>(gfx, "box_vb", dynVbuf);
 
     // Index Buffer - shared
     AddSharedBindable<IndexBuffer>(gfx, "box_ib", cubeMesh.indices);
 
-    // Input Layout - shared
-    const std::vector<D3D11_INPUT_ELEMENT_DESC> layout =
-    {
-        { "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "Normal", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    };
-    AddSharedBindable<InputLayout>(gfx, "position_normal_layout", layout, pvsbc);
+    // Input Layout - shared (from dynamic layout)
+    AddSharedBindable<InputLayout>(gfx, "position_normal_layout", dynVbuf.GetLayout().GetD3DLayout(), pvsbc);
 
     materialConstantBuffer.color = materialColor;
     AddUniqueBindable(std::make_unique<PixelConstantBuffer<PSMaterialConstantBuffer>>(gfx, materialConstantBuffer, 1u));

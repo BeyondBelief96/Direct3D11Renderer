@@ -1,25 +1,31 @@
 #include "Renderable/SolidSphere.h"
 #include "Geometry/GeometryFactory.h"
 #include "Bindable/BindableCommon.h"
+#include "Geometry/Vertex.h"
 
 SolidSphere::SolidSphere(Graphics& gfx, float radius)
 {
 	auto sphereMesh = GeometryFactory::CreateSphere<VertexPosition>(radius, 10, 10);
+
+	D3::VertexLayout dynLayout;
+	dynLayout.Append(D3::VertexLayout::Position3D);
+	D3::VertexBuffer dynVbuf(std::move(dynLayout));
+	for (const auto& v : sphereMesh.vertices)
+	{
+		dynVbuf.EmplaceBack(v.position);
+	}
+
 	// Vertex Shader - shared
 	auto vs = AddSharedBindable<VertexShader>(gfx, "vs_solid", L"shaders/Output/SolidVS.cso");
 	auto pvsbc = vs->GetByteCode();
 	// Pixel Shader - shared
 	AddSharedBindable<PixelShader>(gfx, "ps_solid", L"shaders/Output/SolidPS.cso");
 	// Vertex Buffer - shared
-	AddSharedBindable<VertexBuffer>(gfx, "sphere_vb", sphereMesh.vertices);
+	AddSharedBindable<VertexBuffer>(gfx, "sphere_vb", dynVbuf);
 	// Index Buffer - shared
 	AddSharedBindable<IndexBuffer>(gfx, "sphere_ib", sphereMesh.indices);
-	// Input Layout - shared
-	const std::vector<D3D11_INPUT_ELEMENT_DESC> layout =
-	{
-		{ "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-	AddSharedBindable<InputLayout>(gfx, "solid_sphere_input", layout, pvsbc);
+	// Input Layout - shared (from dynamic layout)
+	AddSharedBindable<InputLayout>(gfx, "solid_sphere_input", dynVbuf.GetLayout().GetD3DLayout(), pvsbc);
 
 	struct PSColorConstant
 	{

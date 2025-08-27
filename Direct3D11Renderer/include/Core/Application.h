@@ -31,6 +31,7 @@ private:
 	std::vector<std::unique_ptr<Renderable>> renderables;
 	std::vector<Cube*> cubes;
 	static constexpr size_t nRenderables = 180;
+	static constexpr size_t nShapes = 1000;
 
 	std::optional<int> comboBoxIndex;
 	std::set<int> boxControlIds;

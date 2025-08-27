@@ -6,10 +6,10 @@ SolidSphere::SolidSphere(Graphics& gfx, float radius)
 {
 	auto sphereMesh = GeometryFactory::CreateSphere<VertexPosition>(radius, 10, 10);
 	// Vertex Shader - shared
-	auto vs = AddSharedBindable<VertexShader>(gfx, "sphere_vs", L"shaders/Output/SolidVS.cso");
+	auto vs = AddSharedBindable<VertexShader>(gfx, "vs_solid", L"shaders/Output/SolidVS.cso");
 	auto pvsbc = vs->GetByteCode();
 	// Pixel Shader - shared
-	AddSharedBindable<PixelShader>(gfx, "sphere_ps", L"shaders/Output/SolidPS.cso");
+	AddSharedBindable<PixelShader>(gfx, "ps_solid", L"shaders/Output/SolidPS.cso");
 	// Vertex Buffer - shared
 	AddSharedBindable<VertexBuffer>(gfx, "sphere_vb", sphereMesh.vertices);
 	// Index Buffer - shared

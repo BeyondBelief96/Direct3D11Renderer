@@ -71,9 +71,9 @@ bool Cube::SpawnControlWindow(int id, Graphics& gfx) noexcept
     {
         ImGui::Text("Material Properties");
         const auto materialColor = ImGui::ColorEdit3("Material Color", &materialConstantBuffer.color.x);
-		const auto specularIntensity = ImGui::SliderFloat("Specular Intensity", &materialConstantBuffer.specularIntensity, 0.05f, 4.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
-        const auto specularPower = ImGui::SliderFloat("Specular Power", &materialConstantBuffer.specularPower, 1.0f, 200.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
-		dirty = materialColor || specularIntensity || specularPower;
+        const auto specularIntensity = ImGui::SliderFloat("Specular Intensity", &materialConstantBuffer.specularIntensity, 0.0f, 2.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
+        const auto specularPower = ImGui::SliderFloat("Specular Power", &materialConstantBuffer.specularPower, 1.0f, 128.0f, "%.1f", ImGuiSliderFlags_Logarithmic);
+        dirty = materialColor || specularIntensity || specularPower;
 
         ImGui::Text("Position");
         ImGui::SliderFloat("R", &r, 0.0f, 80.0f, "%.1f");

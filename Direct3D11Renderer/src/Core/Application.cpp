@@ -2,111 +2,110 @@
 #include "Renderable/Cube.h"
 #include "Renderable/Sphere.h"
 #include "Renderable/TexturedCube.h"
-#include "Renderable/Pyramid.h"
+#include "Renderable/Pyramid.h""
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
 
  float Application::ui_speed_factor = 1.0f;
 
-Application::Application()
-    : wnd(1920, 1080, L"D3DEngine"),
-    freeCamera({ 0.0f, 0.0f, -30.0f }),
-    light(wnd.Gfx())
-{
-    std::mt19937 rng(std::random_device{}());
-    std::uniform_real_distribution<float> adist(0.0f, 3.1415f * 2.0f);
-    std::uniform_real_distribution<float> ddist(0.0f, 3.1415f * 2.0f);
-    std::uniform_real_distribution<float> odist(0.0f, 3.1415f * 0.3f);
-    std::uniform_real_distribution<float> rdist(6.0f, 20.0f);
-    std::uniform_real_distribution<float> bdist(0.0f, 1.0f);
-    std::uniform_real_distribution<float> color_dist(0.0f, 1.0f);
+ Application::Application()
+     : wnd(1920, 1080, L"D3DEngine"),
+     freeCamera({ 0.0f, 0.0f, -30.0f }),
+     light(wnd.Gfx())
+ {
+     std::mt19937 rng(std::random_device{}());
+     std::uniform_real_distribution<float> adist(0.0f, 3.1415f * 2.0f);
+     std::uniform_real_distribution<float> ddist(0.0f, 3.1415f * 2.0f);
+     std::uniform_real_distribution<float> odist(0.0f, 3.1415f * 0.3f);
+     std::uniform_real_distribution<float> rdist(6.0f, 20.0f);
+     std::uniform_real_distribution<float> bdist(0.0f, 1.0f);
+     std::uniform_real_distribution<float> color_dist(0.0f, 1.0f);
 
-    // Distribution for Z positions (positive values)
-    std::uniform_real_distribution<float> zdist(10.0f, 50.0f);
-    // Distribution for X and Y positions (both positive and negative)
-    std::uniform_real_distribution<float> xydist(-20.0f, 20.0f);
+     // Distribution for Z positions (positive values)
+     std::uniform_real_distribution<float> zdist(10.0f, 50.0f);
+     // Distribution for X and Y positions (both positive and negative)
+     std::uniform_real_distribution<float> xydist(-20.0f, 20.0f);
 
-    // Create a mix of geometry types
-    for (int i = 0; i < 7; i++)
-    {
-        // Randomize the material color
-        DirectX::XMFLOAT3 materialColor(
-            color_dist(rng),
-            color_dist(rng),
-            color_dist(rng));
+     // Create a mix of geometry types
+     for (int i = 0; i < nShapes; i++)
+     {
+         // Randomize the material color
+         DirectX::XMFLOAT3 materialColor(
+             color_dist(rng),
+             color_dist(rng),
+             color_dist(rng));
 
-        // Create boxes with explicit position control
-        auto cube = std::make_unique<Cube>(
-            wnd.Gfx(),
-            rng,
-            adist,
-            ddist,
-            odist,
-            rdist,
-            bdist,
-            materialColor);
+         // Create boxes with explicit position control
+         auto cube = std::make_unique<Cube>(
+             wnd.Gfx(),
+             rng,
+             adist,
+             ddist,
+             odist,
+             rdist,
+             bdist,
+             materialColor);
 
-        renderables.push_back(std::move(cube));
+         renderables.push_back(std::move(cube));
 
-        // Add a sphere
-        auto sphere = std::make_unique<Sphere>(
-            wnd.Gfx(),
-            rng,
-            adist,
-            ddist,
-            odist,
-            rdist,
-            1.0f,     // radius
-            16        // tessellation
-        );
+         // Add a sphere
+         auto sphere = std::make_unique<Sphere>(
+             wnd.Gfx(),
+             rng,
+             adist,
+             ddist,
+             odist,
+             rdist,
+             1.0f,     // radius
+             16        // tessellation
+         );
 
-        renderables.push_back(std::move(sphere));
+         renderables.push_back(std::move(sphere));
 
-        // Add a pyramid
-        auto pyramid = std::make_unique<Pyramid>(
-            wnd.Gfx(),
-            rng,
-            adist,
-            ddist,
-            odist,
-            rdist,
-            1.0f,     // radius
-            2.0f,     // height
-            4         // sides (square base)
-        );
+         auto texturedCube = std::make_unique<TexturedCube>(
+             wnd.Gfx(),
+             rng,
+             adist,
+             ddist,
+             odist,
+             rdist,
+             1.0f,
+             L"assets/kappa50.png"
+         );
 
-        renderables.push_back(std::move(pyramid));
-    }
+         renderables.push_back(std::move(texturedCube));
 
-    // Add a few textured cubes
-    for (int i = 0; i < 5; i++)
-    {
-        auto texturedCube = std::make_unique<TexturedCube>(
-            wnd.Gfx(),
-            rng,
-            adist,
-            ddist,
-            odist,
-            rdist,
-            1.0f,
-            L"assets/kappa50.png"
-        );
+         std::uniform_real_distribution<float> pyradist(0.8f, 1.5f);  // Radius distribution
+         std::uniform_real_distribution<float> pyhdist(1.5f, 3.0f);   // Height distribution
+         std::uniform_int_distribution<int> pysidesdist(3, 8);        // Sides distribution
 
-        renderables.push_back(std::move(texturedCube));
-    }
+         auto pyramid = std::make_unique<Pyramid>(
+             wnd.Gfx(),
+             rng,
+             adist,
+             ddist,
+             odist,
+             rdist,
+             pyradist(rng),    // randomized radius
+             pyhdist(rng),     // randomized height
+             pysidesdist(rng)  // randomized number of sides
+         );
 
-    // Initialize vector of non-owning pointers to cubes
-    for (auto& renderable : renderables)
-    {
-        if (auto cp = dynamic_cast<Cube*>(renderable.get()))
-        {
-            cubes.push_back(cp);
-        }
-    }
+         renderables.push_back(std::move(pyramid));
+     }
 
-    wnd.Gfx().SetProjection(freeCamera.GetProjectionMatrix(45.0f, 16.0f / 9.0f, 0.5f, 100.0f));
-}
+     // Initialize vector of non-owning pointers to cubes
+     for (auto& renderable : renderables)
+     {
+         if (auto cp = dynamic_cast<Cube*>(renderable.get()))
+         {
+             cubes.push_back(cp);
+         }
+     }
+
+     wnd.Gfx().SetProjection(freeCamera.GetProjectionMatrix(45.0f, 16.0f / 9.0f, 0.5f, 100.0f));
+ }
 
 int Application::Run()
 {

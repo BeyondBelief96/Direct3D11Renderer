@@ -416,26 +416,25 @@ public:
     }
 
     template<typename VertexType>
-    static GeometryMesh<VertexType> CreatePyramid(float radius = 1.0f, float height = 2.0f, int sides = 4)
+    static GeometryMesh<VertexType> CreateCone(float radius = 1.0f, float height = 2.0f, int longDiv = 24)
     {
         namespace dx = DirectX;
 
-        // Ensure minimum sides
-        sides = std::max(3, sides);
+        // Ensure minimum divisions
+        longDiv = std::max(3, longDiv);
 
         std::vector<VertexType> vertices;
         std::vector<unsigned short> indices;
 
         // Calculate constants
         const float halfHeight = height / 2.0f;
-        const float angleStep = 2.0f * PI / sides;
+        const float angleStep = 2.0f * PI / longDiv;
 
-        // First, create the base vertices
-        for (int i = 0; i < sides; i++)
+        // Create base vertices around the circumference
+        for (int i = 0; i < longDiv; i++)
         {
             float angle = i * angleStep;
 
-            // Create base vertex
             VertexType baseVertex;
             baseVertex.position = {
                 radius * std::cos(angle),
@@ -460,158 +459,74 @@ public:
         unsigned short baseCenterIndex = static_cast<unsigned short>(vertices.size());
         vertices.push_back(baseCenter);
 
-        // Add apex of pyramid
-        VertexType apex;
-        apex.position = { 0.0f, 0.0f, halfHeight };
-        unsigned short apexIndex = static_cast<unsigned short>(vertices.size());
-        vertices.push_back(apex);
+        // Add tip of the cone
+        VertexType tip;
+        tip.position = { 0.0f, 0.0f, halfHeight };
+        unsigned short tipIndex = static_cast<unsigned short>(vertices.size());
+        vertices.push_back(tip);
 
-        // Now create the base triangles (clockwise winding when viewed from -Z)
-        for (int i = 0; i < sides; i++)
+        // Create base indices (connecting each segment to the center)
+        for (unsigned short i = 0; i < longDiv; i++)
         {
-            indices.push_back(baseCenterIndex); // center
-            indices.push_back(i);               // current
-            indices.push_back((i + 1) % sides); // next
+            indices.push_back(baseCenterIndex);
+            indices.push_back((i + 1) % longDiv);
+            indices.push_back(i);
         }
 
-        // Now create side faces
-        for (int i = 0; i < sides; i++)
+        // Create side face indices and calculate normals for the sides
+        for (unsigned short i = 0; i < longDiv; i++)
         {
-            int nextI = (i + 1) % sides;
+            unsigned short nextI = (i + 1) % longDiv;
 
-            // Get the base vertex positions
-            dx::XMFLOAT3 currentPos = vertices[i].position;
-            dx::XMFLOAT3 nextPos = vertices[nextI].position;
-            dx::XMFLOAT3 apexPos = vertices[apexIndex].position;
-
-            // Calculate two vectors along the face
-            dx::XMVECTOR v1 = dx::XMVectorSubtract(
-                dx::XMLoadFloat3(&nextPos),
-                dx::XMLoadFloat3(&apexPos)
-            );
-
-            dx::XMVECTOR v2 = dx::XMVectorSubtract(
-                dx::XMLoadFloat3(&currentPos),
-                dx::XMLoadFloat3(&apexPos)
-            );
-
-            // Calculate the face normal using cross product
-            // Using vector order to ensure normal points outward (for clockwise winding)
-            dx::XMVECTOR faceNormalVec = dx::XMVector3Normalize(
-                dx::XMVector3Cross(v1, v2)
-            );
-
-            // Store the normal
-            dx::XMFLOAT3 faceNormal;
-            dx::XMStoreFloat3(&faceNormal, faceNormalVec);
-
-            // Create copies of vertices for the side face with the correct normal
-            VertexType currentVertexSide = vertices[i]; // Copy base vertex
-            VertexType nextVertexSide = vertices[nextI]; // Copy next base vertex
-            VertexType apexVertexSide = vertices[apexIndex]; // Copy apex
-
+            // If the vertex type supports normals, calculate the proper side normal
             if constexpr (has_normal_member<VertexType>::value) {
-                currentVertexSide.normal = faceNormal;
-                nextVertexSide.normal = faceNormal;
-                apexVertexSide.normal = faceNormal;
+                // Get positions
+                dx::XMVECTOR p0 = dx::XMLoadFloat3(&vertices[i].position);
+                dx::XMVECTOR p1 = dx::XMLoadFloat3(&vertices[nextI].position);
+                dx::XMVECTOR pTip = dx::XMLoadFloat3(&vertices[tipIndex].position);
+
+                // Calculate two vectors along the triangle
+                dx::XMVECTOR v1 = dx::XMVectorSubtract(p1, p0);
+                dx::XMVECTOR v2 = dx::XMVectorSubtract(pTip, p0);
+
+                // Calculate normal using cross product
+                dx::XMVECTOR normalVec = dx::XMVector3Normalize(
+                    dx::XMVector3Cross(v1, v2)
+                );
+
+                // Create new vertices for the sides with the correct normal
+                VertexType sideVertex1 = vertices[i];
+                VertexType sideVertex2 = vertices[nextI];
+                VertexType sideVertexTip = vertices[tipIndex];
+
+                // Store the normal
+                dx::XMFLOAT3 normal;
+                dx::XMStoreFloat3(&normal, normalVec);
+
+                sideVertex1.normal = normal;
+                sideVertex2.normal = normal;
+                sideVertexTip.normal = normal;
+
+                // Add these vertices to the array
+                unsigned short idx1 = static_cast<unsigned short>(vertices.size());
+                vertices.push_back(sideVertex1);
+
+                unsigned short idx2 = static_cast<unsigned short>(vertices.size());
+                vertices.push_back(sideVertex2);
+
+                unsigned short idxTip = static_cast<unsigned short>(vertices.size());
+                vertices.push_back(sideVertexTip);
+
+                // Add indices for this side triangle
+                indices.push_back(idx1);
+                indices.push_back(idx2);
+                indices.push_back(idxTip);
             }
-
-            // Add these vertices to the array
-            unsigned short currentSideIndex = static_cast<unsigned short>(vertices.size());
-            vertices.push_back(currentVertexSide);
-
-            unsigned short nextSideIndex = static_cast<unsigned short>(vertices.size());
-            vertices.push_back(nextVertexSide);
-
-            unsigned short apexSideIndex = static_cast<unsigned short>(vertices.size());
-            vertices.push_back(apexVertexSide);
-
-            // Add indices for the side triangle (clockwise winding when viewed from outside)
-            indices.push_back(currentSideIndex);
-            indices.push_back(apexSideIndex);
-            indices.push_back(nextSideIndex);
-        }
-
-        return GeometryMesh<VertexType>(std::move(vertices), std::move(indices));
-    }
-
-    template<typename VertexType>
-    static GeometryMesh<VertexType> CreatePlane(float width = 2.0f, float height = 2.0f, int divisionsX = 1, int divisionsY = 1)
-    {
-        namespace dx = DirectX;
-
-        // Ensure minimum divisions
-        divisionsX = std::max(1, divisionsX);
-        divisionsY = std::max(1, divisionsY);
-
-        // Calculate the number of vertices in each dimension
-        const int verticesX = divisionsX + 1;
-        const int verticesY = divisionsY + 1;
-
-        // Create vertex array
-        std::vector<VertexType> vertices(verticesX * verticesY);
-
-        // Calculate dimensions and division sizes
-        const float halfWidth = width / 2.0f;
-        const float halfHeight = height / 2.0f;
-        const float divisionSizeX = width / static_cast<float>(divisionsX);
-        const float divisionSizeY = height / static_cast<float>(divisionsY);
-
-        // Generate vertices starting from bottom-left
-        const auto bottomLeft = dx::XMVectorSet(-halfWidth, -halfHeight, 0.0f, 0.0f);
-
-        int vertexIndex = 0;
-        for (int y = 0; y < verticesY; y++)
-        {
-            const float yPos = static_cast<float>(y) * divisionSizeY - halfHeight;
-
-            for (int x = 0; x < verticesX; x++, vertexIndex++)
-            {
-                const float xPos = static_cast<float>(x) * divisionSizeX - halfWidth;
-
-                // Set position
-                vertices[vertexIndex].position = { xPos, yPos, 0.0f };
-
-                // Set texture coordinates (important for our texture mapping)
-                if constexpr (has_texcoord_member<VertexType>::value) {
-                    float u = static_cast<float>(x) / divisionsX;
-                    float v = static_cast<float>(y) / divisionsY;
-                    vertices[vertexIndex].texCoord = { u, v };
-                }
-            }
-        }
-
-        // Generate indices
-        std::vector<unsigned short> indices;
-        indices.reserve(divisionsX * divisionsY * 6); // 2 triangles per quad, 3 vertices per triangle
-
-        // Helper lambda to convert x,y coordinates to vertex index
-        const auto vxy2i = [verticesX](size_t x, size_t y) -> unsigned short {
-            return static_cast<unsigned short>(y * verticesX + x);
-            };
-
-        // Generate quads
-        for (size_t y = 0; y < divisionsY; y++)
-        {
-            for (size_t x = 0; x < divisionsX; x++)
-            {
-                // Get the four corner indices of this quad
-                const std::array<unsigned short, 4> indexArray = {
-                    vxy2i(x, y),         // Bottom-left
-                    vxy2i(x + 1, y),     // Bottom-right
-                    vxy2i(x, y + 1),     // Top-left
-                    vxy2i(x + 1, y + 1)  // Top-right
-                };
-
-                // First triangle (bottom-left, top-left, bottom-right)
-                indices.push_back(indexArray[0]); // Bottom-left
-                indices.push_back(indexArray[2]); // Top-left
-                indices.push_back(indexArray[1]); // Bottom-right
-
-                // Second triangle (bottom-right, top-left, top-right)
-                indices.push_back(indexArray[1]); // Bottom-right
-                indices.push_back(indexArray[2]); // Top-left
-                indices.push_back(indexArray[3]); // Top-right
+            else {
+                // If no normals, we can just use the original vertices
+                indices.push_back(i);
+                indices.push_back(nextI);
+                indices.push_back(tipIndex);
             }
         }
 

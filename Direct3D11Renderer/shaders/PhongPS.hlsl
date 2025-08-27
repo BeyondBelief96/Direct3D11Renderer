@@ -1,6 +1,6 @@
 cbuffer Light
 {
-    float3 lightPosViewSpace;   // Light position in view/camera space
+    float3 lightPosViewSpace; 
     float3 ambientColor;
     float3 diffuseColor;
     float diffuseIntensity;
@@ -41,9 +41,9 @@ float4 main(float3 posViewSpace: Position, float3 normal : Normal) : SV_TARGET
     
     // Calculate specular component using Phong reflection model
     // Reflect expects the first vector to point from light to surface
-    float3 reflectionVector = reflect(-lightDirection, normal);
+    float3 reflectionVector = normalize(reflect(-lightDirection, normal));
     float specularFactor = pow(max(0.0f, dot(reflectionVector, viewDirection)), specularPower);
-    float3 specular = diffuseColor * specularFactor * specularIntensity;
+    float3 specular = (diffuseColor * specularFactor) * specularIntensity;
     
     // Attenuation
     ambient *= attenuation;

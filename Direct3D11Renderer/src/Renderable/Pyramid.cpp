@@ -1,4 +1,6 @@
 #include "Renderable/Pyramid.h"
+#include "Geometry/GeometryFactory.h"
+#include "Bindable/BindableBase.h"
 
 Pyramid::Pyramid(
     Graphics& gfx,
@@ -9,28 +11,28 @@ Pyramid::Pyramid(
     std::uniform_real_distribution<float>& rdist,
     float radius,
     float height,
-    int sides
-) : RenderableTestObject(rng, adist, ddist, odist, rdist)
+    int sides)
+    : RenderableTestObject(rng, adist, ddist, odist, rdist)
 {
-    // Create pyramid mesh with correct normals
-    auto pyramidMesh = GeometryFactory::CreatePyramid<VertexPositionNormal>(radius, height, sides);
+    // Create a pyramid mesh with normals using the cone geometry
+    auto pyramidMesh = GeometryFactory::CreateCone<VertexPositionNormal>(radius, height, sides);
 
     // Bind vertex shader
-    auto vs = AddSharedBindable<VertexShader>(gfx, "vs_pyramid_phong", L"shaders/Output/PhongVS.cso");
+    auto vs = AddSharedBindable<VertexShader>(gfx, "vs_phong", L"shaders/Output/PhongVS.cso");
     auto pvs = vs->GetByteCode();
 
     // Bind Pixel Shader
-    AddSharedBindable<PixelShader>(gfx, "ps_pyramid_phong", L"shaders/Output/PhongPS.cso");
+    AddSharedBindable<PixelShader>(gfx, "ps_phong", L"shaders/Output/PhongPS.cso");
 
     // Bind Vertex Buffer
-    std::string vbKey = "pyramid_vertices_phong_" + std::to_string(sides) + "_" + std::to_string(radius);
+    std::string vbKey = "pyramid_vertices_phong_" + std::to_string(sides);
     AddSharedBindable<VertexBuffer>(gfx, vbKey, pyramidMesh.vertices);
 
     // Bind Index Buffer
     std::string ibKey = "pyramid_indices_phong_" + std::to_string(sides);
     AddSharedBindable<IndexBuffer>(gfx, ibKey, pyramidMesh.indices);
 
-    // Create input layout
+    // Create input layout for position and normal
     const std::vector<D3D11_INPUT_ELEMENT_DESC> layout =
     {
         { "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -47,10 +49,10 @@ Pyramid::Pyramid(
         alignas(16) DirectX::XMFLOAT3 materialColor;
         float specularIntensity = 0.6f;
         float specularPower = 30.0f;
-        float padding[2] = {0.0f, 0.0f};
+        float padding[2] = {};
     } objectConstantBuffer;
 
-    // Generate a solid color for the pyramid
+    // Generate random color for the pyramid
     std::uniform_real_distribution<float> cdist(0.0f, 1.0f);
     objectConstantBuffer.materialColor = { cdist(rng), cdist(rng), cdist(rng) };
 

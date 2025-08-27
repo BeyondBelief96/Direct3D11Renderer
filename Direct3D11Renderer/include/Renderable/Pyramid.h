@@ -1,8 +1,6 @@
 #pragma once
-#include "Renderable/RenderableTestObject.h"
-#include "Geometry/GeometryFactory.h"
-#include "Bindable/BindableBase.h"
-#include <random>
+
+#include "RenderableTestObject.h"
 
 class Pyramid : public RenderableTestObject
 {
@@ -16,8 +14,7 @@ public:
         std::uniform_real_distribution<float>& rdist,
         float radius = 1.0f,
         float height = 2.0f,
-        int sides = 4
-    );
+        int sides = 4);
 
     DirectX::XMMATRIX GetTransformXM() const noexcept override;
 };

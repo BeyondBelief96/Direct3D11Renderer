@@ -26,7 +26,7 @@ private:
     struct PSMaterialConstantBuffer
     {
         DirectX::XMFLOAT3 color = { 0.0f, 0.0f, 0.0f };
-        float specularIntensity = 128.0f;
+        float specularIntensity = 0.6f;
         float specularPower = 30.0f;
         float padding[3] = { 0.0f, 0.0f, 0.0f };
     } materialConstantBuffer;

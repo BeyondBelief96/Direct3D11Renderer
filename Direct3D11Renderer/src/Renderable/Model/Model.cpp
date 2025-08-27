@@ -9,7 +9,7 @@ Node::Node(std::vector<Mesh*> meshesIn, const DirectX::XMMATRIX& transform)
     DirectX::XMStoreFloat4x4(&localTransform, transform);
 }
 
-void Node::Draw(Graphics& gfx, DirectX::FXMMATRIX parentTransform) const noexcept
+void Node::Render(Graphics& gfx, DirectX::FXMMATRIX parentTransform) const noexcept
 {
     const auto accumulatedTransform = DirectX::XMLoadFloat4x4(&localTransform) * parentTransform;
     for (auto* m : meshes)
@@ -18,7 +18,7 @@ void Node::Draw(Graphics& gfx, DirectX::FXMMATRIX parentTransform) const noexcep
     }
     for (const auto& child : children)
     {
-        child->Draw(gfx, accumulatedTransform);
+        child->Render(gfx, accumulatedTransform);
     }
 }
 
@@ -43,9 +43,9 @@ Model::Model(Graphics& gfx, const std::string& filePath)
     root = BuildNode(*scene->mRootNode);
 }
 
-void Model::Draw(Graphics& gfx, DirectX::FXMMATRIX world) const noexcept
+void Model::Render(Graphics& gfx, DirectX::FXMMATRIX world) const noexcept
 {
-    root->Draw(gfx, world);
+    root->Render(gfx, world);
 }
 
 std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh)

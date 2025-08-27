@@ -67,7 +67,7 @@ void Application::ProcessFrame()
 
     // Bind and render
     light.Bind(wnd.Gfx());
-    model->Draw(wnd.Gfx(), modelTransform);
+    model->Render(wnd.Gfx(), modelTransform);
     light.Render(wnd.Gfx());
 
     wnd.Gfx().EndFrame();

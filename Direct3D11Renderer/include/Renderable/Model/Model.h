@@ -19,7 +19,7 @@ class Node
 {
 public:
     Node(std::vector<Mesh*> meshes, const DirectX::XMMATRIX& transform);
-    void Draw(Graphics& gfx, DirectX::FXMMATRIX parentTransform) const noexcept;
+    void Render(Graphics& gfx, DirectX::FXMMATRIX parentTransform) const noexcept;
     void AddChild(std::unique_ptr<Node> child) noexcept;
 private:
     std::vector<std::unique_ptr<Node>> children;
@@ -31,7 +31,7 @@ class Model
 {
 public:
     Model(Graphics& gfx, const std::string& filePath);
-    void Draw(Graphics& gfx, DirectX::FXMMATRIX world) const noexcept;
+    void Render(Graphics& gfx, DirectX::FXMMATRIX world) const noexcept;
 private:
     std::unique_ptr<Mesh> BuildMesh(Graphics& gfx, const aiMesh& mesh);
     std::unique_ptr<Node> BuildNode(const aiNode& node);

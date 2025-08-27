@@ -2,7 +2,7 @@
 
 #include "Renderable/RenderableTestObject.h"
 #include "Geometry/GeometryFactory.h"
-#include "Bindable/BindableBase.h"
+#include "Bindable/BindableCommon.h"
 #include <random>
 
 class Sphere : public RenderableTestObject

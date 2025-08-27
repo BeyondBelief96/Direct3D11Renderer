@@ -144,6 +144,9 @@
     <ClCompile Include="src\Renderable\Pyramid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderable\ModelTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Utilities\ChiliWin.h">
@@ -221,7 +224,7 @@
     <ClInclude Include="include\Renderable\Cube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Bindable\BindableBase.h">
+    <ClInclude Include="include\Bindable\BindableCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Bindable\BindableKey.h">
@@ -302,6 +305,9 @@
     <ClInclude Include="include\Renderable\Pyramid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Renderable\ModelTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Direct3D11Renderer.rc">
@@ -352,9 +358,5 @@
     <None Include="src\Exceptions\DxErr\DXTrace.inl">
       <Filter>Header Files</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="assets\models\nanosuit.obj" />
-    <Object Include="assets\models\suzanne.obj" />
   </ItemGroup>
 </Project>

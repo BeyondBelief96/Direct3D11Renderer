@@ -1,6 +1,6 @@
 #include "Renderable/Pyramid.h"
 #include "Geometry/GeometryFactory.h"
-#include "Bindable/BindableBase.h"
+#include "Bindable/BindableCommon.h"
 
 Pyramid::Pyramid(
     Graphics& gfx,

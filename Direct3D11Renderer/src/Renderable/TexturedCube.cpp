@@ -1,5 +1,5 @@
 #include "Renderable/TexturedCube.h"
-#include "Bindable/BindableBase.h"
+#include "Bindable/BindableCommon.h"
 
 TexturedCube::TexturedCube(
     Graphics& gfx,

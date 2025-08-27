@@ -2,7 +2,8 @@
 #include "Renderable/Cube.h"
 #include "Renderable/Sphere.h"
 #include "Renderable/TexturedCube.h"
-#include "Renderable/Pyramid.h""
+#include "Renderable/ModelTest.h"
+#include "Renderable/Pyramid.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
@@ -93,6 +94,18 @@
          );
 
          renderables.push_back(std::move(pyramid));
+
+         auto suzanne = std::make_unique<ModelTest>(
+             wnd.Gfx(),
+             rng,
+             adist,
+             ddist,
+             odist,
+             rdist,
+             1.0f
+         );
+
+         renderables.push_back(std::move(suzanne));
      }
 
      // Initialize vector of non-owning pointers to cubes

@@ -1,5 +1,5 @@
 #include "Renderable/Cube.h"
-#include "Bindable/BindableBase.h"
+#include "Bindable/BindableCommon.h"
 #include "Bindable/BindableCache.h"
 #include "Geometry/GeometryFactory.h"
 #include "imgui/imgui.h"

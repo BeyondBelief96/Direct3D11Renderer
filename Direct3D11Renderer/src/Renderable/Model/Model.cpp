@@ -10,8 +10,8 @@
 // Node Class - Represents a node in the model's scene graph hierarchy.
 // -----------------------------------------------------------------------------
 
-Node::Node(const std::string& name, std::vector<Mesh*> meshesIn, const DirectX::XMMATRIX& transformIn)
-    : meshes(std::move(meshesIn)), name(name)
+Node::Node(int id, const std::string& name, std::vector<Mesh*> meshesIn, const DirectX::XMMATRIX& transformIn)
+    : meshes(std::move(meshesIn)), name(name), id(id)
 {
     DirectX::XMStoreFloat4x4(&transform, transformIn);
     DirectX::XMStoreFloat4x4(&appliedTransform, DirectX::XMMatrixIdentity());
@@ -37,27 +37,24 @@ void Node::Render(Graphics& gfx, DirectX::FXMMATRIX parentTransform) const noexc
 /// <summary>
 /// Renders the node hierarchy as an ImGui tree for debugging purposes.
 /// </summary>
-void Node::RenderTree(int& nodeIndex, std::optional<int>& selectedIndex, Node*& pSelectedNode) const noexcept
+void Node::RenderTree(std::optional<int>& selectedIndex, Node*& pSelectedNode) const noexcept
 {
-    const int currentIndex = nodeIndex;
-    nodeIndex++;
+    const auto nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow
+        | ((GetId() == selectedIndex.value_or(-1)) ? ImGuiTreeNodeFlags_Selected : 0)
+        | ((children.size() == 0) ? ImGuiTreeNodeFlags_Leaf : 0);
 
-    const auto nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow 
-		| ((currentIndex == selectedIndex.value_or(-1)) ? ImGuiTreeNodeFlags_Selected : 0)
-		| ((children.size() == 0) ? ImGuiTreeNodeFlags_Leaf : 0);
-
-    const auto expanded = ImGui::TreeNodeEx((void*)(intptr_t)currentIndex, nodeFlags, name.c_str());
+    const auto expanded = ImGui::TreeNodeEx((void*)(intptr_t)GetId(), nodeFlags, name.c_str());
 
     if (ImGui::IsItemClicked())
     {
-        selectedIndex = currentIndex;
+        selectedIndex = GetId();
         pSelectedNode = const_cast<Node*>(this);
     }
     if (expanded)
     {
         for (const auto& child : children)
         {
-            child->RenderTree(nodeIndex, selectedIndex, pSelectedNode);
+            child->RenderTree(selectedIndex, pSelectedNode);
         }
         ImGui::TreePop();
 	}
@@ -71,6 +68,11 @@ void Node::AddChild(std::unique_ptr<Node> child) noexcept
 void Node::SetAppliedTransform(DirectX::FXMMATRIX transform) noexcept
 {
     DirectX::XMStoreFloat4x4(&appliedTransform, transform);
+}
+
+int Node::GetId() const noexcept
+{
+    return id;
 }
 
 // -----------------------------------------------------------------------------
@@ -93,9 +95,8 @@ public:
         
         if (ImGui::Begin(windowName))
         {
-            int nodeIndexTracker = 0;
             ImGui::Columns(2, nullptr, true);
-            root.RenderTree(nodeIndexTracker, selectedIndex, pSelectedNode);
+            root.RenderTree(selectedIndex, pSelectedNode);
             
             ImGui::NextColumn();
             ImGui::Text("Orientation");
@@ -196,7 +197,8 @@ Model::Model(Graphics& gfx, const std::string& filePath) : pWindow(std::make_uni
     {
         meshes.push_back(BuildMesh(gfx, *scene->mMeshes[i]));
     }
-    root = BuildNode(*scene->mRootNode);
+    int nextId = 0;
+    root = BuildNode(nextId, *scene->mRootNode);
 }
 
 Model::~Model() noexcept {};
@@ -275,7 +277,7 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh)
     return std::make_unique<Mesh>(gfx, std::move(binds));
 }
 
-std::unique_ptr<Node> Model::BuildNode(const aiNode& node) noexcept
+std::unique_ptr<Node> Model::BuildNode(int& nextId, const aiNode& node) noexcept
 {
     using namespace DirectX;
     const auto transform = XMMatrixTranspose(
@@ -289,10 +291,10 @@ std::unique_ptr<Node> Model::BuildNode(const aiNode& node) noexcept
         collect.push_back(meshes.at(node.mMeshes[i]).get());
     }
 
-    auto created = std::make_unique<Node>(node.mName.C_Str(), std::move(collect), transform);
+    auto created = std::make_unique<Node>(nextId++, node.mName.C_Str(), std::move(collect), transform);
     for (unsigned int i = 0; i < node.mNumChildren; ++i)
     {
-        created->AddChild(BuildNode(*node.mChildren[i]));
+        created->AddChild(BuildNode(nextId, *node.mChildren[i]));
     }
     return created;
 }

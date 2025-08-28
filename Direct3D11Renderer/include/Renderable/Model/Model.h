@@ -22,12 +22,14 @@
 class Node
 {
 public:
-    Node(const std::string& name, std::vector<Mesh*> meshes, const DirectX::XMMATRIX& transform);
+    Node(int id, const std::string& name, std::vector<Mesh*> meshes, const DirectX::XMMATRIX& transform);
     void Render(Graphics& gfx, DirectX::FXMMATRIX parentTransform) const noexcept;
-    void RenderTree(int& nodeIndex, std::optional<int>& selectedIndex, Node*& pSelectedNode) const noexcept;
+    void RenderTree(std::optional<int>& selectedIndex, Node*& pSelectedNode) const noexcept;
     void AddChild(std::unique_ptr<Node> child) noexcept;
     void SetAppliedTransform(DirectX::FXMMATRIX transform) noexcept;
+    int GetId() const noexcept;
 private:
+    int id;
     std::string name;
     std::vector<std::unique_ptr<Node>> children;
     std::vector<Mesh*> meshes;
@@ -49,7 +51,7 @@ public:
     void ShowModelControlWindow(const char* windowName = nullptr) noexcept;
 private:
     std::unique_ptr<Mesh> BuildMesh(Graphics& gfx, const aiMesh& mesh);
-    std::unique_ptr<Node> BuildNode(const aiNode& node) noexcept;
+    std::unique_ptr<Node> BuildNode(int& nextId, const aiNode& node) noexcept;
 private:
     std::unique_ptr<Node> root;
     std::vector<std::unique_ptr<Mesh>> meshes;

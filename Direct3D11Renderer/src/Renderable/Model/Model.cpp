@@ -46,14 +46,15 @@ void Node::RenderTree(int& nodeIndex, std::optional<int>& selectedIndex, Node*& 
 		| ((currentIndex == selectedIndex.value_or(-1)) ? ImGuiTreeNodeFlags_Selected : 0)
 		| ((children.size() == 0) ? ImGuiTreeNodeFlags_Leaf : 0);
 
-    if (ImGui::TreeNodeEx((void*)(intptr_t)currentIndex, nodeFlags, name.c_str()))
+    const auto expanded = ImGui::TreeNodeEx((void*)(intptr_t)currentIndex, nodeFlags, name.c_str());
+
+    if (ImGui::IsItemClicked())
     {
-        if (ImGui::IsItemClicked())
-        {
-            selectedIndex = currentIndex;
-            pSelectedNode = const_cast<Node*>(this);
-        }
-        
+        selectedIndex = currentIndex;
+        pSelectedNode = const_cast<Node*>(this);
+    }
+    if (expanded)
+    {
         for (const auto& child : children)
         {
             child->RenderTree(nodeIndex, selectedIndex, pSelectedNode);

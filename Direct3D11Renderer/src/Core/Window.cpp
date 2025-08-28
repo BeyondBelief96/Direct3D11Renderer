@@ -2,6 +2,7 @@
 #include "Core/Window.h"
 #include "Exceptions/WindowExceptions.h"
 #include <sstream>
+#include <vector>
 #include "resource.h"
 #include "imgui/imgui_impl_win32.h"
 
@@ -137,10 +138,8 @@ void Window::CaptureMouse()
 		RECT clipRect = { upperLeft.x, upperLeft.y, lowerRight.x, lowerRight.y };
 		ClipCursor(&clipRect);
 
-		// Center cursor in window
-		POINT centerPos = { width / 2, height / 2 };
-		ClientToScreen(hwnd, &centerPos);
-		SetCursorPos(centerPos.x, centerPos.y);
+		// Register for raw mouse input
+		RegisterRawInput();
 
 		mouseCaptured = true;
 
@@ -152,6 +151,9 @@ void Window::ReleaseMouse()
 {
 	if (mouseCaptured)
 	{
+		// Unregister raw input
+		UnregisterRawInput();
+
 		// Show Cursor
 		ShowCursor(TRUE);
 		// Release cursor from window
@@ -179,6 +181,38 @@ Graphics& Window::Gfx()
 	}
 
 	return *pGraphics;
+}
+
+void Window::RegisterRawInput()
+{
+	if (!rawInputRegistered)
+	{
+		RAWINPUTDEVICE rid = {};
+		rid.usUsagePage = 0x01; // HID_USAGE_PAGE_GENERIC
+		rid.usUsage = 0x02;     // HID_USAGE_GENERIC_MOUSE
+		rid.dwFlags = 0;        // No special flags
+		rid.hwndTarget = hwnd;  // Target window
+
+		if (RegisterRawInputDevices(&rid, 1, sizeof(RAWINPUTDEVICE)))
+		{
+			rawInputRegistered = true;
+		}
+	}
+}
+
+void Window::UnregisterRawInput()
+{
+	if (rawInputRegistered)
+	{
+		RAWINPUTDEVICE rid = {};
+		rid.usUsagePage = 0x01; // HID_USAGE_PAGE_GENERIC
+		rid.usUsage = 0x02;     // HID_USAGE_GENERIC_MOUSE
+		rid.dwFlags = RIDEV_REMOVE;
+		rid.hwndTarget = nullptr;
+
+		RegisterRawInputDevices(&rid, 1, sizeof(RAWINPUTDEVICE));
+		rawInputRegistered = false;
+	}
 }
 
 LRESULT Window::HandleMsgSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -253,6 +287,42 @@ LRESULT Window::HandleMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		/*********** END KEYBOARD MESSAGES ***********/
 
 		/************* MOUSE MESSAGES ****************/
+	case WM_INPUT:
+	{
+		if (ImGui::GetIO().WantCaptureMouse || !mouseCaptured)
+		{
+			break;
+		}
+
+		// Get the size of the raw input data
+		UINT dwSize = 0;
+		GetRawInputData((HRAWINPUT)lParam, RID_INPUT, nullptr, &dwSize, sizeof(RAWINPUTHEADER));
+
+		// Allocate buffer and get the raw input data
+		std::vector<BYTE> lpb(dwSize);
+		if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, lpb.data(), &dwSize, sizeof(RAWINPUTHEADER)) != dwSize)
+		{
+			break;
+		}
+
+		// Cast to RAWINPUT structure
+		RAWINPUT* raw = (RAWINPUT*)lpb.data();
+
+		// Process mouse input
+		if (raw->header.dwType == RIM_TYPEMOUSE)
+		{
+			int deltaX = raw->data.mouse.lLastX;
+			int deltaY = raw->data.mouse.lLastY;
+
+			// Only process if there's actual movement
+			if (deltaX != 0 || deltaY != 0)
+			{
+				// Notify mouse of movement using deltas
+				mouse.OnMouseMove(deltaX, deltaY, true);
+			}
+		}
+		break;
+	}
 	case WM_MOUSEMOVE:
 	{
 		if (ImGui::GetIO().WantCaptureMouse)
@@ -262,27 +332,9 @@ LRESULT Window::HandleMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 
 		const POINTS pt = MAKEPOINTS(lParam);
 
-		if (mouseCaptured)
+		if (!mouseCaptured)
 		{
-			// When mouse is captured, calculate relative movement from center
-			int deltaX = pt.x - width / 2;
-			int deltaY = pt.y - height / 2;
-
-			// Only process if there's actual movement
-			if (deltaX != 0 || deltaY != 0)
-			{
-				// Notify mouse of movement using deltas
-				mouse.OnMouseMove(deltaX, deltaY, true);
-
-				// Reset cursor to center
-				POINT centerPos = { width / 2, height / 2 };
-				ClientToScreen(hwnd, &centerPos);
-				SetCursorPos(centerPos.x, centerPos.y);
-			}
-		}
-		else
-		{
-			// Normal mouse movement
+			// Normal mouse movement when not captured
 			mouse.OnMouseMove(pt.x, pt.y, false);
 
 			// When mouse enters the window, set capture and notify

@@ -37,6 +37,8 @@ public:
 	void CaptureMouse();
 	void ReleaseMouse();
 	bool IsMouseCaptured() const noexcept;
+	void RegisterRawInput();
+	void UnregisterRawInput();
 	Graphics& Gfx();
 
 	Keyboard kbd;
@@ -50,6 +52,7 @@ private:
 	int height;
 	HWND hwnd;
 	bool mouseCaptured = false;
+	bool rawInputRegistered = false;
 	POINT originalMousePos = {};
 	std::unique_ptr<Graphics> pGraphics;
 };

@@ -2,9 +2,10 @@
 #include "Bindable/BindableCommon.h"
 #include "Geometry/Vertex.h"
 #include <cassert>
+#include <imgui/imgui.h>
 
-Node::Node(std::vector<Mesh*> meshesIn, const DirectX::XMMATRIX& transform)
-    : meshes(std::move(meshesIn))
+Node::Node(const std::string& name, std::vector<Mesh*> meshesIn, const DirectX::XMMATRIX& transform)
+    : meshes(std::move(meshesIn)), name(name)
 {
     DirectX::XMStoreFloat4x4(&localTransform, transform);
 }
@@ -20,6 +21,21 @@ void Node::Render(Graphics& gfx, DirectX::FXMMATRIX parentTransform) const noexc
     {
         child->Render(gfx, accumulatedTransform);
     }
+}
+
+/// <summary>
+/// Renders the node hierarchy as an ImGui tree for debugging purposes.
+/// </summary>
+void Node::RenderTree() const noexcept
+{
+    if (ImGui::TreeNode(name.c_str()))
+    {
+        for (const auto& child : children)
+        {
+            child->RenderTree();
+        }
+        ImGui::TreePop();
+	}
 }
 
 void Node::AddChild(std::unique_ptr<Node> child) noexcept
@@ -43,9 +59,31 @@ Model::Model(Graphics& gfx, const std::string& filePath)
     root = BuildNode(*scene->mRootNode);
 }
 
-void Model::Render(Graphics& gfx, DirectX::FXMMATRIX world) const noexcept
+void Model::Render(Graphics& gfx) const noexcept
 {
-    root->Render(gfx, world);
+    const auto transform =
+        DirectX::XMMatrixRotationRollPitchYaw(modelPose.pitch, modelPose.yaw, modelPose.roll)
+        * DirectX::XMMatrixTranslation(modelPose.x, modelPose.y, modelPose.z);
+    root->Render(gfx, transform);
+}
+
+void Model::ShowModelControlWindow(const char* windowName) noexcept
+{
+    if (ImGui::Begin("Model"))
+    {
+        ImGui::Columns(2, nullptr, true);
+        root->RenderTree();
+        ImGui::NextColumn();
+        ImGui::Text("Orientation");
+        ImGui::SliderAngle("Roll", &modelPose.roll, -180.0f, 180.0f);
+        ImGui::SliderAngle("Pitch", &modelPose.pitch, -180.0f, 180.0f);
+        ImGui::SliderAngle("Yaw", &modelPose.yaw, -180.0f, 180.0f);
+        ImGui::Text("Position");
+        ImGui::SliderFloat("X", &modelPose.x, -20.0f, 20.0f);
+        ImGui::SliderFloat("Y", &modelPose.y, -20.0f, 20.0f);
+        ImGui::SliderFloat("Z", &modelPose.z, -20.0f, 20.0f);
+    }
+    ImGui::End();
 }
 
 std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh)
@@ -105,7 +143,7 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh)
     return std::make_unique<Mesh>(gfx, std::move(binds));
 }
 
-std::unique_ptr<Node> Model::BuildNode(const aiNode& node)
+std::unique_ptr<Node> Model::BuildNode(const aiNode& node) noexcept
 {
     using namespace DirectX;
     const auto transform = XMMatrixTranspose(
@@ -119,7 +157,7 @@ std::unique_ptr<Node> Model::BuildNode(const aiNode& node)
         collect.push_back(meshes.at(node.mMeshes[i]).get());
     }
 
-    auto created = std::make_unique<Node>(std::move(collect), transform);
+    auto created = std::make_unique<Node>(node.mName.C_Str(), std::move(collect), transform);
     for (unsigned int i = 0; i < node.mNumChildren; ++i)
     {
         created->AddChild(BuildNode(*node.mChildren[i]));

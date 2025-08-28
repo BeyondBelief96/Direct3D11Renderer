@@ -50,13 +50,10 @@ void Application::ProcessFrame()
     wnd.Gfx().SetView(freeCamera.GetViewMatrix());
     wnd.Gfx().BeginFrame(0.07f, 0.0f, 0.12f);
 
-    using namespace DirectX;
-    const auto modelTransform = XMMatrixRotationRollPitchYaw(modelPose.pitch, modelPose.yaw, modelPose.roll) *
-        XMMatrixTranslation(modelPose.x, modelPose.y, modelPose.z);
-
     // UI
     SpawnSimulationWindow();
-    SpawnModelWindow();
+	RenderPointLightControlWindow();
+    model->ShowModelControlWindow();
 
     // Apply light controls
     light.SetPosition({ lightControls.x, lightControls.y, lightControls.z });
@@ -67,7 +64,7 @@ void Application::ProcessFrame()
 
     // Bind and render
     light.Bind(wnd.Gfx());
-    model->Render(wnd.Gfx(), modelTransform);
+    model->Render(wnd.Gfx());
     light.Render(wnd.Gfx());
 
     wnd.Gfx().EndFrame();
@@ -92,33 +89,19 @@ void Application::SpawnSimulationWindow() noexcept
     ImGui::End();
 }
 
-void Application::SpawnModelWindow() noexcept
+void Application::RenderPointLightControlWindow() noexcept
 {
-    if (ImGui::Begin("Model"))
+    if (ImGui::Begin("Point Light Controls"))
     {
-        ImGui::Text("Orientation");
-        ImGui::SliderAngle("Roll", &modelPose.roll, -180.0f, 180.0f);
-        ImGui::SliderAngle("Pitch", &modelPose.pitch, -180.0f, 180.0f);
-        ImGui::SliderAngle("Yaw", &modelPose.yaw, -180.0f, 180.0f);
-
-        ImGui::Text("Position");
-        ImGui::SliderFloat("X", &modelPose.x, -20.0f, 20.0f, "%.2f");
-        ImGui::SliderFloat("Y", &modelPose.y, -20.0f, 20.0f, "%.2f");
-        ImGui::SliderFloat("Z", &modelPose.z, -20.0f, 20.0f, "%.2f");
-
-        ImGui::Separator();
-        ImGui::Text("Light");
-        ImGui::SliderFloat("Light X", &lightControls.x, -50.0f, 50.0f, "%.2f");
-        ImGui::SliderFloat("Light Y", &lightControls.y, -50.0f, 50.0f, "%.2f");
-        ImGui::SliderFloat("Light Z", &lightControls.z, -50.0f, 50.0f, "%.2f");
+        ImGui::SliderFloat3("Position", &lightControls.x, -50.0f, 50.0f);
         ImGui::ColorEdit3("Ambient", lightControls.ambient);
         ImGui::ColorEdit3("Diffuse", lightControls.diffuse);
-        ImGui::SliderFloat("Intensity", &lightControls.diffuseIntensity, 0.0f, 4.0f);
-        ImGui::SliderFloat("Att C", &lightControls.attConstant, 0.0f, 2.0f);
-        ImGui::SliderFloat("Att L", &lightControls.attLinear, 0.0f, 1.0f);
-        ImGui::SliderFloat("Att Q", &lightControls.attQuadratic, 0.0f, 1.0f);
+        ImGui::SliderFloat("Diffuse Intensity", &lightControls.diffuseIntensity, 0.0f, 5.0f);
+        ImGui::SliderFloat("Attenuation Constant", &lightControls.attConstant, 0.0f, 5.0f);
+        ImGui::SliderFloat("Attenuation Linear", &lightControls.attLinear, 0.0f, 1.0f);
+        ImGui::SliderFloat("Attenuation Quadratic", &lightControls.attQuadratic, 0.0f, 1.0f);
     }
-    ImGui::End();
+	ImGui::End();
 }
 
 

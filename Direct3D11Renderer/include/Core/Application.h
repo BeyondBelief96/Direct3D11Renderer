@@ -18,7 +18,7 @@ public:
 private:
 	void ProcessFrame();
 	void SpawnSimulationWindow() noexcept;
-	void SpawnModelWindow() noexcept;
+	void RenderPointLightControlWindow() noexcept;
 
 	FreeFlyCamera freeCamera;
 	Window wnd;
@@ -26,17 +26,7 @@ private:
 	static float ui_speed_factor;
 	float speed_factor = 1.0f;
 	PointLight light;
-
 	std::unique_ptr<Model> model;
-	struct
-	{
-		float roll = 0.0f;
-		float pitch = 0.0f;
-		float yaw = 0.0f;
-		float x = 0.0f;
-		float y = 0.0f;
-		float z = 0.0f;
-	} modelPose;
 	struct
 	{
 		float x = 0.0f;

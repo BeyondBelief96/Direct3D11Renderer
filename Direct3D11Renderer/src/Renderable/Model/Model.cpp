@@ -1,5 +1,6 @@
 #include "Renderable/Model/Model.h"
 #include "Bindable/BindableCommon.h"
+#include "Exceptions/ModelException.h"
 #include "Geometry/Vertex.h"
 #include <cassert>
 #include <imgui/imgui.h>
@@ -180,8 +181,15 @@ Model::Model(Graphics& gfx, const std::string& filePath) : pWindow(std::make_uni
     const aiScene* scene = importer.ReadFile(
         filePath.c_str(),
         aiProcess_Triangulate |
+        aiProcess_ConvertToLeftHanded |
+        aiProcess_GenNormals |
         aiProcess_JoinIdenticalVertices
     );
+
+    if (scene == nullptr)
+    {
+        throw ModelException(__LINE__, __FILE__, importer.GetErrorString());
+    }
 
     for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
     {

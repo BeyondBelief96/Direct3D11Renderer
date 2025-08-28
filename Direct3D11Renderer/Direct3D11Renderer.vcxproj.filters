@@ -78,9 +78,6 @@
     <ClCompile Include="src\Renderable\Renderable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderable\Cube.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Bindable\TransformConstantBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -90,16 +87,10 @@
     <ClCompile Include="src\Exceptions\BindableLookupException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderable\Sphere.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Bindable\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Bindable\Sampler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderable\TexturedCube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\imgui\imgui.cpp">
@@ -138,13 +129,16 @@
     <ClCompile Include="src\Exceptions\DxErr\dxerr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderable\Pyramid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderable\ModelTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderable\SolidSphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderable\Model\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderable\Model\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Exceptions\ModelException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -221,9 +215,6 @@
     <ClInclude Include="include\Renderable\Renderable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderable\Cube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Bindable\BindableCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -242,9 +233,6 @@
     <ClInclude Include="include\Geometry\GeometryFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderable\Sphere.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Bindable\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -252,9 +240,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Bindable\Sampler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderable\TexturedCube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\imgui\imconfig.h">
@@ -299,16 +284,19 @@
     <ClInclude Include="include\Exceptions\dxerr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderable\Pyramid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderable\ModelTest.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Geometry\Vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderable\SolidSphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderable\Model\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderable\Model\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Exceptions\ModelException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -329,18 +317,8 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders\VertexShader.hlsl" />
-    <FxCompile Include="shaders\PixelShader.hlsl" />
-    <FxCompile Include="shaders\ColorIndexVS.hlsl" />
-    <FxCompile Include="shaders\ColorIndexPS.hlsl" />
-    <FxCompile Include="shaders\TextureVS.hlsl" />
-    <FxCompile Include="shaders\TexturePS.hlsl" />
     <FxCompile Include="shaders\PhongVS.hlsl" />
     <FxCompile Include="shaders\PhongPS.hlsl" />
-    <FxCompile Include="shaders\SolidVS.hlsl" />
-    <FxCompile Include="shaders\SolidPS.hlsl" />
-    <FxCompile Include="shaders\TexturedPhongVS.hlsl" />
-    <FxCompile Include="shaders\TexturedPhongPS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\Downloads\DXTrace.inl">

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/Graphics.h"
+#include "Core/Graphics.h"
 #include "Renderable/SolidSphere.h"
 #include "Bindable/ConstantBuffer.h"
 

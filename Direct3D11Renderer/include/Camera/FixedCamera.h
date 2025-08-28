@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics/Graphics.h"
+#include "Core/Graphics.h"
 
 class FixedCamera
 {

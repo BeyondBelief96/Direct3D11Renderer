@@ -172,7 +172,7 @@
     <ClCompile Include="src\Exceptions\DxgiDebugManager.cpp" />
     <ClCompile Include="src\Exceptions\HrException.cpp" />
     <ClCompile Include="src\Exceptions\WindowExceptions.cpp" />
-    <ClCompile Include="src\Graphics\Graphics.cpp" />
+    <ClCompile Include="src\Core\Graphics.cpp" />
     <ClCompile Include="src\Exceptions\GraphicsExceptions.cpp" />
     <ClCompile Include="src\imgui\imgui.cpp" />
     <ClCompile Include="src\imgui\imgui_demo.cpp" />
@@ -223,7 +223,7 @@
     <ClInclude Include="include\Exceptions\WindowExceptions.h" />
     <ClInclude Include="include\Geometry\GeometryFactory.h" />
     <ClInclude Include="include\Geometry\GeometryMesh.h" />
-    <ClInclude Include="include\Graphics\Graphics.h" />
+    <ClInclude Include="include\Core\Graphics.h" />
     <ClInclude Include="include\Exceptions\GraphicsExceptions.h" />
     <ClInclude Include="include\imgui\imconfig.h" />
     <ClInclude Include="include\imgui\imgui.h" />

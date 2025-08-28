@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Renderable/Model/Mesh.h"
-#include "Graphics/Graphics.h"
+#include "Core/Graphics.h"
 #include <DirectXMath.h>
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>

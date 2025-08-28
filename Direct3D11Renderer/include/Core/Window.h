@@ -2,7 +2,7 @@
 #include "Utilities/ChiliWin.h"
 #include "Input/Keyboard.h"
 #include "Input/Mouse.h"
-#include "Graphics/Graphics.h"
+#include "Graphics.h"
 #include <optional>
 #include <memory>
 

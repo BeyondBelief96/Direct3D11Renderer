@@ -33,7 +33,7 @@
     <ClCompile Include="src\Core\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics\Graphics.cpp">
+    <ClCompile Include="src\Core\Graphics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Utilities\D3Timer.cpp">
@@ -164,7 +164,7 @@
     <ClInclude Include="include\Core\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Graphics\Graphics.h">
+    <ClInclude Include="include\Core\Graphics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Utilities\D3Timer.h">

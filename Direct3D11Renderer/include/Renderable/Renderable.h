@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics/Graphics.h"
+#include "Core/Graphics.h"
 #include "Bindable/Bindable.h"
 #include "Bindable/IndexBuffer.h"
 #include "Bindable/BindableCache.h"
@@ -18,7 +18,6 @@ public:
     void Render(Graphics& gfx) const noexcept(!_DEBUG);
     void AddUniqueBindable(std::unique_ptr<Bindable> bindable) noexcept(!_DEBUG);
 
-    // Safer template method to get unique bindable with type checking
     template<typename T>
     T* QueryUniqueBindable() noexcept
     {
@@ -34,7 +33,6 @@ public:
         return nullptr;
     }
 
-    // Check if a bindable of specific type exists
     template<typename T>
     bool HasUniqueBindable() const noexcept
     {
@@ -50,7 +48,6 @@ public:
         return false;
     }
 
-    // Add a bindable and return a pointer to it for further configuration
     template<typename T, typename... Args>
     T* AddUniqueBindableAndGet(Args&&... args) noexcept(!_DEBUG)
     {
@@ -69,7 +66,6 @@ public:
         return raw_ptr;
     }
 
-    // Update a bindable if it exists, create it if it doesn't
     template<typename T, typename... Args>
     T* UpdateOrCreateUniqueBindable(Args&&... args) noexcept(!_DEBUG)
     {
@@ -88,7 +84,6 @@ public:
         return AddUniqueBindableAndGet<T>(std::forward<Args>(args)...);
     }
 
-    // Shared bindable management
     template<typename T, typename... Args>
     std::shared_ptr<T> AddSharedBindable(Graphics& gfx, const std::string& id, Args&&... args)
     {

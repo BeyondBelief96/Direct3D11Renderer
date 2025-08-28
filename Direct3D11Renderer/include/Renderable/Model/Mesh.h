@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Renderable/Renderable.h"
-#include "Graphics/Graphics.h"
+#include "Core/Graphics.h"
 #include "Bindable/Bindable.h"
 #include <DirectXMath.h>
 #include <memory>

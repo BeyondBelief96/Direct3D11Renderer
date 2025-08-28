@@ -31,7 +31,7 @@ private:
     std::string name;
     std::vector<std::unique_ptr<Node>> children;
     std::vector<Mesh*> meshes;
-    DirectX::XMFLOAT4X4 localTransform{};
+    DirectX::XMFLOAT4X4 transform{};
     DirectX::XMFLOAT4X4 appliedTransform{};
 };
 

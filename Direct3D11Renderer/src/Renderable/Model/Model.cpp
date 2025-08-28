@@ -10,18 +10,18 @@
 // Node Class - Represents a node in the model's scene graph hierarchy.
 // -----------------------------------------------------------------------------
 
-Node::Node(const std::string& name, std::vector<Mesh*> meshesIn, const DirectX::XMMATRIX& transform)
+Node::Node(const std::string& name, std::vector<Mesh*> meshesIn, const DirectX::XMMATRIX& transformIn)
     : meshes(std::move(meshesIn)), name(name)
 {
-    DirectX::XMStoreFloat4x4(&localTransform, transform);
+    DirectX::XMStoreFloat4x4(&transform, transformIn);
     DirectX::XMStoreFloat4x4(&appliedTransform, DirectX::XMMatrixIdentity());
 }
 
 void Node::Render(Graphics& gfx, DirectX::FXMMATRIX parentTransform) const noexcept
 {
     const auto built = 
-        DirectX::XMLoadFloat4x4(&localTransform) * 
         DirectX::XMLoadFloat4x4(&appliedTransform) * 
+        DirectX::XMLoadFloat4x4(&transform) * 
         parentTransform;
         
     for (auto* m : meshes)

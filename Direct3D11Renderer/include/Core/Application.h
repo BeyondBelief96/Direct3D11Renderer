@@ -3,7 +3,6 @@
 #include "Utilities/D3Timer.h"
 #include "Renderable/Renderable.h"
 #include "Renderable/Model/Model.h"
-#include "Camera/FixedCamera.h"
 #include "Camera/FreeFlyCamera.h"
 #include "Lights/PointLight.h"
 #include <vector>

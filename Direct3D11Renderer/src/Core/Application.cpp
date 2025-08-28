@@ -15,7 +15,7 @@
      // Load a single model (adjust path as needed)
      model = std::make_unique<Model>(wnd.Gfx(), "assets/models/nano.gltf");
 
-     wnd.Gfx().SetProjection(freeCamera.GetProjectionMatrix(45.0f, 16.0f / 9.0f, 0.5f, 100.0f));
+     wnd.Gfx().SetProjection(CreateProjectionMatrix(freeCamera, 45.0f, 16.0f / 9.0f, 0.5f, 100.0f));
  }
 
 int Application::Run()
@@ -46,7 +46,7 @@ void Application::ProcessFrame()
 
     freeCamera.ProcessInput(wnd, wnd.mouse, wnd.kbd, dt);
 
-    wnd.Gfx().SetProjection(freeCamera.GetProjectionMatrix(45.0f, 16.0f / 9.0f, 0.5f, 100.0f));
+    wnd.Gfx().SetProjection(CreateProjectionMatrix(freeCamera, 45.0f, 16.0f / 9.0f, 0.5f, 100.0f));
     wnd.Gfx().SetView(freeCamera.GetViewMatrix());
     wnd.Gfx().BeginFrame(0.07f, 0.0f, 0.12f);
 

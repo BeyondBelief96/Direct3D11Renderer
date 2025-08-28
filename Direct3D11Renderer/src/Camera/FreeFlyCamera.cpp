@@ -1,183 +1,120 @@
 #include "Camera/FreeFlyCamera.h"
+#include "Core/Window.h"
+#include "Input/Mouse.h"
+#include "Input/Keyboard.h"
+#include <algorithm>
+#include <cmath>
 
 using namespace DirectX;
 
-FreeFlyCamera::FreeFlyCamera(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 up, float yaw, float pitch)
+
+FreeFlyCamera::FreeFlyCamera(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 worldUp, float yaw, float pitch)
 	: position(position),
-	worldUp(up),
+	worldUp(worldUp),
 	yaw(yaw),
 	pitch(pitch),
-	speed(DEFAULT_SPEED),
-	sensitivity(DEFAULT_SENSITIVITY),
-	zoom(DEFAULT_ZOOM)
+	speed(10.0f),
+	sensitivity(0.1f),
+	zoom(1.0f)
 {
+	// Initialize vectors - these will be properly calculated by UpdateCameraVectors
 	front = { 0.0f, 0.0f, 1.0f };
 	right = { 1.0f, 0.0f, 0.0f };
-	this->up = { 0.0f, 1.0f, 0.0f };
+	up = { 0.0f, 1.0f, 0.0f };
+	
 	UpdateCameraVectors();
 }
 
 DirectX::XMMATRIX FreeFlyCamera::GetViewMatrix() const noexcept
 {
-	XMVECTOR pos = XMLoadFloat3(&position);
-	XMFLOAT3 targetPosition;
-	XMStoreFloat3(&targetPosition,
-		XMVectorAdd(XMLoadFloat3(&position),XMLoadFloat3(&front)));
-	XMVECTOR target = XMLoadFloat3(&targetPosition);
-
-	XMVECTOR upDir = XMLoadFloat3(&this->up);
+	const XMVECTOR pos = XMLoadFloat3(&position);
+	const XMVECTOR target = XMVectorAdd(pos, XMLoadFloat3(&front));
+	const XMVECTOR upDir = XMLoadFloat3(&up);
 	
-	return XMMatrixLookAtLH(pos, target, upDir); 
+	return XMMatrixLookAtLH(pos, target, upDir);
 }
 
-DirectX::XMMATRIX FreeFlyCamera::GetProjectionMatrix(float fovDegrees, float aspectRatio, float nearZ, float farZ) const noexcept
+void FreeFlyCamera::ProcessInput(Window& wnd, Mouse& mouse, const Keyboard& keyboard, float deltaTime) noexcept
 {
-	float fovRadians = XMConvertToRadians(fovDegrees) / zoom;
-	return XMMatrixPerspectiveFovLH(fovRadians, aspectRatio, nearZ, farZ);
-}
-
-void FreeFlyCamera::UpdatePosition(CameraDirection direction, float deltaTime) noexcept
-{
-	float deltaPosition = speed * deltaTime; // speed/second * second
-
-	XMVECTOR pos = XMLoadFloat3(&position);
-	XMVECTOR front = XMLoadFloat3(&this->front);
-	XMVECTOR right = XMLoadFloat3(&this->right);
-	XMVECTOR up = XMLoadFloat3(&this->up);
-
-	if (direction == CameraDirection::FORWARD)
+	// Handle camera mode toggle
+	const bool currentRightMouseState = mouse.RightIsPressed();
+	if (currentRightMouseState && !previousRightMouseState)
 	{
-		pos = XMVectorAdd(pos, XMVectorScale(front, deltaPosition));
+		ToggleActiveState(wnd);
 	}
-	if (direction == CameraDirection::BACKWARD)
-	{
-		pos = XMVectorSubtract(pos, XMVectorScale(front, deltaPosition));
-	}
-	if (direction == CameraDirection::LEFT)
-	{
-		pos = XMVectorAdd(pos, XMVectorScale(right, deltaPosition));
-	}
-	if (direction == CameraDirection::RIGHT)
-	{
-		pos = XMVectorSubtract(pos, XMVectorScale(right, deltaPosition));
-	}
-	if (direction == CameraDirection::UP)
-	{
-		pos = XMVectorAdd(pos, XMVectorScale(up, deltaPosition));
-	}
-	if (direction == CameraDirection::DOWN)
-	{
-		pos = XMVectorSubtract(pos, XMVectorScale(up, deltaPosition));
-	}
+	previousRightMouseState = currentRightMouseState;
 
-	XMStoreFloat3(&position, pos);
-}
+	// Only process movement input if camera is active
+	if (!isActive)
+		return;
 
-void FreeFlyCamera::UpdateOrientation(float xOffset, float yOffset, bool constrainPitch) noexcept
-{
-	xOffset *= sensitivity;
-	yOffset *= sensitivity;
+	// Process keyboard movement
+	if (keyboard.KeyIsPressed('W'))
+		UpdateMovement(CameraDirection::FORWARD, deltaTime);
+	if (keyboard.KeyIsPressed('S'))
+		UpdateMovement(CameraDirection::BACKWARD, deltaTime);
+	if (keyboard.KeyIsPressed('A'))
+		UpdateMovement(CameraDirection::LEFT, deltaTime);
+	if (keyboard.KeyIsPressed('D'))
+		UpdateMovement(CameraDirection::RIGHT, deltaTime);
+	if (keyboard.KeyIsPressed('E') || keyboard.KeyIsPressed(VK_SPACE))
+		UpdateMovement(CameraDirection::UP, deltaTime);
+	if (keyboard.KeyIsPressed('Q') || keyboard.KeyIsPressed(VK_CONTROL))
+		UpdateMovement(CameraDirection::DOWN, deltaTime);
 
-	yaw += xOffset;
-	pitch += yOffset;
+	// Process mouse orientation
+	const int deltaX = mouse.GetDeltaX();
+	const int deltaY = mouse.GetDeltaY();
 
-	if (constrainPitch)
+	if (deltaX != 0 || deltaY != 0)
 	{
-		if (pitch > 89.0f)
-			pitch = 89.0f;
-		if (pitch < -89.0f)
-			pitch = -89.0f;
+		// Negate deltas to match expected camera behavior
+		UpdateOrientation(static_cast<float>(-deltaX), static_cast<float>(-deltaY));
+		// Clear deltas after processing
+		mouse.ClearDelta();
 	}
 
-	UpdateCameraVectors();
-}
-
-void FreeFlyCamera::UpdateZoom(float yOffset) noexcept
-{
-	zoom -= yOffset;
-
-	if (zoom < 1.0f) zoom = 1.0f;
-	if (zoom > 45.0f) zoom = 45.0f;
+	// Process mouse wheel zoom
+	while (!mouse.IsEmpty())
+	{
+		const auto event = mouse.Read();
+		switch (event.GetType())
+		{
+		case Mouse::Event::Type::WheelUp:
+			UpdateZoom(-0.05f);
+			break;
+		case Mouse::Event::Type::WheelDown:
+			UpdateZoom(0.05f);
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void FreeFlyCamera::Reset() noexcept
 {
 	position = { 0.0f, 0.0f, 0.0f };
 	worldUp = { 0.0f, 1.0f, 0.0f };
-	front = { 0.0f, 0.0f, 1.0f };
-	yaw = DEFAULT_YAW;
-	pitch = DEFAULT_PITCH_VALUE;
-
-	speed = DEFAULT_SPEED;
-	sensitivity = DEFAULT_SENSITIVITY;
-	zoom = DEFAULT_ZOOM;
-
+	yaw = 90.0f;
+	pitch = 0.0f;
+	speed = 10.0f;
+	sensitivity = 0.1f;
+	zoom = 1.0f;
+	
 	UpdateCameraVectors();
 }
 
-void FreeFlyCamera::ProcessInput(Window& wnd, Mouse& mouse, const Keyboard& keyboard, float deltaTime) noexcept
-{
-	// Handle camera mode toggle
-	bool currentRightMouseState = mouse.RightIsPressed();
-	if (currentRightMouseState && !previousRightMouseState)
-	{
-		ToggleCameraMode(wnd);
-	}
-	previousRightMouseState = currentRightMouseState;
-
-	// Only process movement input if camera is active
-	if (!cameraActive)
-		return;
-
-	// Keyboard movement
-	if (keyboard.KeyIsPressed('W'))
-		UpdatePosition(CameraDirection::FORWARD, deltaTime);
-	if (keyboard.KeyIsPressed('S'))
-		UpdatePosition(CameraDirection::BACKWARD, deltaTime);
-	if (keyboard.KeyIsPressed('A'))
-		UpdatePosition(CameraDirection::LEFT, deltaTime);
-	if (keyboard.KeyIsPressed('D'))
-		UpdatePosition(CameraDirection::RIGHT, deltaTime);
-	if (keyboard.KeyIsPressed('E') || keyboard.KeyIsPressed(VK_SPACE))
-		UpdatePosition(CameraDirection::UP, deltaTime);
-	if (keyboard.KeyIsPressed('Q') || keyboard.KeyIsPressed(VK_CONTROL))
-		UpdatePosition(CameraDirection::DOWN, deltaTime);
-
-	// Mouse orientation - process the deltas directly
-	const int deltaX = mouse.GetDeltaX();
-	const int deltaY = mouse.GetDeltaY();
-
-	if (deltaX != 0 || deltaY != 0)
-	{
-		// Negating both x and y deltas so that camera matrix matches what the models must transform by.
-		UpdateOrientation(static_cast<float>(-deltaX), static_cast<float>(-deltaY));
-		// Reset mouse deltas after processing
-		mouse.ClearDelta();
-	}
-
-	// Process wheel events from the queue
-	while (!mouse.IsEmpty())
-	{
-		const auto e = mouse.Read();
-		if (e.GetType() == Mouse::Event::Type::WheelUp)
-		{
-			UpdateZoom(-0.05f);
-		}
-		else if (e.GetType() == Mouse::Event::Type::WheelDown)
-		{
-			UpdateZoom(0.05f);
-		}
-	}
-}
+// === Property Accessors ===
 
 DirectX::XMFLOAT3 FreeFlyCamera::GetPosition() const noexcept
 {
 	return position;
 }
 
-void FreeFlyCamera::SetPosition(const DirectX::XMFLOAT3& position) noexcept
+void FreeFlyCamera::SetPosition(const DirectX::XMFLOAT3& newPosition) noexcept
 {
-	this->position = position;
+	position = newPosition;
 }
 
 float FreeFlyCamera::GetZoom() const noexcept
@@ -185,10 +122,115 @@ float FreeFlyCamera::GetZoom() const noexcept
 	return zoom;
 }
 
-void FreeFlyCamera::ToggleCameraMode(Window& wnd)
+float FreeFlyCamera::GetSpeed() const noexcept
 {
-	cameraActive = !cameraActive;
-	if (cameraActive)
+	return speed;
+}
+
+void FreeFlyCamera::SetSpeed(float newSpeed) noexcept
+{
+	speed = std::max(0.1f, newSpeed); // Ensure positive speed
+}
+
+float FreeFlyCamera::GetSensitivity() const noexcept
+{
+	return sensitivity;
+}
+
+void FreeFlyCamera::SetSensitivity(float newSensitivity) noexcept
+{
+	sensitivity = std::max(0.01f, newSensitivity); // Ensure positive sensitivity
+}
+
+bool FreeFlyCamera::IsActive() const noexcept
+{
+	return isActive;
+}
+
+DirectX::XMFLOAT3 FreeFlyCamera::GetFront() const noexcept
+{
+	return front;
+}
+
+DirectX::XMFLOAT3 FreeFlyCamera::GetUp() const noexcept
+{
+	return up;
+}
+
+DirectX::XMFLOAT3 FreeFlyCamera::GetRight() const noexcept
+{
+	return right;
+}
+
+// === Private Methods ===
+
+void FreeFlyCamera::UpdateMovement(CameraDirection direction, float deltaTime) noexcept
+{
+	const float deltaPosition = speed * deltaTime;
+	
+	XMVECTOR pos = XMLoadFloat3(&position);
+	const XMVECTOR frontVec = XMLoadFloat3(&front);
+	const XMVECTOR rightVec = XMLoadFloat3(&right);
+	const XMVECTOR upVec = XMLoadFloat3(&up);
+
+	switch (direction)
+	{
+	case CameraDirection::FORWARD:
+		pos = XMVectorAdd(pos, XMVectorScale(frontVec, deltaPosition));
+		break;
+	case CameraDirection::BACKWARD:
+		pos = XMVectorSubtract(pos, XMVectorScale(frontVec, deltaPosition));
+		break;
+	case CameraDirection::LEFT:
+		pos = XMVectorAdd(pos, XMVectorScale(rightVec, deltaPosition));
+		break;
+	case CameraDirection::RIGHT:
+		pos = XMVectorSubtract(pos, XMVectorScale(rightVec, deltaPosition));
+		break;
+	case CameraDirection::UP:
+		pos = XMVectorAdd(pos, XMVectorScale(upVec, deltaPosition));
+		break;
+	case CameraDirection::DOWN:
+		pos = XMVectorSubtract(pos, XMVectorScale(upVec, deltaPosition));
+		break;
+	default:
+		break;
+	}
+
+	XMStoreFloat3(&position, pos);
+}
+
+void FreeFlyCamera::UpdateOrientation(float xOffset, float yOffset, bool constrainPitch) noexcept
+{
+	// Apply sensitivity
+	xOffset *= sensitivity;
+	yOffset *= sensitivity;
+
+	// Update angles
+	yaw += xOffset;
+	pitch += yOffset;
+
+	// Constrain pitch to prevent camera flipping
+	if (constrainPitch)
+	{
+		pitch = std::clamp(pitch, -89.0f, 89.0f);
+	}
+
+	// Recalculate camera vectors
+	UpdateCameraVectors();
+}
+
+void FreeFlyCamera::UpdateZoom(float yOffset) noexcept
+{
+	zoom -= yOffset;
+	zoom = std::clamp(zoom, 1.0f, 45.0f);
+}
+
+void FreeFlyCamera::ToggleActiveState(Window& wnd)
+{
+	isActive = !isActive;
+	
+	if (isActive)
 	{
 		wnd.CaptureMouse();
 	}
@@ -198,34 +240,41 @@ void FreeFlyCamera::ToggleCameraMode(Window& wnd)
 	}
 }
 
-bool FreeFlyCamera::IsCameraActive() const noexcept
-{
-	return cameraActive;
-}
-
 void FreeFlyCamera::UpdateCameraVectors() noexcept
 {
-	// Calculate new front vector based on yaw and pitch
+	// Calculate new front vector from yaw and pitch
+	const float yawRad = XMConvertToRadians(yaw);
+	const float pitchRad = XMConvertToRadians(pitch);
+	
 	DirectX::XMFLOAT3 newFront;
-	newFront.x = cosf(DirectX::XMConvertToRadians(yaw)) * cosf(DirectX::XMConvertToRadians(pitch));
-	newFront.y = sinf(DirectX::XMConvertToRadians(pitch));
-	newFront.z = sinf(DirectX::XMConvertToRadians(yaw)) * cosf(DirectX::XMConvertToRadians(pitch));
+	newFront.x = std::cos(yawRad) * std::cos(pitchRad);
+	newFront.y = std::sin(pitchRad);
+	newFront.z = std::sin(yawRad) * std::cos(pitchRad);
 
 	// Normalize front vector
-	DirectX::XMVECTOR frontVector = DirectX::XMLoadFloat3(&newFront);
-	frontVector = DirectX::XMVector3Normalize(frontVector);
-	DirectX::XMStoreFloat3(&front, frontVector);
+	XMVECTOR frontVector = XMLoadFloat3(&newFront);
+	frontVector = XMVector3Normalize(frontVector);
+	XMStoreFloat3(&front, frontVector);
 
-	// Calculate right vector
-	DirectX::XMVECTOR upVector = DirectX::XMLoadFloat3(&worldUp);
-	DirectX::XMVECTOR rightVector = DirectX::XMVector3Normalize(
-		DirectX::XMVector3Cross(frontVector, upVector)
-	);
-	DirectX::XMStoreFloat3(&right, rightVector);
+	// Calculate right vector (cross product of front and world up)
+	const XMVECTOR worldUpVector = XMLoadFloat3(&worldUp);
+	XMVECTOR rightVector = XMVector3Normalize(XMVector3Cross(frontVector, worldUpVector));
+	XMStoreFloat3(&right, rightVector);
 
-	// Calculate up vector
-	upVector = DirectX::XMVector3Normalize(
-		DirectX::XMVector3Cross(rightVector, frontVector)
-	);
-	DirectX::XMStoreFloat3(&up, upVector);
+	// Calculate up vector (cross product of right and front)
+	XMVECTOR upVector = XMVector3Normalize(XMVector3Cross(rightVector, frontVector));
+	XMStoreFloat3(&up, upVector);
+}
+
+// === Global Utility Function ===
+
+DirectX::XMMATRIX CreateProjectionMatrix(
+	const FreeFlyCamera& camera, 
+	float fovDegrees, 
+	float aspectRatio, 
+	float nearZ, 
+	float farZ) noexcept
+{
+	const float fovRadians = XMConvertToRadians(fovDegrees) / camera.GetZoom();
+	return XMMatrixPerspectiveFovLH(fovRadians, aspectRatio, nearZ, farZ);
 }

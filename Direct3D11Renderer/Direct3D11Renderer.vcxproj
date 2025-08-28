@@ -158,7 +158,6 @@
     <ClCompile Include="src\Bindable\TransformConstantBuffer.cpp" />
     <ClCompile Include="src\Bindable\VertexBuffer.cpp" />
     <ClCompile Include="src\Bindable\VertexShader.cpp" />
-    <ClCompile Include="src\Camera\FixedCamera.cpp" />
     <ClCompile Include="src\Camera\FreeFlyCamera.cpp" />
     <ClCompile Include="src\Exceptions\ModelException.cpp" />
     <ClCompile Include="src\Renderable\Model\Mesh.cpp" />
@@ -204,7 +203,6 @@
     <ClInclude Include="include\Bindable\TransformConstantBuffer.h" />
     <ClInclude Include="include\Bindable\VertexBuffer.h" />
     <ClInclude Include="include\Bindable\VertexShader.h" />
-    <ClInclude Include="include\Camera\FixedCamera.h" />
     <ClInclude Include="include\Camera\FreeFlyCamera.h" />
     <ClInclude Include="include\Exceptions\dxerr.h" />
     <ClInclude Include="include\Exceptions\ModelException.h" />

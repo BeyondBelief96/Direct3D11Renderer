@@ -37,24 +37,24 @@ void Node::Render(Graphics& gfx, DirectX::FXMMATRIX parentTransform) const noexc
 /// <summary>
 /// Renders the node hierarchy as an ImGui tree for debugging purposes.
 /// </summary>
-void Node::RenderTree(std::optional<int>& selectedIndex, Node*& pSelectedNode) const noexcept
+void Node::RenderTree(std::optional<int>& selectedNodeId, Node*& pSelectedNode) const noexcept
 {
     const auto nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow
-        | ((GetId() == selectedIndex.value_or(-1)) ? ImGuiTreeNodeFlags_Selected : 0)
+        | ((GetId() == selectedNodeId.value_or(-1)) ? ImGuiTreeNodeFlags_Selected : 0)
         | ((children.size() == 0) ? ImGuiTreeNodeFlags_Leaf : 0);
 
     const auto expanded = ImGui::TreeNodeEx((void*)(intptr_t)GetId(), nodeFlags, name.c_str());
 
     if (ImGui::IsItemClicked())
     {
-        selectedIndex = GetId();
+        selectedNodeId = GetId();
         pSelectedNode = const_cast<Node*>(this);
     }
     if (expanded)
     {
         for (const auto& child : children)
         {
-            child->RenderTree(selectedIndex, pSelectedNode);
+            child->RenderTree(selectedNodeId, pSelectedNode);
         }
         ImGui::TreePop();
 	}

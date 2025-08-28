@@ -3,36 +3,59 @@
 #include "Geometry/Vertex.h"
 #include <cassert>
 #include <imgui/imgui.h>
+#include <unordered_map>
+
+// -----------------------------------------------------------------------------
+// Node Class - Represents a node in the model's scene graph hierarchy.
+// -----------------------------------------------------------------------------
 
 Node::Node(const std::string& name, std::vector<Mesh*> meshesIn, const DirectX::XMMATRIX& transform)
     : meshes(std::move(meshesIn)), name(name)
 {
     DirectX::XMStoreFloat4x4(&localTransform, transform);
+    DirectX::XMStoreFloat4x4(&appliedTransform, DirectX::XMMatrixIdentity());
 }
 
 void Node::Render(Graphics& gfx, DirectX::FXMMATRIX parentTransform) const noexcept
 {
-    const auto accumulatedTransform = DirectX::XMLoadFloat4x4(&localTransform) * parentTransform;
+    const auto built = 
+        DirectX::XMLoadFloat4x4(&localTransform) * 
+        DirectX::XMLoadFloat4x4(&appliedTransform) * 
+        parentTransform;
+        
     for (auto* m : meshes)
     {
-        m->Draw(gfx, accumulatedTransform);
+        m->Draw(gfx, built);
     }
     for (const auto& child : children)
     {
-        child->Render(gfx, accumulatedTransform);
+        child->Render(gfx, built);
     }
 }
 
 /// <summary>
 /// Renders the node hierarchy as an ImGui tree for debugging purposes.
 /// </summary>
-void Node::RenderTree() const noexcept
+void Node::RenderTree(int& nodeIndex, std::optional<int>& selectedIndex, Node*& pSelectedNode) const noexcept
 {
-    if (ImGui::TreeNode(name.c_str()))
+    const int currentIndex = nodeIndex;
+    nodeIndex++;
+
+    const auto nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow 
+		| ((currentIndex == selectedIndex.value_or(-1)) ? ImGuiTreeNodeFlags_Selected : 0)
+		| ((children.size() == 0) ? ImGuiTreeNodeFlags_Leaf : 0);
+
+    if (ImGui::TreeNodeEx((void*)(intptr_t)currentIndex, nodeFlags, name.c_str()))
     {
+        if (ImGui::IsItemClicked())
+        {
+            selectedIndex = currentIndex;
+            pSelectedNode = const_cast<Node*>(this);
+        }
+        
         for (const auto& child : children)
         {
-            child->RenderTree();
+            child->RenderTree(nodeIndex, selectedIndex, pSelectedNode);
         }
         ImGui::TreePop();
 	}
@@ -43,35 +66,103 @@ void Node::AddChild(std::unique_ptr<Node> child) noexcept
     children.push_back(std::move(child));
 }
 
+void Node::SetAppliedTransform(DirectX::FXMMATRIX transform) noexcept
+{
+    DirectX::XMStoreFloat4x4(&appliedTransform, transform);
+}
+
+// -----------------------------------------------------------------------------
+// Model Class - Represents a 3D model composed of meshes and a node hierarchy.
+// -----------------------------------------------------------------------------
+
+/// <summary>
+/// Represents a window for controlling the model's pose (position and orientation) and displaying its node hierarchy.
+/// This class uses ImGui for rendering the UI elements.
+/// This class is private to the Model class and is not exposed externally.
+/// Used for debugging and visualization purposes.
+/// </summary>
 class ModelWindow
 {
 public:
     void Render(const char* windowName, const Node& root) noexcept
     {
-        if (ImGui::Begin("Model"))
+        // Default window name to "Model" if none provided
+        windowName = windowName ? windowName : "Model";
+        
+        if (ImGui::Begin(windowName))
         {
+            int nodeIndexTracker = 0;
             ImGui::Columns(2, nullptr, true);
-            root.RenderTree();
+            root.RenderTree(nodeIndexTracker, selectedIndex, pSelectedNode);
+            
             ImGui::NextColumn();
             ImGui::Text("Orientation");
-            ImGui::SliderAngle("Roll", &modelPose.roll, -180.0f, 180.0f);
-            ImGui::SliderAngle("Pitch", &modelPose.pitch, -180.0f, 180.0f);
-            ImGui::SliderAngle("Yaw", &modelPose.yaw, -180.0f, 180.0f);
-            ImGui::Text("Position");
-            ImGui::SliderFloat("X", &modelPose.x, -20.0f, 20.0f);
-            ImGui::SliderFloat("Y", &modelPose.y, -20.0f, 20.0f);
-            ImGui::SliderFloat("Z", &modelPose.z, -20.0f, 20.0f);
+            
+            if (pSelectedNode != nullptr)
+            {
+                // Get or create transform parameters for the selected node
+                auto& transform = transforms[*selectedIndex];
+                
+                ImGui::SliderAngle("Roll", &transform.roll, -180.0f, 180.0f);
+                ImGui::SliderAngle("Pitch", &transform.pitch, -180.0f, 180.0f);
+                ImGui::SliderAngle("Yaw", &transform.yaw, -180.0f, 180.0f);
+                ImGui::Text("Position");
+                ImGui::SliderFloat("X", &transform.x, -20.0f, 20.0f);
+                ImGui::SliderFloat("Y", &transform.y, -20.0f, 20.0f);
+                ImGui::SliderFloat("Z", &transform.z, -20.0f, 20.0f);
+            }
+            else
+            {
+                // Use model-wide pose when no node is selected
+                ImGui::SliderAngle("Roll", &modelPose.roll, -180.0f, 180.0f);
+                ImGui::SliderAngle("Pitch", &modelPose.pitch, -180.0f, 180.0f);
+                ImGui::SliderAngle("Yaw", &modelPose.yaw, -180.0f, 180.0f);
+                ImGui::Text("Position");
+                ImGui::SliderFloat("X", &modelPose.x, -20.0f, 20.0f);
+                ImGui::SliderFloat("Y", &modelPose.y, -20.0f, 20.0f);
+                ImGui::SliderFloat("Z", &modelPose.z, -20.0f, 20.0f);
+            }
         }
         ImGui::End();
     }
 
     DirectX::XMMATRIX GetTransform() const noexcept
     {
+        if (selectedIndex.has_value() && pSelectedNode != nullptr)
+        {
+            const auto& transform = transforms.at(*selectedIndex);
+            return 
+                DirectX::XMMatrixRotationRollPitchYaw(transform.pitch, transform.yaw, transform.roll)
+                * DirectX::XMMatrixTranslation(transform.x, transform.y, transform.z);
+        }
+        
         return 
             DirectX::XMMatrixRotationRollPitchYaw(modelPose.pitch, modelPose.yaw, modelPose.roll)
             * DirectX::XMMatrixTranslation(modelPose.x, modelPose.y, modelPose.z);
     }
+    
+    Node* GetSelectedNode() const noexcept
+    {
+        return pSelectedNode;
+    }
+    
 private:
+    std::optional<int> selectedIndex;
+    Node* pSelectedNode = nullptr;
+    
+    struct TransformParameters
+    {
+        float roll = 0.0f;
+        float pitch = 0.0f;
+        float yaw = 0.0f;
+        float x = 0.0f;
+        float y = 0.0f;
+        float z = 0.0f;
+    };
+    
+    std::unordered_map<int, TransformParameters> transforms;
+    
+    // Default model-wide transformation
     struct
     {
         float roll = 0.0f;
@@ -103,7 +194,14 @@ Model::~Model() noexcept {};
 
 void Model::Render(Graphics& gfx) const noexcept
 {
-    root->Render(gfx, pWindow->GetTransform());
+    // Apply transform to selected node if any
+    if (auto node = pWindow->GetSelectedNode())
+    {
+        node->SetAppliedTransform(pWindow->GetTransform());
+    }
+    
+    // Render the model with identity as initial transform
+    root->Render(gfx, DirectX::XMMatrixIdentity());
 }
 
 void Model::ShowModelControlWindow(const char* windowName) noexcept

@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <optional>
 
 /// <summary>
 /// A node in the model's scene graph, containing meshes and child nodes.
@@ -23,13 +24,15 @@ class Node
 public:
     Node(const std::string& name, std::vector<Mesh*> meshes, const DirectX::XMMATRIX& transform);
     void Render(Graphics& gfx, DirectX::FXMMATRIX parentTransform) const noexcept;
-    void RenderTree() const noexcept;
+    void RenderTree(int& nodeIndex, std::optional<int>& selectedIndex, Node*& pSelectedNode) const noexcept;
     void AddChild(std::unique_ptr<Node> child) noexcept;
+    void SetAppliedTransform(DirectX::FXMMATRIX transform) noexcept;
 private:
     std::string name;
     std::vector<std::unique_ptr<Node>> children;
     std::vector<Mesh*> meshes;
     DirectX::XMFLOAT4X4 localTransform{};
+    DirectX::XMFLOAT4X4 appliedTransform{};
 };
 
 /// <summary>

@@ -24,7 +24,7 @@ class Node
 public:
     Node(int id, const std::string& name, std::vector<Mesh*> meshes, const DirectX::XMMATRIX& transform);
     void Render(Graphics& gfx, DirectX::FXMMATRIX parentTransform) const noexcept;
-    void RenderTree(std::optional<int>& selectedNodeId, Node*& pSelectedNode) const noexcept;
+    void RenderTree(Node*& pSelectedNode) const noexcept;
     void AddChild(std::unique_ptr<Node> child) noexcept;
     void SetAppliedTransform(DirectX::FXMMATRIX transform) noexcept;
     int GetId() const noexcept;

@@ -37,24 +37,24 @@ void Node::Render(Graphics& gfx, DirectX::FXMMATRIX parentTransform) const noexc
 /// <summary>
 /// Renders the node hierarchy as an ImGui tree for debugging purposes.
 /// </summary>
-void Node::RenderTree(std::optional<int>& selectedNodeId, Node*& pSelectedNode) const noexcept
+void Node::RenderTree(Node*& pSelectedNode) const noexcept
 {
+    const auto selectedId = (pSelectedNode == nullptr) ? -1 : pSelectedNode->GetId();
     const auto nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow
-        | ((GetId() == selectedNodeId.value_or(-1)) ? ImGuiTreeNodeFlags_Selected : 0)
+        | ((GetId() == selectedId) ? ImGuiTreeNodeFlags_Selected : 0)
         | ((children.size() == 0) ? ImGuiTreeNodeFlags_Leaf : 0);
 
     const auto expanded = ImGui::TreeNodeEx((void*)(intptr_t)GetId(), nodeFlags, name.c_str());
 
     if (ImGui::IsItemClicked())
     {
-        selectedNodeId = GetId();
         pSelectedNode = const_cast<Node*>(this);
     }
     if (expanded)
     {
         for (const auto& child : children)
         {
-            child->RenderTree(selectedNodeId, pSelectedNode);
+            child->RenderTree(pSelectedNode);
         }
         ImGui::TreePop();
 	}
@@ -96,7 +96,7 @@ public:
         if (ImGui::Begin(windowName))
         {
             ImGui::Columns(2, nullptr, true);
-            root.RenderTree(selectedIndex, pSelectedNode);
+            root.RenderTree(pSelectedNode);
             
             ImGui::NextColumn();
             ImGui::Text("Orientation");
@@ -104,7 +104,7 @@ public:
             if (pSelectedNode != nullptr)
             {
                 // Get or create transform parameters for the selected node
-                auto& transform = transforms[*selectedIndex];
+                auto& transform = transforms[pSelectedNode->GetId()];
                 
                 ImGui::SliderAngle("Roll", &transform.roll, -180.0f, 180.0f);
                 ImGui::SliderAngle("Pitch", &transform.pitch, -180.0f, 180.0f);
@@ -131,9 +131,9 @@ public:
 
     DirectX::XMMATRIX GetTransform() const noexcept
     {
-        if (selectedIndex.has_value() && pSelectedNode != nullptr)
+        if (pSelectedNode != nullptr)
         {
-            const auto& transform = transforms.at(*selectedIndex);
+            const auto& transform = transforms.at(pSelectedNode->GetId());
             return 
                 DirectX::XMMatrixRotationRollPitchYaw(transform.pitch, transform.yaw, transform.roll)
                 * DirectX::XMMatrixTranslation(transform.x, transform.y, transform.z);
@@ -150,7 +150,6 @@ public:
     }
     
 private:
-    std::optional<int> selectedIndex;
     Node* pSelectedNode = nullptr;
     
     struct TransformParameters

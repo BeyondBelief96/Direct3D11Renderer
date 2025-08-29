@@ -225,13 +225,15 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 
     D3::VertexLayout layout;
     layout.Append(D3::VertexLayout::Position3D)
-          .Append(D3::VertexLayout::Normal);
+          .Append(D3::VertexLayout::Normal)
+          .Append(D3::VertexLayout::Texture2D);
     D3::VertexBuffer vbuf(std::move(layout));
     for (unsigned int i = 0; i < mesh.mNumVertices; ++i)
     {
         vbuf.EmplaceBack(
             *reinterpret_cast<const XMFLOAT3*>(&mesh.mVertices[i]),
-            *reinterpret_cast<const XMFLOAT3*>(&mesh.mNormals[i])
+            *reinterpret_cast<const XMFLOAT3*>(&mesh.mNormals[i]),
+			*reinterpret_cast<const XMFLOAT2*>(&mesh.mTextureCoords[0][i])
         );
     }
 

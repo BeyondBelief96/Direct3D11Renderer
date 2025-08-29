@@ -4,9 +4,36 @@
 
 Texture::Texture(Graphics& gfx, const std::wstring& path)
 {
+	LoadFromWideString(gfx, path);
+}
+
+Texture::Texture(Graphics& gfx, const std::string& path)
+{
+	std::wstring widePath;
+	widePath.reserve(path.length());
+	for (const auto& c : path)
+	{
+		widePath.push_back(static_cast<wchar_t>(c));
+	}
+	LoadFromWideString(gfx, widePath);
+}
+
+Texture::Texture(Graphics& gfx, const char* path)
+{
+	std::wstring widePath;
+	std::string stringPath(path);
+	widePath.reserve(stringPath.length());
+	for (const auto& c : stringPath)
+	{
+		widePath.push_back(static_cast<wchar_t>(c));
+	}
+	LoadFromWideString(gfx, widePath);
+}
+
+void Texture::LoadFromWideString(Graphics& gfx, const std::wstring& path)
+{
 	DEBUGMANAGER(gfx);
 
-	// Load image using WIC
 	Microsoft::WRL::ComPtr<IWICBitmapDecoder> pDecoder;
 	hr = WICFactory::GetFactory()->CreateDecoderFromFilename(
 		path.c_str(),
@@ -21,15 +48,12 @@ Texture::Texture(Graphics& gfx, const std::wstring& path)
 		throw GFX_EXCEPT(hr);
 	}
 
-	// Get the first frame of the image
 	Microsoft::WRL::ComPtr<IWICBitmapFrameDecode> pFrame;
 	GFX_THROW_INFO(pDecoder->GetFrame(0, &pFrame));
 
-	// Get image format
 	WICPixelFormatGUID pixelFormat;
 	GFX_THROW_INFO(pFrame->GetPixelFormat(&pixelFormat));
 
-	// Convert format to RGBA32 if needed
 	Microsoft::WRL::ComPtr<IWICFormatConverter> pConverter;
 	if (pixelFormat != GUID_WICPixelFormat32bppRGBA)
 	{
@@ -44,14 +68,11 @@ Texture::Texture(Graphics& gfx, const std::wstring& path)
 		));
 	}
 
-	// Get image dimensions
 	UINT width, height;
 	GFX_THROW_INFO(pFrame->GetSize(&width, &height));
 
-	// Create temporary buffer for image data
-	std::vector<uint8_t> buffer(width * height * 4); // 4 byte per pixel (RGBA)
+	std::vector<uint8_t> buffer(width * height * 4);
 
-	// Copy image data to buffer
 	if (pConverter)
 	{
 		GFX_THROW_INFO(pConverter->CopyPixels(
@@ -71,7 +92,6 @@ Texture::Texture(Graphics& gfx, const std::wstring& path)
 		));
 	}
 
-	// Create texture description
 	D3D11_TEXTURE2D_DESC textureDesc = {};
 	textureDesc.Width = width;
 	textureDesc.Height = height;
@@ -85,13 +105,11 @@ Texture::Texture(Graphics& gfx, const std::wstring& path)
 	textureDesc.CPUAccessFlags = 0;
 	textureDesc.MiscFlags = 0;
 
-	// Create texture subresource data
 	D3D11_SUBRESOURCE_DATA subresourceData = {};
 	subresourceData.pSysMem = buffer.data();
-	subresourceData.SysMemPitch = width * 4; // 4 bytes per pixel (RGBA)
+	subresourceData.SysMemPitch = width * 4;
 	subresourceData.SysMemSlicePitch = 0;
 
-	// Create texture
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pTexture;
 	GFX_THROW_INFO(GetDevice(gfx)->CreateTexture2D(
 		&textureDesc,
@@ -99,7 +117,6 @@ Texture::Texture(Graphics& gfx, const std::wstring& path)
 		pTexture.ReleaseAndGetAddressOf()
 	));
 
-	// Create shader resource view
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Format = textureDesc.Format;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;

@@ -194,7 +194,7 @@ Model::Model(Graphics& gfx, const std::string& filePath) : pWindow(std::make_uni
 
     for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
     {
-        meshes.push_back(BuildMesh(gfx, *scene->mMeshes[i]));
+        meshes.push_back(BuildMesh(gfx, *scene->mMeshes[i], scene->mMaterials));
     }
     int nextId = 0;
     root = BuildNode(nextId, *scene->mRootNode);
@@ -219,7 +219,7 @@ void Model::ShowModelControlWindow(const char* windowName) noexcept
     pWindow->Render(windowName, *root);
 }
 
-std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh)
+std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const aiMaterial* const* pMaterials)
 {
     using namespace DirectX;
 
@@ -246,23 +246,32 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh)
         indices.push_back(f.mIndices[2]);
     }
 
-    std::vector<std::unique_ptr<Bindable>> binds;
+    std::vector<std::unique_ptr<Bindable>> bindables;
+
+    if (mesh.mMaterialIndex >= 0)
+    {
+		auto& material = pMaterials[mesh.mMaterialIndex];
+        aiString textureFileName;
+        material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFileName);
+		bindables.push_back(std::make_unique<Texture>(gfx, "assets/models/nano_textured/" + std::string(textureFileName.C_Str())));
+		bindables.push_back(std::make_unique<Sampler>(gfx));
+    }
 
     // VB/IB
-    binds.push_back(std::make_unique<VertexBuffer>(gfx, vbuf));
-    binds.push_back(std::make_unique<IndexBuffer>(gfx, indices));
+    bindables.push_back(std::make_unique<VertexBuffer>(gfx, vbuf));
+    bindables.push_back(std::make_unique<IndexBuffer>(gfx, indices));
 
     // Shaders
     auto pvs = std::make_unique<VertexShader>(gfx, L"shaders/Output/PhongVS.cso");
     auto vsbc = pvs->GetByteCode();
-    binds.push_back(std::move(pvs));
-    binds.push_back(std::make_unique<PixelShader>(gfx, L"shaders/Output/PhongPS.cso"));
+    bindables.push_back(std::move(pvs));
+    bindables.push_back(std::make_unique<PixelShader>(gfx, L"shaders/Output/PhongPS.cso"));
 
     // Input layout from dynamic layout
-    binds.push_back(std::make_unique<InputLayout>(gfx, vbuf.GetLayout().GetD3DLayout(), vsbc));
+    bindables.push_back(std::make_unique<InputLayout>(gfx, vbuf.GetLayout().GetD3DLayout(), vsbc));
 
     // Primitive topology
-    binds.push_back(std::make_unique<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+    bindables.push_back(std::make_unique<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 
     struct PSMaterial
     {
@@ -271,9 +280,9 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh)
         float specularPower = 30.0f;
         float padding[3] = {};
     } pm;
-    binds.push_back(std::make_unique<PixelConstantBuffer<PSMaterial>>(gfx, pm, 1u));
+    bindables.push_back(std::make_unique<PixelConstantBuffer<PSMaterial>>(gfx, pm, 1u));
 
-    return std::make_unique<Mesh>(gfx, std::move(binds));
+    return std::make_unique<Mesh>(gfx, std::move(bindables));
 }
 
 std::unique_ptr<Node> Model::BuildNode(int& nextId, const aiNode& node) noexcept

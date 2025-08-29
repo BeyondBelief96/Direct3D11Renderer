@@ -50,7 +50,7 @@ public:
     void Render(Graphics& gfx) const noexcept;
     void ShowModelControlWindow(const char* windowName = nullptr) noexcept;
 private:
-    std::unique_ptr<Mesh> BuildMesh(Graphics& gfx, const aiMesh& mesh);
+    std::unique_ptr<Mesh> BuildMesh(Graphics& gfx, const aiMesh& mesh, const aiMaterial* const* pMaterials);
     std::unique_ptr<Node> BuildNode(int& nextId, const aiNode& node) noexcept;
 private:
     std::unique_ptr<Node> root;

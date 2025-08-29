@@ -11,12 +11,15 @@ cbuffer Light
 
 cbuffer ObjectConstantBuffer
 {
-    float3 materialColor;
     float specularIntensity;
     float specularPower;
+    float padding[2]; // Padding to ensure 16-byte alignment
 };
 
-float4 main(float3 posViewSpace: Position, float3 normal : Normal) : SV_TARGET
+Texture2D tex;
+SamplerState samplerState;
+
+float4 main(float3 posViewSpace: Position, float3 normal : Normal, float2 texCoord : TexCoord) : SV_TARGET
 {
     // In camera space, the normal may still need normalization due to interpolation
     normal = normalize(normal);
@@ -31,13 +34,12 @@ float4 main(float3 posViewSpace: Position, float3 normal : Normal) : SV_TARGET
     // Calculate distance to light
     const float distanceToLight = length(lightPosViewSpace - posViewSpace);
     const float attenuation = 1.0f / (attConstant + attLinear * distanceToLight + attQuadratic * (distanceToLight * distanceToLight));
-    
-    // Ambient light contribution
-    float3 ambient = ambientColor * materialColor;
+   
+    float ambient = ambientColor;
     
     // Calculate diffuse component
     const float diffuseFactor = max(0.0f, dot(normal, lightDirection));
-    float3 diffuse = diffuseColor * diffuseFactor * diffuseIntensity * materialColor;
+    float3 diffuse = diffuseColor * diffuseFactor * diffuseIntensity;
     
     // Calculate specular component using Phong reflection model
     // Reflect expects the first vector to point from light to surface
@@ -53,5 +55,6 @@ float4 main(float3 posViewSpace: Position, float3 normal : Normal) : SV_TARGET
     // Combine all lighting components
     float3 finalColor = (ambient + diffuse + specular);
     
-    return float4(saturate(finalColor), 1.0f);
+    // Sample texture and modulate with lighting result
+    return float4(saturate(finalColor), 1.0f) * tex.Sample(samplerState, texCoord);
 }

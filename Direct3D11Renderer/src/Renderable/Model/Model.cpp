@@ -277,10 +277,9 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 
     struct PSMaterial
     {
-        DirectX::XMFLOAT3 color = { 0.6f,0.6f,0.8f };
         float specularIntensity = 0.6f;
         float specularPower = 30.0f;
-        float padding[3] = {};
+        float padding[2] = {};
     } pm;
     bindables.push_back(std::make_unique<PixelConstantBuffer<PSMaterial>>(gfx, pm, 1u));
 

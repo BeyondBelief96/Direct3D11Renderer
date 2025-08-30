@@ -9,13 +9,6 @@ cbuffer Light
     float attQuadratic;
 };
 
-cbuffer ObjectConstantBuffer
-{
-    float specularIntensity;
-    float specularPower;
-    float padding[2]; // Padding to ensure 16-byte alignment
-};
-
 Texture2D diff;
 Texture2D specular;
 SamplerState splr;
@@ -36,23 +29,18 @@ float4 main(float3 posViewSpace : Position, float3 normal : Normal, float2 texCo
     const float distanceToLight = length(lightPosViewSpace - posViewSpace);
     const float attenuation = 1.0f / (attConstant + attLinear * distanceToLight + attQuadratic * (distanceToLight * distanceToLight));
    
-    float ambient = ambientColor;
+    const float3 ambient = ambientColor;
     
     // Calculate diffuse component
-    float3 diffuse = diffuseColor * diffuseIntensity * max(0.0f, dot(lightDirection, normal));
+    const float3 diffuse = attenuation * diffuseColor * diffuseIntensity * max(0.0f, dot(lightDirection, normal));
     
     // Calculate specular component using Phong reflection model
     // Reflect expects the first vector to point from light to surface
     float3 reflectionVector = normalize(reflect(-lightDirection, normal));
     float4 specularSample = specular.Sample(splr, texCoord);
     const float3 specularColorIntensity = specularSample.rgb;
-    const float specularPowerFromMap = specularSample.a; // Renamed to avoid conflict
-    float3 specular = specularColorIntensity * pow(max(0.0f, dot(reflectionVector, viewDirection)), specularPowerFromMap) * specularIntensity;
-    
-    // Attenuation
-    ambient *= attenuation;
-    diffuse *= attenuation;
-    specular *= attenuation;
+    const float specularPower = specularSample.a;
+    const float3 specular = attenuation * specularColorIntensity * pow(max(0.0f, dot(reflectionVector, viewDirection)), specularPower);
     
     // Combine all lighting components
     float3 finalColor = (ambient + diffuse + specular);

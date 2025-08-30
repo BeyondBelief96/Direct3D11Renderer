@@ -290,6 +290,14 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
     else
     {
         bindables.push_back(std::make_unique<PixelShader>(gfx, L"shaders/Output/PhongPS.cso"));
+        struct PSMaterialConstant
+        {
+            float specularIntensity = 1.6f;
+            float specularPower = 50.0f;
+            float padding[2] = { 0.0f, 0.0f };
+        } pmc;
+
+		bindables.push_back(std::make_unique<PixelConstantBuffer<PSMaterialConstant>>(gfx, pmc, 1u));
 	}
 
     // Input layout from dynamic layout

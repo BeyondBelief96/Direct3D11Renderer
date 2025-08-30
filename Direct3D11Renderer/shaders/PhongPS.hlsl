@@ -35,10 +35,10 @@ float4 main(float3 posViewSpace: Position, float3 normal : Normal, float2 texCoo
     const float distanceToLight = length(lightPosViewSpace - posViewSpace);
     const float attenuation = 1.0f / (attConstant + attLinear * distanceToLight + attQuadratic * (distanceToLight * distanceToLight));
    
-    float ambient = ambientColor;
+    float3 ambient = ambientColor;
     
     // Calculate diffuse component
-    const float diffuseFactor = max(0.0f, dot(normal, lightDirection));
+    const float diffuseFactor = max(0.0f, dot(lightDirection, normal));
     float3 diffuse = diffuseColor * diffuseFactor * diffuseIntensity;
     
     // Calculate specular component using Phong reflection model

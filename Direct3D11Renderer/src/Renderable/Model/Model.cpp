@@ -250,13 +250,28 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 
     std::vector<std::unique_ptr<Bindable>> bindables;
 
+    bool hasSpecularMap = false;
     if (mesh.mMaterialIndex >= 0)
     {
 		auto& material = pMaterials[mesh.mMaterialIndex];
+        const auto basePath = "assets/models/nano_textured/";
         aiString textureFileName;
+
+		// Textures
+
+		// Diffuse texture
         material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFileName);
-		bindables.push_back(std::make_unique<Texture>(gfx, "assets/models/nano_textured/" + std::string(textureFileName.C_Str())));
-		bindables.push_back(std::make_unique<Sampler>(gfx));
+		bindables.push_back(std::make_unique<Texture>(gfx, basePath + std::string(textureFileName.C_Str()), 0));
+
+		// Specular texture
+        if (material->GetTexture(aiTextureType_SPECULAR, 0, &textureFileName) == aiReturn_SUCCESS)
+        {
+			hasSpecularMap = true;
+            bindables.push_back(std::make_unique<Texture>(gfx, basePath + std::string(textureFileName.C_Str()), 1));
+        }
+        
+		// Sampler
+        bindables.push_back(std::make_unique<Sampler>(gfx));
     }
 
     // VB/IB
@@ -267,7 +282,15 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
     auto pvs = std::make_unique<VertexShader>(gfx, L"shaders/Output/PhongVS.cso");
     auto vsbc = pvs->GetByteCode();
     bindables.push_back(std::move(pvs));
-    bindables.push_back(std::make_unique<PixelShader>(gfx, L"shaders/Output/PhongPS.cso"));
+
+    if (hasSpecularMap)
+    {
+        bindables.push_back(std::make_unique<PixelShader>(gfx, L"shaders/Output/PhongPSSpecularMap.cso"));
+    }
+    else
+    {
+        bindables.push_back(std::make_unique<PixelShader>(gfx, L"shaders/Output/PhongPS.cso"));
+	}
 
     // Input layout from dynamic layout
     bindables.push_back(std::make_unique<InputLayout>(gfx, vbuf.GetLayout().GetD3DLayout(), vsbc));
@@ -277,8 +300,8 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 
     struct PSMaterial
     {
-        float specularIntensity = 0.6f;
-        float specularPower = 30.0f;
+        float specularIntensity = 1.6f;
+        float specularPower = 50.0f;
         float padding[2] = {};
     } pm;
     bindables.push_back(std::make_unique<PixelConstantBuffer<PSMaterial>>(gfx, pm, 1u));

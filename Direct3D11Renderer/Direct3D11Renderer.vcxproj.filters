@@ -313,6 +313,7 @@
   <ItemGroup>
     <FxCompile Include="shaders\PhongVS.hlsl" />
     <FxCompile Include="shaders\PhongPS.hlsl" />
+    <FxCompile Include="shaders\PhongPSSpecularMap.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\Downloads\DXTrace.inl">

@@ -2,12 +2,12 @@
 #include "Exceptions/GraphicsExceptions.h"
 #include "Utilities/WICFactory.h"
 
-Texture::Texture(Graphics& gfx, const std::wstring& path)
+Texture::Texture(Graphics& gfx, const std::wstring& path, unsigned int slot = 0)
 {
 	LoadFromWideString(gfx, path);
 }
 
-Texture::Texture(Graphics& gfx, const std::string& path)
+Texture::Texture(Graphics& gfx, const std::string& path, unsigned int slot = 0)
 {
 	std::wstring widePath;
 	widePath.reserve(path.length());
@@ -18,7 +18,7 @@ Texture::Texture(Graphics& gfx, const std::string& path)
 	LoadFromWideString(gfx, widePath);
 }
 
-Texture::Texture(Graphics& gfx, const char* path)
+Texture::Texture(Graphics& gfx, const char* path, unsigned int slot = 0)
 {
 	std::wstring widePath;
 	std::string stringPath(path);
@@ -132,5 +132,5 @@ void Texture::LoadFromWideString(Graphics& gfx, const std::wstring& path)
 
 void Texture::Bind(Graphics& gfx) noexcept
 {
-	GetContext(gfx)->PSSetShaderResources(0u, 1u, pTextureView.GetAddressOf());
+	GetContext(gfx)->PSSetShaderResources(slot, 1u, pTextureView.GetAddressOf());
 }

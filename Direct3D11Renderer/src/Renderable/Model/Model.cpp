@@ -285,7 +285,7 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 
     if (hasSpecularMap)
     {
-        bindables.push_back(std::make_unique<PixelShader>(gfx, L"shaders/Output/PhongPSSpecularMap.cso"));
+        bindables.push_back(std::make_unique<PixelShader>(gfx, L"shaders/Output/PhongPS.cso"));
     }
     else
     {

@@ -54,13 +54,35 @@ void Texture::LoadFromWideString(Graphics& gfx, const std::wstring& path)
 	WICPixelFormatGUID pixelFormat;
 	GFX_THROW_INFO(pFrame->GetPixelFormat(&pixelFormat));
 
+	// Determine the best target format based on source
+	WICPixelFormatGUID targetFormat;
+	DXGI_FORMAT dxgiFormat;
+	
+	// Check if source is already in a format we can use directly
+	if (pixelFormat == GUID_WICPixelFormat32bppRGBA)
+	{
+		targetFormat = GUID_WICPixelFormat32bppRGBA;
+		dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+	}
+	else if (pixelFormat == GUID_WICPixelFormat32bppBGRA)
+	{
+		targetFormat = GUID_WICPixelFormat32bppBGRA;
+		dxgiFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+	}
+	else
+	{
+		// Default to RGBA for unknown formats
+		targetFormat = GUID_WICPixelFormat32bppRGBA;
+		dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+	}
+
 	Microsoft::WRL::ComPtr<IWICFormatConverter> pConverter;
-	if (pixelFormat != GUID_WICPixelFormat32bppRGBA)
+	if (pixelFormat != targetFormat)
 	{
 		GFX_THROW_INFO(WICFactory::GetFactory()->CreateFormatConverter(&pConverter));
 		GFX_THROW_INFO(pConverter->Initialize(
 			pFrame.Get(),
-			GUID_WICPixelFormat32bppRGBA,
+			targetFormat,
 			WICBitmapDitherTypeNone,
 			nullptr,
 			0.0f,
@@ -97,7 +119,7 @@ void Texture::LoadFromWideString(Graphics& gfx, const std::wstring& path)
 	textureDesc.Height = height;
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 1;
-	textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	textureDesc.Format = dxgiFormat;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.SampleDesc.Quality = 0;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;

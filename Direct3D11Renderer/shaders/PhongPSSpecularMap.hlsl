@@ -29,22 +29,26 @@ float4 main(float3 posViewSpace : Position, float3 normal : Normal, float2 texCo
     const float distanceToLight = length(lightPosViewSpace - posViewSpace);
     const float attenuation = 1.0f / (attConstant + attLinear * distanceToLight + attQuadratic * (distanceToLight * distanceToLight));
    
-    const float3 ambient = ambientColor;
+    // Sample diffuse texture
+    const float4 diffuseSample = diff.Sample(splr, texCoord);
     
     // Calculate diffuse component
-    const float3 diffuse = attenuation * diffuseColor * diffuseIntensity * max(0.0f, dot(lightDirection, normal));
+    const float diffuseFactor = max(0.0f, dot(lightDirection, normal));
+    float3 diffuse = diffuseColor * diffuseFactor * diffuseIntensity * attenuation;
     
     // Calculate specular component using Phong reflection model
-    // Reflect expects the first vector to point from light to surface
     float3 reflectionVector = normalize(reflect(-lightDirection, normal));
     float4 specularSample = specular.Sample(splr, texCoord);
     const float3 specularColorIntensity = specularSample.rgb;
-    const float specularPower = specularSample.a;
-    const float3 specular = attenuation * specularColorIntensity * pow(max(0.0f, dot(reflectionVector, viewDirection)), specularPower);
+    const float specularPower = specularSample.a * 256.0f; // Scale alpha to proper power range
+    float specularFactor = pow(max(0.0f, dot(reflectionVector, viewDirection)), specularPower);
+    float3 specularColor = (diffuseColor * specularFactor) * specularColorIntensity * attenuation;
     
-    // Combine all lighting components
-    float3 finalColor = (ambient + diffuse + specular);
+    // Calculate ambient with attenuation
+    float3 ambient = ambientColor * attenuation;
     
-    // Sample texture and modulate with lighting result
-    return float4(saturate(finalColor), 1.0f) * diff.Sample(splr, texCoord);
+    // Combine all lighting components and modulate with diffuse texture
+    float3 finalColor = (ambient + diffuse + specularColor) * diffuseSample.rgb;
+    
+    return float4(saturate(finalColor), diffuseSample.a);
 }

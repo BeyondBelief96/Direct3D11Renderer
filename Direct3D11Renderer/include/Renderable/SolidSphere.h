@@ -10,5 +10,5 @@ public:
 	void SetPosition(DirectX::XMFLOAT3 pos) noexcept;
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
 private:
-	DirectX::XMFLOAT3 position = { 1.0f, 1.0f, 1.0f };
+	DirectX::XMFLOAT3 position = { 2.6f, 13.5f, -3.5f };
 };

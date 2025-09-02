@@ -250,7 +250,7 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 
     std::vector<std::unique_ptr<Bindable>> bindables;
     bool hasSpecularMap = false;
-
+    float shininess = 35.0f;
     if (mesh.mMaterialIndex >= 0)
     {
 		auto& material = *pMaterials[mesh.mMaterialIndex];
@@ -266,6 +266,10 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 
             bindables.push_back(std::make_unique<Texture>(gfx, basePath + std::string(textureFileName.C_Str()), 1));
             hasSpecularMap = true;
+        }
+        else
+        {
+            material.Get(AI_MATKEY_SHININESS, shininess);
         }
         
 		// Sampler
@@ -291,9 +295,11 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
         struct PSMaterial
         {
             float specularIntensity = 1.6f;
-            float specularPower = 50.0f;
+            float specularPower = 0.0f;
             float padding[2] = {};
         } pm;
+
+        pm.specularPower = shininess;
         bindables.push_back(std::make_unique<PixelConstantBuffer<PSMaterial>>(gfx, pm, 1u));
 	}
 

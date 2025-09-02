@@ -249,25 +249,23 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
     }
 
     std::vector<std::unique_ptr<Bindable>> bindables;
-
     bool hasSpecularMap = false;
+
     if (mesh.mMaterialIndex >= 0)
     {
-		auto& material = pMaterials[mesh.mMaterialIndex];
+		auto& material = *pMaterials[mesh.mMaterialIndex];
         const auto basePath = "assets/models/nano_textured/";
         aiString textureFileName;
-
-		// Textures
-
 		// Diffuse texture
-        material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFileName);
+        material.GetTexture(aiTextureType_DIFFUSE, 0, &textureFileName);
 		bindables.push_back(std::make_unique<Texture>(gfx, basePath + std::string(textureFileName.C_Str()), 0));
 
 		// Specular texture
-        if (material->GetTexture(aiTextureType_SPECULAR, 0, &textureFileName) == aiReturn_SUCCESS)
+        if (material.GetTexture(aiTextureType_SPECULAR, 0, &textureFileName) == aiReturn_SUCCESS)
         {
-			hasSpecularMap = true;
+
             bindables.push_back(std::make_unique<Texture>(gfx, basePath + std::string(textureFileName.C_Str()), 1));
+            hasSpecularMap = true;
         }
         
 		// Sampler
@@ -285,19 +283,18 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 
     if (hasSpecularMap)
     {
-        bindables.push_back(std::make_unique<PixelShader>(gfx, L"shaders/Output/PhongPS.cso"));
+        bindables.push_back(std::make_unique<PixelShader>(gfx, L"shaders/Output/PhongPSSpecularMap.cso"));
     }
     else
     {
         bindables.push_back(std::make_unique<PixelShader>(gfx, L"shaders/Output/PhongPS.cso"));
-        struct PSMaterialConstant
+        struct PSMaterial
         {
             float specularIntensity = 1.6f;
             float specularPower = 50.0f;
-            float padding[2] = { 0.0f, 0.0f };
-        } pmc;
-
-		bindables.push_back(std::make_unique<PixelConstantBuffer<PSMaterialConstant>>(gfx, pmc, 1u));
+            float padding[2] = {};
+        } pm;
+        bindables.push_back(std::make_unique<PixelConstantBuffer<PSMaterial>>(gfx, pm, 1u));
 	}
 
     // Input layout from dynamic layout
@@ -305,14 +302,6 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 
     // Primitive topology
     bindables.push_back(std::make_unique<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-
-    struct PSMaterial
-    {
-        float specularIntensity = 1.6f;
-        float specularPower = 50.0f;
-        float padding[2] = {};
-    } pm;
-    bindables.push_back(std::make_unique<PixelConstantBuffer<PSMaterial>>(gfx, pm, 1u));
 
     return std::make_unique<Mesh>(gfx, std::move(bindables));
 }

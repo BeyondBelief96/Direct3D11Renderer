@@ -38,17 +38,18 @@ float4 main(float3 posViewSpace : Position, float3 normal : Normal, float2 texCo
     
     // Calculate specular component using Phong reflection model
     float3 reflectionVector = normalize(reflect(-lightDirection, normal));
-    float4 specularSample = specular.Sample(splr, texCoord);
+    
+    const float4 specularSample = specular.Sample(splr, texCoord);
     const float3 specularColorIntensity = specularSample.rgb;
-    const float specularPower = specularSample.a * 256.0f; // Scale alpha to proper power range
+    const float specularPower = specularSample.a;
     float specularFactor = pow(max(0.0f, dot(reflectionVector, viewDirection)), specularPower);
-    float3 specularColor = (diffuseColor * specularFactor) * specularColorIntensity * attenuation;
+    float3 specularColor = specularFactor * specularColorIntensity * attenuation;
     
     // Calculate ambient with attenuation
     float3 ambient = ambientColor * attenuation;
     
     // Combine all lighting components and modulate with diffuse texture
-    float3 finalColor = (ambient + diffuse + specularColor) * diffuseSample.rgb;
+    float3 finalColor = ambient + diffuse + specularColor;
     
-    return float4(saturate(finalColor), diffuseSample.a);
+    return float4(saturate(finalColor), 1.0f) * diff.Sample(splr, texCoord);
 }

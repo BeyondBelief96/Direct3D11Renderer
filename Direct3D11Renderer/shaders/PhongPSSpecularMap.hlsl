@@ -15,41 +15,21 @@ SamplerState splr;
 
 float4 main(float3 posViewSpace : Position, float3 normal : Normal, float2 texCoord : TexCoord) : SV_TARGET
 {
-    // In camera space, the normal may still need normalization due to interpolation
-    normal = normalize(normal);
-    
-    // In camera space, the camera is at (0,0,0), so the view direction is just
-    // the negative of the fragment position
-    const float3 viewDirection = normalize(-posViewSpace);
-    
-    // Calculate direction from fragment to light in view space
-    const float3 lightDirection = normalize(lightPosViewSpace - posViewSpace);
-    
-    // Calculate distance to light
-    const float distanceToLight = length(lightPosViewSpace - posViewSpace);
-    const float attenuation = 1.0f / (attConstant + attLinear * distanceToLight + attQuadratic * (distanceToLight * distanceToLight));
-   
-    // Sample diffuse texture
-    const float4 diffuseSample = diff.Sample(splr, texCoord);
-    
-    // Calculate diffuse component
-    const float diffuseFactor = max(0.0f, dot(lightDirection, normal));
-    float3 diffuse = diffuseColor * diffuseFactor * diffuseIntensity * attenuation;
-    
-    // Calculate specular component using Phong reflection model
-    float3 reflectionVector = normalize(reflect(-lightDirection, normal));
-    
+    // fragment to light vector data
+    const float3 vToL = lightPosViewSpace - posViewSpace;
+    const float distToL = length(vToL);
+    const float3 dirToL = vToL / distToL;
+	// attenuation
+    const float att = 1.0f / (attConstant + attLinear * distToL + attQuadratic * (distToL * distToL));
+	// diffuse intensity
+    const float3 diffuse = diffuseColor * diffuseIntensity * att * max(0.0f, dot(dirToL, normal));
+	// reflected light vector
+    const float3 r = reflect(-dirToL, normal);
+	// calculate specular intensity based on angle between viewing vector and reflection vector, narrow with power function
     const float4 specularSample = specular.Sample(splr, texCoord);
     const float3 specularColorIntensity = specularSample.rgb;
-    const float specularPower = specularSample.a;
-    float specularFactor = pow(max(0.0f, dot(reflectionVector, viewDirection)), specularPower);
-    float3 specularColor = specularFactor * specularColorIntensity * attenuation;
-    
-    // Calculate ambient with attenuation
-    float3 ambient = ambientColor * attenuation;
-    
-    // Combine all lighting components and modulate with diffuse texture
-    float3 finalColor = ambient + diffuse + specularColor;
-    
-    return float4(saturate(finalColor), 1.0f) * diff.Sample(splr, texCoord);
+    const float specularPower = pow(2.0f, specularSample.a * 13.0f);
+    const float3 specular = att * specularColorIntensity * pow(max(0.0f, dot(normalize(-r), normalize(posViewSpace))), specularPower);
+	// final color
+    return float4(saturate((diffuse + ambientColor) * diff.Sample(splr, texCoord).rgb + specular * specularColorIntensity), 1.0f);
 }

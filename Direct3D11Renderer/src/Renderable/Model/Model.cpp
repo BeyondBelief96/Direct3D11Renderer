@@ -223,10 +223,13 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 {
     using namespace DirectX;
 
+	// Define the vertex layout
     D3::VertexLayout layout;
     layout.Append(D3::VertexLayout::Position3D)
           .Append(D3::VertexLayout::Normal)
           .Append(D3::VertexLayout::Texture2D);
+
+	// Create vertex buffer and populate it
     D3::VertexBuffer vbuf(std::move(layout));
     for (unsigned int i = 0; i < mesh.mNumVertices; ++i)
     {
@@ -237,6 +240,7 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
         );
     }
 
+	// Create index buffer and populate it
     std::vector<unsigned short> indices;
     indices.reserve(mesh.mNumFaces * 3);
     for (unsigned int i = 0; i < mesh.mNumFaces; ++i)
@@ -251,20 +255,21 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
     std::vector<std::shared_ptr<Bindable>> bindables;
     bool hasSpecularMap = false;
     float shininess = 35.0f;
+    const auto basePath = "assets/models/nano_textured/";
     if (mesh.mMaterialIndex >= 0)
     {
 		auto& material = *pMaterials[mesh.mMaterialIndex];
-        const auto basePath = "assets/models/nano_textured/";
+
         aiString textureFileName;
 		// Diffuse texture
         material.GetTexture(aiTextureType_DIFFUSE, 0, &textureFileName);
-		bindables.push_back(std::make_shared<Texture>(gfx, basePath + std::string(textureFileName.C_Str()), 0));
+        bindables.push_back(Texture::Resolve(gfx, basePath + std::string(textureFileName.C_Str()), 0));
 
 		// Specular texture
         if (material.GetTexture(aiTextureType_SPECULAR, 0, &textureFileName) == aiReturn_SUCCESS)
         {
 
-            bindables.push_back(std::make_shared<Texture>(gfx, basePath + std::string(textureFileName.C_Str()), 1));
+            bindables.push_back(Texture::Resolve(gfx, basePath + std::string(textureFileName.C_Str()), 1));
             hasSpecularMap = true;
         }
         else
@@ -273,25 +278,27 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
         }
         
 		// Sampler
-        bindables.push_back(std::make_shared<Sampler>(gfx));
+        bindables.push_back(Sampler::Resolve(gfx));
     }
 
+	const auto meshTag = basePath + std::string("%") + mesh.mName.C_Str();
+
     // VB/IB
-    bindables.push_back(std::make_shared<VertexBuffer>(gfx, vbuf));
-    bindables.push_back(std::make_shared<IndexBuffer>(gfx, indices));
+    bindables.push_back(VertexBuffer::Resolve(gfx, meshTag, vbuf));
+    bindables.push_back(IndexBuffer::Resolve(gfx, meshTag, indices));
 
     // Shaders
-    auto pvs = std::make_shared<VertexShader>(gfx, "shaders/Output/PhongVS.cso");
-    auto vsbc = pvs->GetByteCode();
+    auto pvs = VertexShader::Resolve(gfx, "shaders/Output/PhongVS.cso");
+    auto vsbc = static_cast<VertexShader&>(*pvs).GetByteCode();
     bindables.push_back(std::move(pvs));
 
     if (hasSpecularMap)
     {
-        bindables.push_back(std::make_shared<PixelShader>(gfx, "shaders/Output/PhongPSSpecularMap.cso"));
+        bindables.push_back(PixelShader::Resolve(gfx, "shaders/Output/PhongPSSpecularMap.cso"));
     }
     else
     {
-        bindables.push_back(std::make_shared<PixelShader>(gfx, "shaders/Output/PhongPS.cso"));
+        bindables.push_back(PixelShader::Resolve(gfx, "shaders/Output/PhongPS.cso"));
         struct PSMaterial
         {
             float specularIntensity = 1.6f;
@@ -304,7 +311,7 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 	}
 
     // Input layout from dynamic layout
-    bindables.push_back(std::make_shared<InputLayout>(gfx, vbuf.GetLayout().GetD3DLayout(), vsbc));
+    bindables.push_back(std::make_shared<InputLayout>(gfx, vbuf.GetLayout(), vsbc));
 
     // Primitive topology
     bindables.push_back(std::make_shared<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));

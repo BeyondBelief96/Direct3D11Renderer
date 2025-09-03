@@ -16,31 +16,31 @@ SolidSphere::SolidSphere(Graphics& gfx, float radius)
 	}
 
 	// Vertex Shader
-	auto vs = std::make_shared<VertexShader>(gfx, "shaders/Output/SolidVS.cso");
-	auto pvsbc = vs->GetByteCode();
+	auto vs = VertexShader::Resolve(gfx, "shaders/Output/SolidVS.cso");
+	auto pvsbc = static_cast<VertexShader*>(vs.get())->GetByteCode();
 	AddBindable(vs);
 	
 	// Pixel Shader
-	AddBindable(std::make_shared<PixelShader>(gfx, "shaders/Output/SolidPS.cso"));
+	AddBindable(PixelShader::Resolve(gfx, "shaders/Output/SolidPS.cso"));
 	
 	// Vertex Buffer
-	AddBindable(std::make_shared<VertexBuffer>(gfx, dynVbuf));
+	AddBindable(VertexBuffer::Resolve(gfx, "sphere", dynVbuf));
 	
 	// Index Buffer
-	AddBindable(std::make_shared<IndexBuffer>(gfx, sphereMesh.indices));
+	AddBindable(IndexBuffer::Resolve(gfx, "sphere", sphereMesh.indices));
 	
 	// Input Layout
-	AddBindable(std::make_shared<InputLayout>(gfx, dynVbuf.GetLayout().GetD3DLayout(), pvsbc));
+	AddBindable(InputLayout::Resolve(gfx, dynVbuf.GetLayout(), pvsbc));
 
 	struct PSColorConstant
 	{
 		DirectX::XMVECTOR color = { 1.0f, 1.0f, 1.0f };
 		float padding;
 	} colorConstantBuffer;
-	AddBindable(std::make_shared<PixelConstantBuffer<PSColorConstant>>(gfx, colorConstantBuffer));
+	AddBindable(PixelConstantBuffer<PSColorConstant>::Resolve(gfx, colorConstantBuffer));
 	
 	// Topology
-	AddBindable(std::make_shared<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+	AddBindable(Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 
 	AddBindable(std::make_shared<TransformConstantBuffer>(gfx, *this));
 }

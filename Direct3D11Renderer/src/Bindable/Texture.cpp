@@ -2,11 +2,6 @@
 #include "Exceptions/GraphicsExceptions.h"
 #include "Utilities/WICFactory.h"
 
-Texture::Texture(Graphics& gfx, const std::wstring& path, UINT slot = 0) : slot(slot)
-{
-	LoadFromWideString(gfx, path);
-}
-
 Texture::Texture(Graphics& gfx, const std::string& path, UINT slot = 0) : slot(slot)
 {
 	std::wstring widePath;
@@ -18,17 +13,21 @@ Texture::Texture(Graphics& gfx, const std::string& path, UINT slot = 0) : slot(s
 	LoadFromWideString(gfx, widePath);
 }
 
-Texture::Texture(Graphics& gfx, const char* path, UINT slot = 0) : slot(slot)
+std::shared_ptr<Bindable> Texture::Resolve(Graphics& gfx, const std::string& path, UINT slot)
 {
-	std::wstring widePath;
-	std::string stringPath(path);
-	widePath.reserve(stringPath.length());
-	for (const auto& c : stringPath)
-	{
-		widePath.push_back(static_cast<wchar_t>(c));
-	}
-	LoadFromWideString(gfx, widePath);
+	return BindableCache::Resolve<Texture>(gfx, path, slot);
 }
+
+std::string Texture::GenerateUID(const std::string& path, UINT slot)
+{
+	return typeid(Texture).name() + std::string("#") + path + "#" + std::to_string(slot);
+}
+
+std::string Texture::GetUID() const noexcept
+{
+	return GenerateUID(path, slot);
+}
+
 
 void Texture::LoadFromWideString(Graphics& gfx, const std::wstring& path)
 {
@@ -156,3 +155,4 @@ void Texture::Bind(Graphics& gfx) noexcept
 {
 	GetContext(gfx)->PSSetShaderResources(slot, 1u, pTextureView.GetAddressOf());
 }
+

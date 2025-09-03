@@ -1,16 +1,18 @@
 #pragma once
 
-#include "Bindable.h"
+#include "BindableCommon.h"
 #include <wrl.h>
 #include <string>
 
 class Texture : public Bindable
 {
 public:
-	Texture(Graphics& gfx, const std::wstring& path, UINT slot);
 	Texture(Graphics& gfx, const std::string& path, UINT slot);
-	Texture(Graphics& gfx, const char* path, UINT slot);
 	void Bind(Graphics& gfx) noexcept override;
+	std::string GetUID() const noexcept override;
+
+	static std::shared_ptr<Bindable> Resolve(Graphics& gfx, const std::string& path, UINT slot = 0);
+	static std::string GenerateUID(const std::string& path, UINT slot);
 private:
 	void LoadFromWideString(Graphics& gfx, const std::wstring& path);
 	unsigned int slot;

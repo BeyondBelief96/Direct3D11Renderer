@@ -1,7 +1,13 @@
 #include "Bindable/IndexBuffer.h"
+#include "Bindable/BindableCache.h"
 
 IndexBuffer::IndexBuffer(Graphics& gfx, const std::vector<unsigned short>& indices)
-	: count((UINT)indices.size())
+	: IndexBuffer(gfx, "?", indices)
+{
+}
+
+IndexBuffer::IndexBuffer(Graphics& gfx, std::string tag, const std::vector<unsigned short>& indices)
+	: count((UINT)indices.size()), tag(tag)
 {
 	DEBUGMANAGER(gfx);
 
@@ -25,4 +31,19 @@ void IndexBuffer::Bind(Graphics& gfx) noexcept
 UINT IndexBuffer::GetCount() const noexcept
 {
 	return count;
+}
+
+std::string IndexBuffer::GetUID() const noexcept
+{
+	return GenerateUID_(tag);
+}
+
+std::shared_ptr<IndexBuffer> IndexBuffer::Resolve(Graphics& gfx, const std::string tag, const std::vector<unsigned short>& indices)
+{
+	return BindableCache::Resolve<IndexBuffer>(gfx, tag, indices);
+}
+
+std::string IndexBuffer::GenerateUID_(const std::string& tag)
+{
+	return typeid(IndexBuffer).name() + std::string("#") + tag;
 }

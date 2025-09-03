@@ -16,12 +16,12 @@ SolidSphere::SolidSphere(Graphics& gfx, float radius)
 	}
 
 	// Vertex Shader
-	auto vs = std::make_shared<VertexShader>(gfx, L"shaders/Output/SolidVS.cso");
+	auto vs = std::make_shared<VertexShader>(gfx, "shaders/Output/SolidVS.cso");
 	auto pvsbc = vs->GetByteCode();
 	AddBindable(vs);
 	
 	// Pixel Shader
-	AddBindable(std::make_shared<PixelShader>(gfx, L"shaders/Output/SolidPS.cso"));
+	AddBindable(std::make_shared<PixelShader>(gfx, "shaders/Output/SolidPS.cso"));
 	
 	// Vertex Buffer
 	AddBindable(std::make_shared<VertexBuffer>(gfx, dynVbuf));

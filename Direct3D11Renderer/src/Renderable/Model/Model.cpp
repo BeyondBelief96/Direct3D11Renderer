@@ -281,17 +281,17 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
     bindables.push_back(std::make_shared<IndexBuffer>(gfx, indices));
 
     // Shaders
-    auto pvs = std::make_shared<VertexShader>(gfx, L"shaders/Output/PhongVS.cso");
+    auto pvs = std::make_shared<VertexShader>(gfx, "shaders/Output/PhongVS.cso");
     auto vsbc = pvs->GetByteCode();
     bindables.push_back(std::move(pvs));
 
     if (hasSpecularMap)
     {
-        bindables.push_back(std::make_shared<PixelShader>(gfx, L"shaders/Output/PhongPSSpecularMap.cso"));
+        bindables.push_back(std::make_shared<PixelShader>(gfx, "shaders/Output/PhongPSSpecularMap.cso"));
     }
     else
     {
-        bindables.push_back(std::make_shared<PixelShader>(gfx, L"shaders/Output/PhongPS.cso"));
+        bindables.push_back(std::make_shared<PixelShader>(gfx, "shaders/Output/PhongPS.cso"));
         struct PSMaterial
         {
             float specularIntensity = 1.6f;

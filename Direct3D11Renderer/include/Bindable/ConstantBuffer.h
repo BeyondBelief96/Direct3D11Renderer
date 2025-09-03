@@ -1,8 +1,11 @@
 #pragma once
 
 #include "Bindable.h"
+#include "BindableCache.h"
 #include "Exceptions/GraphicsExceptions.h"
 #include <wrl.h>
+#include <typeinfo>
+#include <memory>
 
 template<typename C>
 class ConstantBuffer : public Bindable
@@ -53,11 +56,26 @@ class VertexConstantBuffer : public ConstantBuffer<C>
 {
 	using ConstantBuffer<C>::pConstantBuffer;
 	using ConstantBuffer<C>::slot;
+	using Bindable::GetContext;
 public:
 	using ConstantBuffer<C>::ConstantBuffer;
 	void Bind(Graphics& gfx) noexcept override
 	{
 		Bindable::GetContext(gfx)->VSSetConstantBuffers(slot, 1u, pConstantBuffer.GetAddressOf());
+	}
+	std::string GetUID() const noexcept override
+	{
+		return GenerateUID();
+	}
+
+	static std::string GenerateUID()
+	{
+		return typeid(VertexConstantBuffer).name();
+	}
+
+	static std::shared_ptr<Bindable> Resolve(Graphics& gfx)
+	{
+		return BindableCache::Resolve<VertexConstantBuffer>(gfx);
 	}
 };
 
@@ -72,5 +90,20 @@ public:
 	void Bind(Graphics& gfx) noexcept override
 	{
 		GetContext(gfx)->PSSetConstantBuffers(slot, 1u, pConstantBuffer.GetAddressOf());
+	}
+
+	std::string GetUID() const noexcept override
+	{
+		return GenerateUID();
+	}
+
+	static std::string GenerateUID()
+	{
+		return typeid(PixelConstantBuffer).name();
+	}
+
+	static std::shared_ptr<Bindable> Resolve(Graphics& gfx)
+	{
+		return BindableCache::Resolve<PixelConstantBuffer>(gfx);
 	}
 };

@@ -7,7 +7,15 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(where MSBuild)",
-      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\MSBuild.exe\" \"C:\\Users\\brand\\Source\\Repos\\Direct3D11Renderer\\Direct3D11Renderer.sln\" /p:Configuration=Debug /p:Platform=x64)"
+      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\MSBuild.exe\" \"C:\\Users\\brand\\Source\\Repos\\Direct3D11Renderer\\Direct3D11Renderer.sln\" /p:Configuration=Debug /p:Platform=x64)",
+      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"Direct3D11Renderer.sln\" \"/p:Configuration=Debug\" \"/p:Platform=x64\")",
+      "Bash(MSBuild:*)",
+      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\MSBuild.exe\" \"Direct3D11Renderer.sln\" /p:Configuration=Debug /p:Platform=x64)",
+      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\MSBuild.exe\" Direct3D11Renderer.sln)",
+      "Bash(Get-ChildItem -Directory)",
+      "Bash(dir)",
+      "Bash(dir:*)",
+      "Bash(where msbuild)"
     ],
     "deny": [],
     "ask": []

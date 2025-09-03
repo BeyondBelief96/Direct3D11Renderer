@@ -148,7 +148,6 @@
     <ClCompile Include="src\Exceptions\DxErr\dxerr.cpp" />
     <ClCompile Include="src\Core\Application.cpp" />
     <ClCompile Include="src\Bindable\Bindable.cpp" />
-    <ClCompile Include="src\Bindable\BindableKey.cpp" />
     <ClCompile Include="src\Bindable\IndexBuffer.cpp" />
     <ClCompile Include="src\Bindable\InputLayout.cpp" />
     <ClCompile Include="src\Bindable\PixelShader.cpp" />
@@ -191,7 +190,6 @@
     <ClInclude Include="include\Bindable\Bindable.h" />
     <ClInclude Include="include\Bindable\BindableCommon.h" />
     <ClInclude Include="include\Bindable\BindableCache.h" />
-    <ClInclude Include="include\Bindable\BindableKey.h" />
     <ClInclude Include="include\Bindable\ConstantBuffer.h" />
     <ClInclude Include="include\Bindable\IndexBuffer.h" />
     <ClInclude Include="include\Bindable\InputLayout.h" />

@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <cassert>
 #include <utility>
+#include <string>
 #include <d3d11.h>
 #include <DirectXMath.h>
 
@@ -159,6 +160,24 @@ namespace D3
 				desc.push_back(e.GetDesc());
 			}
 			return desc;
+		}
+		std::string GetCode() const
+		{
+			std::string code;
+			for (const auto& e : elements)
+			{
+				switch (e.GetType())
+				{
+				case Position2D: code += "P2"; break;
+				case Position3D: code += "P3"; break;
+				case Texture2D: code += "T2"; break;
+				case Normal: code += "N"; break;
+				case Float3Color: code += "C3"; break;
+				case Float4Color: code += "C4"; break;
+				case BGRAColor: code += "CB"; break;
+				}
+			}
+			return code;
 		}
 	private:
 		std::vector<Element> elements;

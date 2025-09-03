@@ -1,4 +1,4 @@
-#include "Bindable/Sampler.h"
+#include "Bindable/BindableCommon.h"
 
 Sampler::Sampler(Graphics& gfx)
 {
@@ -16,4 +16,19 @@ Sampler::Sampler(Graphics& gfx)
 void Sampler::Bind(Graphics& gfx) noexcept
 {
 	GetContext(gfx)->PSSetSamplers(0u, 1u, pSampler.GetAddressOf());
+}
+
+std::shared_ptr<Bindable> Sampler::Resolve(Graphics& gfx)
+{
+	return BindableCache::Resolve<Sampler>(gfx);
+}
+
+std::string Sampler::GenerateUID()
+{
+	return typeid(Sampler).name();
+}
+
+std::string Sampler::GetUID() const noexcept
+{
+	return GenerateUID();
 }

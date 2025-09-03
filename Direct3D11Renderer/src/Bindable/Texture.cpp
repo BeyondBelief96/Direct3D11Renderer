@@ -2,12 +2,12 @@
 #include "Exceptions/GraphicsExceptions.h"
 #include "Utilities/WICFactory.h"
 
-Texture::Texture(Graphics& gfx, const std::wstring& path, unsigned int slot = 0) : slot(slot)
+Texture::Texture(Graphics& gfx, const std::wstring& path, UINT slot = 0) : slot(slot)
 {
 	LoadFromWideString(gfx, path);
 }
 
-Texture::Texture(Graphics& gfx, const std::string& path, unsigned int slot = 0) : slot(slot)
+Texture::Texture(Graphics& gfx, const std::string& path, UINT slot = 0) : slot(slot)
 {
 	std::wstring widePath;
 	widePath.reserve(path.length());
@@ -18,7 +18,7 @@ Texture::Texture(Graphics& gfx, const std::string& path, unsigned int slot = 0) 
 	LoadFromWideString(gfx, widePath);
 }
 
-Texture::Texture(Graphics& gfx, const char* path, unsigned int slot = 0) : slot(slot)
+Texture::Texture(Graphics& gfx, const char* path, UINT slot = 0) : slot(slot)
 {
 	std::wstring widePath;
 	std::string stringPath(path);

@@ -5,13 +5,6 @@
 
 void Renderable::Render(Graphics& gfx) const noexcept(!_DEBUG)
 {
-    // Bind unique bindables
-    for (auto& b : bindables)
-    {
-        b->Bind(gfx);
-    }
-
-    // Bind shared bindables
     for (auto& b : bindables)
     {
         b->Bind(gfx);

@@ -307,14 +307,14 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
         } pm;
 
         pm.specularPower = shininess;
-        bindables.push_back(std::make_shared<PixelConstantBuffer<PSMaterial>>(gfx, pm, 1u));
+        bindables.push_back(PixelConstantBuffer<PSMaterial>::Resolve(gfx, pm, 1u));
 	}
 
     // Input layout from dynamic layout
-    bindables.push_back(std::make_shared<InputLayout>(gfx, vbuf.GetLayout(), vsbc));
+    bindables.push_back(InputLayout::Resolve(gfx, vbuf.GetLayout(), vsbc));
 
     // Primitive topology
-    bindables.push_back(std::make_shared<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+    bindables.push_back(Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 
     return std::make_unique<Mesh>(gfx, std::move(bindables));
 }

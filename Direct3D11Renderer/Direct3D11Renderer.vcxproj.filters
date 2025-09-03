@@ -120,9 +120,6 @@
     <ClCompile Include="src\Lights\PointLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderable\RenderableTestObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Exceptions\DxErr\dxerr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -267,9 +264,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Lights\PointLight.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderable\RenderableTestObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Utilities\MathUtils.h">

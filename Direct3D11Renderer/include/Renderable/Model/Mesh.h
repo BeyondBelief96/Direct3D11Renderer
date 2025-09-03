@@ -15,7 +15,7 @@ class Mesh : public Renderable
 {
 public:
     // Construct mesh with a prepared set of bindables (VB, IB, shaders, layout, constants, etc.)
-    Mesh(Graphics& gfx, std::vector<std::unique_ptr<Bindable>> bindables);
+    Mesh(Graphics& gfx, std::vector<std::shared_ptr<Bindable>> bindables);
 
     // Draw with an externally-supplied transform (typically from a scene graph node)
     void Draw(Graphics& gfx, DirectX::FXMMATRIX accumulatedTransform) const noexcept;

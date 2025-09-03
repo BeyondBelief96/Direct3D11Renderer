@@ -2,6 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Global
+Remember that you are on a windows 11 machine and you are running in powershell, so always use powershell commands when executing terminal commands, never bash commands.
+
 ## Build System
 
 This is a Visual Studio 2022 C++ project using MSBuild. The main solution file is `Direct3D11Renderer.sln`.

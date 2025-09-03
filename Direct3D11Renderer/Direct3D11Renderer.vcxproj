@@ -162,7 +162,6 @@
     <ClCompile Include="src\Exceptions\ModelException.cpp" />
     <ClCompile Include="src\Renderable\Model\Mesh.cpp" />
     <ClCompile Include="src\Renderable\Model\Model.cpp" />
-    <ClCompile Include="src\Renderable\RenderableTestObject.cpp" />
     <ClCompile Include="src\Renderable\SolidSphere.cpp" />
     <ClCompile Include="src\Utilities\D3Timer.cpp" />
     <ClCompile Include="src\Exceptions\BindableLookupException.cpp" />
@@ -209,7 +208,6 @@
     <ClInclude Include="include\Geometry\Vertex.h" />
     <ClInclude Include="include\Renderable\Model\Mesh.h" />
     <ClInclude Include="include\Renderable\Model\Model.h" />
-    <ClInclude Include="include\Renderable\RenderableTestObject.h" />
     <ClInclude Include="include\Renderable\SolidSphere.h" />
     <ClInclude Include="include\Utilities\D3Timer.h" />
     <ClInclude Include="include\Utilities\ChiliWin.h" />

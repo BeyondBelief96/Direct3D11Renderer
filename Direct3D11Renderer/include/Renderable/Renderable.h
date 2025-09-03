@@ -16,111 +16,11 @@ public:
     virtual ~Renderable() = default;
 
     void Render(Graphics& gfx) const noexcept(!_DEBUG);
-    void AddUniqueBindable(std::unique_ptr<Bindable> bindable) noexcept(!_DEBUG);
-
-    template<typename T>
-    T* QueryUniqueBindable() noexcept
-    {
-        static_assert(std::is_base_of<Bindable, T>::value, "T must inherit from Bindable");
-
-        for (auto& bindable : bindables)
-        {
-            if (auto* ptr = dynamic_cast<T*>(bindable.get()))
-            {
-                return ptr;
-            }
-        }
-        return nullptr;
-    }
-
-    template<typename T>
-    bool HasUniqueBindable() const noexcept
-    {
-        static_assert(std::is_base_of<Bindable, T>::value, "T must inherit from Bindable");
-
-        for (const auto& bindable : bindables)
-        {
-            if (dynamic_cast<T*>(bindable.get()) != nullptr)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    template<typename T, typename... Args>
-    T* AddUniqueBindableAndGet(Args&&... args) noexcept(!_DEBUG)
-    {
-        static_assert(std::is_base_of<Bindable, T>::value, "T must inherit from Bindable");
-
-        auto bindable = std::make_unique<T>(std::forward<Args>(args)...);
-        T* raw_ptr = bindable.get();
-
-        // Handle index buffer specially
-        if (auto* indexBuffer = dynamic_cast<IndexBuffer*>(raw_ptr))
-        {
-            pIndexBuffer = indexBuffer;
-        }
-
-        bindables.push_back(std::move(bindable));
-        return raw_ptr;
-    }
-
-    template<typename T, typename... Args>
-    T* UpdateOrCreateUniqueBindable(Args&&... args) noexcept(!_DEBUG)
-    {
-        static_assert(std::is_base_of<Bindable, T>::value, "T must inherit from Bindable");
-
-        // First try to find an existing bindable of type T
-        for (auto& bindable : bindables)
-        {
-            if (auto* ptr = dynamic_cast<T*>(bindable.get()))
-            {
-                return ptr; // Return existing bindable
-            }
-        }
-
-        // If not found, create a new one
-        return AddUniqueBindableAndGet<T>(std::forward<Args>(args)...);
-    }
-
-    template<typename T, typename... Args>
-    std::shared_ptr<T> AddSharedBindable(Graphics& gfx, const std::string& id, Args&&... args)
-    {
-        static_assert(std::is_base_of<Bindable, T>::value, "T must inherit from Bindable");
-
-        auto shared = BindableCache::Create<T>(gfx, id, std::forward<Args>(args)...);
-
-        // Handle index buffer specially
-        if (auto* indexBuffer = dynamic_cast<IndexBuffer*>(shared.get()))
-        {
-            pIndexBuffer = indexBuffer;
-        }
-
-        sharedBindables.push_back(shared);
-        return shared;
-    }
-
-    template<typename T>
-    std::shared_ptr<T> QuerySharedBindable() noexcept
-    {
-        static_assert(std::is_base_of<Bindable, T>::value, "T must inherit from Bindable");
-
-        for (auto& bindable : sharedBindables)
-        {
-            if (auto ptr = std::dynamic_pointer_cast<T>(bindable))
-            {
-                return ptr;
-            }
-        }
-        return nullptr;
-    }
+    void AddBindable(std::shared_ptr<Bindable> bindable);
 
     virtual DirectX::XMMATRIX GetTransformXM() const noexcept = 0;
-    virtual void Update(float dt) noexcept {};
 
 private:
     const IndexBuffer* pIndexBuffer = nullptr;
-    std::vector<std::unique_ptr<Bindable>> bindables;
-    std::vector<std::shared_ptr<Bindable>> sharedBindables;
+    std::vector<std::shared_ptr<Bindable>> bindables;
 };

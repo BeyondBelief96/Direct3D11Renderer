@@ -12,7 +12,7 @@ void Renderable::Render(Graphics& gfx) const noexcept(!_DEBUG)
     }
 
     // Bind shared bindables
-    for (auto& b : sharedBindables)
+    for (auto& b : bindables)
     {
         b->Bind(gfx);
     }
@@ -20,19 +20,13 @@ void Renderable::Render(Graphics& gfx) const noexcept(!_DEBUG)
     gfx.DrawIndexed(pIndexBuffer->GetCount());
 }
 
-void Renderable::AddUniqueBindable(std::unique_ptr<Bindable> bindable) noexcept(!_DEBUG)
+void Renderable::AddBindable(std::shared_ptr<Bindable> bindable)
 {
-    // Check if this is an IndexBuffer
-    if (auto* indexBuffer = dynamic_cast<IndexBuffer*>(bindable.get()))
+    if (typeid(*bindable) == typeid(IndexBuffer))
     {
-        // Handle index buffer logic
-        assert("Attempting to add index buffer a second time" && pIndexBuffer == nullptr);
-        pIndexBuffer = indexBuffer;
-        bindables.push_back(std::move(bindable));
+        assert("Binding multiple index buffers not allowed" && pIndexBuffer == nullptr);
+        pIndexBuffer = &static_cast<IndexBuffer&>(*bindable);
     }
-    else
-    {
-        // Handle regular bindable
-        bindables.push_back(std::move(bindable));
-    }
+
+	bindables.push_back(std::move(bindable));
 }

@@ -18,7 +18,7 @@ void Sampler::Bind(Graphics& gfx) noexcept
 	GetContext(gfx)->PSSetSamplers(0u, 1u, pSampler.GetAddressOf());
 }
 
-std::shared_ptr<Bindable> Sampler::Resolve(Graphics& gfx)
+std::shared_ptr<Sampler> Sampler::Resolve(Graphics& gfx)
 {
 	return BindableCache::Resolve<Sampler>(gfx);
 }

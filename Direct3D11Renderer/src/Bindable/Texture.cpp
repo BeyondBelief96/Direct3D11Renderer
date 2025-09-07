@@ -13,7 +13,7 @@ Texture::Texture(Graphics& gfx, const std::string& path, UINT slot = 0) : slot(s
 	LoadFromWideString(gfx, widePath);
 }
 
-std::shared_ptr<Bindable> Texture::Resolve(Graphics& gfx, const std::string& path, UINT slot)
+std::shared_ptr<Texture> Texture::Resolve(Graphics& gfx, const std::string& path, UINT slot)
 {
 	return BindableCache::Resolve<Texture>(gfx, path, slot);
 }

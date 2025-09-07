@@ -8,13 +8,16 @@ class TransformConstantBuffer : public Bindable
 public:
 	TransformConstantBuffer(Graphics& gfx, const Renderable& parent, UINT slot = 0u);
 	void Bind(Graphics& gfx) noexcept override;
-private:
+protected:
 	// Transform buffer
 	struct TransformBuffer
 	{
 		DirectX::XMMATRIX modelViewProj;
 		DirectX::XMMATRIX model;
 	};
+	void UpdateBindImpl(Graphics& gfx, const TransformBuffer& tf) noexcept;
+	TransformBuffer GetTransformBuffer(Graphics& gfx) noexcept;
+private:
 	static std::unique_ptr<VertexConstantBuffer<TransformBuffer>> pVertexConstantBuffer;
 	const Renderable& parent;
 };

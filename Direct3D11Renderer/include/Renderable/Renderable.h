@@ -18,6 +18,19 @@ public:
     void Render(Graphics& gfx) const noexcept(!_DEBUG);
     void AddBindable(std::shared_ptr<Bindable> bindable);
 
+	template<class T>
+	T* QueryBindable() noexcept
+	{
+		for (auto& pb : bindables)
+		{
+			if (auto pt = dynamic_cast<T*>(pb.get()))
+			{
+				return pt;
+			}
+		}
+		return nullptr;
+	}
+
     virtual DirectX::XMMATRIX GetTransformXM() const noexcept = 0;
 
 private:

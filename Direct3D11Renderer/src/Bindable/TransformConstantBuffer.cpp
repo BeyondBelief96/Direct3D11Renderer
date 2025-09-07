@@ -12,7 +12,18 @@ TransformConstantBuffer::TransformConstantBuffer(Graphics& gfx, const Renderable
 
 void TransformConstantBuffer::Bind(Graphics& gfx) noexcept
 {
-    DirectX::XMMATRIX modelView = parent.GetTransformXM() * gfx.GetView();
+	UpdateBindImpl(gfx, GetTransformBuffer(gfx));
+}
+
+void TransformConstantBuffer::UpdateBindImpl(Graphics& gfx, const TransformBuffer& tf) noexcept
+{
+	pVertexConstantBuffer->Update(gfx, tf);
+	pVertexConstantBuffer->Bind(gfx);
+}
+
+TransformConstantBuffer::TransformBuffer TransformConstantBuffer::GetTransformBuffer(Graphics & gfx) noexcept
+{
+	DirectX::XMMATRIX modelView = parent.GetTransformXM() * gfx.GetView();
 
 	const TransformBuffer transformBuffer
 	{
@@ -21,9 +32,7 @@ void TransformConstantBuffer::Bind(Graphics& gfx) noexcept
 			modelView * gfx.GetProjection())
 	};
 
-    // Update and bind the constant buffer
-    pVertexConstantBuffer->Update(gfx, transformBuffer);
-    pVertexConstantBuffer->Bind(gfx);
+	return transformBuffer;
 }
 
 std::unique_ptr<VertexConstantBuffer<TransformConstantBuffer::TransformBuffer>>

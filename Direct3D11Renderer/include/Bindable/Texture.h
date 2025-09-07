@@ -11,7 +11,7 @@ public:
 	void Bind(Graphics& gfx) noexcept override;
 	std::string GetUID() const noexcept override;
 
-	static std::shared_ptr<Bindable> Resolve(Graphics& gfx, const std::string& path, UINT slot = 0);
+	static std::shared_ptr<Texture> Resolve(Graphics& gfx, const std::string& path, UINT slot = 0);
 	static std::string GenerateUID(const std::string& path, UINT slot);
 private:
 	void LoadFromWideString(Graphics& gfx, const std::wstring& path);

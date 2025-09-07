@@ -8,7 +8,7 @@ public:
 	Sampler(Graphics& gfx);
 	void Bind(Graphics& gfx) noexcept override;
 	std::string GetUID() const noexcept override;
-	static std::shared_ptr<Bindable> Resolve(Graphics& gfx);
+	static std::shared_ptr<Sampler> Resolve(Graphics& gfx);
 	static std::string GenerateUID();
 protected:
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> pSampler;

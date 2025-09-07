@@ -1,4 +1,11 @@
-void main(float3 pos : Position) : SV_Position
+cbuffer CBuf
 {
-    
-}
+    matrix modelView;
+    matrix modelViewProj;
+};
+
+float4 main(float3 pos : Position) : SV_Position
+{
+    return mul(float4(pos, 1.0f), modelViewProj);
+
+};

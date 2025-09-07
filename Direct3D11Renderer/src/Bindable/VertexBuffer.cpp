@@ -33,7 +33,7 @@ std::string VertexBuffer::GetUID() const noexcept
 	return GenerateUID(tag);
 }
 
-std::shared_ptr<Bindable> VertexBuffer::Resolve(Graphics& gfx, const std::string& tag, const D3::VertexBuffer& vbuf)
+std::shared_ptr<VertexBuffer> VertexBuffer::Resolve(Graphics& gfx, const std::string& tag, const D3::VertexBuffer& vbuf)
 {
 	return BindableCache::Resolve<VertexBuffer>(gfx, tag, vbuf);
 }

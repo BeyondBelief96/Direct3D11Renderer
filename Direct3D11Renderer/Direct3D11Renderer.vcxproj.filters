@@ -132,6 +132,9 @@
     <ClCompile Include="src\Exceptions\ModelException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderable\TestPlane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Utilities\ChiliWin.h">
@@ -281,6 +284,15 @@
     <ClInclude Include="include\Exceptions\ModelException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Geometry\Plane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Geometry\IndexedTriangleList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderable\TestPlane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Direct3D11Renderer.rc">
@@ -302,6 +314,9 @@
     <FxCompile Include="shaders\PhongVS.hlsl" />
     <FxCompile Include="shaders\PhongPS.hlsl" />
     <FxCompile Include="shaders\PhongPSSpecularMap.hlsl" />
+    <FxCompile Include="shaders\PointLightPS.hlsl" />
+    <FxCompile Include="shaders\PointLightVS.hlsl" />
+    <FxCompile Include="shaders\PhongPSNormalMap.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\Downloads\DXTrace.inl">

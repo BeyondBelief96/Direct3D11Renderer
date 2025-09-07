@@ -16,12 +16,12 @@ SolidSphere::SolidSphere(Graphics& gfx, float radius)
 	}
 
 	// Vertex Shader
-	auto vs = VertexShader::Resolve(gfx, "shaders/Output/SolidVS.cso");
+	auto vs = VertexShader::Resolve(gfx, "shaders/Output/PointLightVS.cso");
 	auto pvsbc = static_cast<VertexShader*>(vs.get())->GetByteCode();
 	AddBindable(vs);
 	
 	// Pixel Shader
-	AddBindable(PixelShader::Resolve(gfx, "shaders/Output/SolidPS.cso"));
+	AddBindable(PixelShader::Resolve(gfx, "shaders/Output/PointLightPS.cso"));
 	
 	// Vertex Buffer
 	AddBindable(VertexBuffer::Resolve(gfx, "sphere", dynVbuf));
@@ -37,7 +37,7 @@ SolidSphere::SolidSphere(Graphics& gfx, float radius)
 		DirectX::XMVECTOR color = { 1.0f, 1.0f, 1.0f };
 		float padding;
 	} colorConstantBuffer;
-	AddBindable(PixelConstantBuffer<PSColorConstant>::Resolve(gfx, colorConstantBuffer));
+	AddBindable(PixelConstantBuffer<PSColorConstant>::Resolve(gfx, colorConstantBuffer, 1u));
 	
 	// Topology
 	AddBindable(Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));

@@ -5,6 +5,7 @@
 #include <cassert>
 #include <imgui/imgui.h>
 #include <unordered_map>
+#include <filesystem>
 
 // -----------------------------------------------------------------------------
 // Node Class - Represents a node in the model's scene graph hierarchy.
@@ -176,11 +177,11 @@ private:
     } modelPose;
 };
 
-Model::Model(Graphics& gfx, const std::string& filePath) : pWindow(std::make_unique<ModelWindow>())
+Model::Model(Graphics& gfx, const std::string& modelPath) : pWindow(std::make_unique<ModelWindow>())
 {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(
-        filePath.c_str(),
+        modelPath.c_str(),
         aiProcess_Triangulate |
         aiProcess_ConvertToLeftHanded |
         aiProcess_GenNormals |
@@ -195,7 +196,7 @@ Model::Model(Graphics& gfx, const std::string& filePath) : pWindow(std::make_uni
 
     for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
     {
-        meshes.push_back(BuildMesh(gfx, *scene->mMeshes[i], scene->mMaterials));
+        meshes.push_back(BuildMesh(gfx, *scene->mMeshes[i], scene->mMaterials, modelPath));
     }
     int nextId = 0;
     root = BuildNode(nextId, *scene->mRootNode);
@@ -220,13 +221,17 @@ void Model::ShowModelControlWindow(const char* windowName) noexcept
     pWindow->Render(windowName, *root);
 }
 
-std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const aiMaterial* const* pMaterials)
+std::unique_ptr<Mesh> Model::BuildMesh(
+    Graphics& gfx,
+    const aiMesh& mesh, 
+    const aiMaterial* const* pMaterials,
+    const std::filesystem::path& modelPath)
 {
     using namespace DirectX;
 
     std::vector<std::shared_ptr<Bindable>> bindablePtrs;
 
-    const std::string base = "assets/models/gobber/";
+    const auto rootPath = modelPath.parent_path().string() + "\\";
 
     bool hasSpecularMap = false;
     bool hasNormalMap = false;
@@ -245,7 +250,7 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 
         if(material.GetTexture(aiTextureType_DIFFUSE, 0, &textureFileName) == aiReturn_SUCCESS)
         {
-            bindablePtrs.push_back(Texture::Resolve(gfx, base + textureFileName.C_Str(), 0u));
+            bindablePtrs.push_back(Texture::Resolve(gfx, rootPath + textureFileName.C_Str(), 0u));
 			hasDiffuseMap = true;
         }
         else
@@ -255,7 +260,7 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 
         if (material.GetTexture(aiTextureType_SPECULAR, 0, &textureFileName) == aiReturn_SUCCESS)
         {
-			auto specularTexture = Texture::Resolve(gfx, base + textureFileName.C_Str(), 1u);
+			auto specularTexture = Texture::Resolve(gfx, rootPath + textureFileName.C_Str(), 1u);
             hasAlphaChannel = specularTexture->AlphaChannelLoaded();
             bindablePtrs.push_back(std::move(specularTexture));
             hasSpecularMap = true;
@@ -271,7 +276,7 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 
         if(material.GetTexture(aiTextureType_NORMALS, 0, &textureFileName) == aiReturn_SUCCESS)
         {
-			auto normalMap = Texture::Resolve(gfx, base + textureFileName.C_Str(), 2u);
+			auto normalMap = Texture::Resolve(gfx, rootPath + textureFileName.C_Str(), 2u);
 			hasAlphaChannel = normalMap->AlphaChannelLoaded();
             bindablePtrs.push_back(std::move(normalMap));
             hasNormalMap = true;
@@ -282,7 +287,7 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
             bindablePtrs.push_back(Sampler::Resolve(gfx));
 		}
 
-        const std::string meshTag = base + "%" + mesh.mName.C_Str();
+        const std::string meshTag = modelPath.string() + "%" + mesh.mName.C_Str();
         const float scale = 6.0f;
 
         if (hasDiffuseMap && hasNormalMap && hasSpecularMap)

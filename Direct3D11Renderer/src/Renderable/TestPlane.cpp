@@ -15,11 +15,11 @@ TestPlane::TestPlane(Graphics& gfx, float size)
 
 	AddBindable(Texture::Resolve(gfx, "assets\\models\\brick_wall\\brick_wall_diffuse.jpg"));
 	AddBindable(Texture::Resolve(gfx, "assets\\models\\brick_wall\\brick_wall_normal.jpg", 1u));
-	auto pvs = VertexShader::Resolve(gfx, "shaders\\Output\\PhongVS.cso");
+	auto pvs = VertexShader::Resolve(gfx, "shaders\\Output\\BlinnPhong_Diffuse_VS.cso");
 	auto pvsbc = pvs->GetByteCode();
 	AddBindable(std::move(pvs));
 
-	AddBindable(PixelShader::Resolve(gfx, "shaders\\Output\\PhongPSNormalMap.cso"));
+	AddBindable(PixelShader::Resolve(gfx, "shaders\\Output\\BlinnPhong_NormalMapped_PS.cso"));
 
 	AddBindable(PixelConstantBuffer<PSMaterialConstant>::Resolve(gfx, pmc, 1u));
 

@@ -16,12 +16,12 @@ SolidSphere::SolidSphere(Graphics& gfx, float radius)
 	}
 
 	// Vertex Shader
-	auto vs = VertexShader::Resolve(gfx, "shaders/Output/PointLightVS.cso");
+	auto vs = VertexShader::Resolve(gfx, "shaders/Output/PointLightIndicator_VS.cso");
 	auto pvsbc = static_cast<VertexShader*>(vs.get())->GetByteCode();
 	AddBindable(vs);
 	
 	// Pixel Shader
-	AddBindable(PixelShader::Resolve(gfx, "shaders/Output/PointLightPS.cso"));
+	AddBindable(PixelShader::Resolve(gfx, "shaders/Output/PointLightIndicator_PS.cso"));
 	
 	// Vertex Buffer
 	AddBindable(VertexBuffer::Resolve(gfx, "sphere", dynVbuf));

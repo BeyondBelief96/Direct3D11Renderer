@@ -18,7 +18,14 @@
       "Bash(where msbuild)",
       "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"Direct3D11Renderer.sln\" /p:Configuration=Debug /p:Platform=x64)",
       "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" Direct3D11Renderer.sln \"/p:Configuration=Debug\" \"/p:Platform=x64\")",
-      "Bash(Remove-Item \"C:\\Users\\brand\\source\\repos\\Direct3D11Renderer\\docs\\Vertex_Developer_Documentation.md\" -Force)"
+      "Bash(Remove-Item \"C:\\Users\\brand\\source\\repos\\Direct3D11Renderer\\docs\\Vertex_Developer_Documentation.md\" -Force)",
+      "Bash(Remove-Item \"Direct3D11Renderer\\shaders\\PhongVS.hlsl\")",
+      "Bash(Remove-Item \"Direct3D11Renderer\\shaders\\PhongPS.hlsl\")",
+      "Bash(Remove-Item \"Direct3D11Renderer\\shaders\\PhongVSNormalMap.hlsl\")",
+      "Bash(Remove-Item \"Direct3D11Renderer\\shaders\\PhongPSNormalMap.hlsl\")",
+      "Bash(Remove-Item \"Direct3D11Renderer\\shaders\\PhongVSNoTextures.hlsl\")",
+      "Bash(del:*)",
+      "Bash(\"/c/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/MSBuild.exe\" Direct3D11Renderer.sln /p:Configuration=Debug /p:Platform=x64)"
     ],
     "deny": [],
     "ask": []

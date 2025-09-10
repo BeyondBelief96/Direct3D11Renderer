@@ -311,16 +311,15 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders\PhongVS.hlsl" />
-    <FxCompile Include="shaders\PhongPS.hlsl" />
-    <FxCompile Include="shaders\PhongPSSpecularMap.hlsl" />
-    <FxCompile Include="shaders\PointLightPS.hlsl" />
-    <FxCompile Include="shaders\PointLightVS.hlsl" />
-    <FxCompile Include="shaders\PhongPSSpecNormalMap.hlsl" />
-    <FxCompile Include="shaders\PhongVSNormalMap.hlsl" />
-    <FxCompile Include="shaders\PhongPSNormalMap.hlsl" />
-    <FxCompile Include="shaders\PhongVSNoTextures.hlsl" />
-    <FxCompile Include="shaders\PhongPSNoTextures.hlsl" />
+    <FxCompile Include="shaders\BlinnPhong_Diffuse_VS.hlsl" />
+    <FxCompile Include="shaders\BlinnPhong_Diffuse_PS.hlsl" />
+    <FxCompile Include="shaders\PointLightIndicator_PS.hlsl" />
+    <FxCompile Include="shaders\PointLightIndicator_VS.hlsl" />
+    <FxCompile Include="shaders\BlinnPhong_SpecularNormalMapped_PS.hlsl" />
+    <FxCompile Include="shaders\BlinnPhong_NormalMapped_VS.hlsl" />
+    <FxCompile Include="shaders\BlinnPhong_NormalMapped_PS.hlsl" />
+    <FxCompile Include="shaders\BlinnPhong_Solid_VS.hlsl" />
+    <FxCompile Include="shaders\BlinnPhong_Solid_PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\Downloads\DXTrace.inl">

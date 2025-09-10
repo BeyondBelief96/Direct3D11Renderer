@@ -320,10 +320,10 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
             bindablePtrs.push_back(VertexBuffer::Resolve(gfx, meshTag, vertexBuffer));
 			bindablePtrs.push_back(IndexBuffer::Resolve(gfx, meshTag, indices));
 
-			auto vertexShader = VertexShader::Resolve(gfx, shaderBasePath + "PhongVSNormalMap.cso");
+			auto vertexShader = VertexShader::Resolve(gfx, shaderBasePath + "BlinnPhong_NormalMapped_VS.cso");
             auto vertexShaderByteCode = vertexShader->GetByteCode();
             bindablePtrs.push_back(std::move(vertexShader));
-			bindablePtrs.push_back(PixelShader::Resolve(gfx, shaderBasePath + "PhongPSSpecNormalMap.cso"));
+			bindablePtrs.push_back(PixelShader::Resolve(gfx, shaderBasePath + "BlinnPhong_SpecularNormalMapped_PS.cso"));
 			bindablePtrs.push_back(InputLayout::Resolve(gfx, vertexBuffer.GetLayout(), vertexShaderByteCode));
 
             struct PixelShaderMaterialConstantBuffer
@@ -374,10 +374,10 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
             bindablePtrs.push_back(VertexBuffer::Resolve(gfx, meshTag, vertexBuffer));
             bindablePtrs.push_back(IndexBuffer::Resolve(gfx, meshTag, indices));
 
-            auto vertexShader = VertexShader::Resolve(gfx, shaderBasePath + "PhongVSNormalMap.cso");
+            auto vertexShader = VertexShader::Resolve(gfx, shaderBasePath + "BlinnPhong_NormalMapped_VS.cso");
             auto vertexShaderByteCode = vertexShader->GetByteCode();
             bindablePtrs.push_back(std::move(vertexShader));
-            bindablePtrs.push_back(PixelShader::Resolve(gfx, shaderBasePath + "PhongPSNormalMap.cso"));
+            bindablePtrs.push_back(PixelShader::Resolve(gfx, shaderBasePath + "BlinnPhong_NormalMapped_PS.cso"));
             bindablePtrs.push_back(InputLayout::Resolve(gfx, vertexBuffer.GetLayout(), vertexShaderByteCode));
 
             struct PixelShaderMaterialConstantBuffer
@@ -424,11 +424,11 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 			bindablePtrs.push_back(VertexBuffer::Resolve(gfx, meshTag, vertexBuffer));
 			bindablePtrs.push_back(IndexBuffer::Resolve(gfx, meshTag, indices));
 
-            auto vertexShader = VertexShader::Resolve(gfx, shaderBasePath + "PhongVS.cso");
+            auto vertexShader = VertexShader::Resolve(gfx, shaderBasePath + "BlinnPhong_Diffuse_VS.cso");
 			auto vertexShaderByteCode = vertexShader->GetByteCode();
 
 			bindablePtrs.push_back(std::move(vertexShader));
-			bindablePtrs.push_back(PixelShader::Resolve(gfx, shaderBasePath + "PhongPS.cso"));
+			bindablePtrs.push_back(PixelShader::Resolve(gfx, shaderBasePath + "BlinnPhong_Diffuse_PS.cso"));
             bindablePtrs.push_back(InputLayout::Resolve(gfx, vertexBuffer.GetLayout(), vertexShaderByteCode));
             struct PixelShaderMaterialConstantBuffer
             {
@@ -466,10 +466,10 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
             }
             bindablePtrs.push_back(VertexBuffer::Resolve(gfx, meshTag, vertexBuffer));
             bindablePtrs.push_back(IndexBuffer::Resolve(gfx, meshTag, indices));
-            auto vertexShader = VertexShader::Resolve(gfx, shaderBasePath + "PhongVSNoTextures.cso");
+            auto vertexShader = VertexShader::Resolve(gfx, shaderBasePath + "BlinnPhong_Solid_VS.cso");
             auto vertexShaderByteCode = vertexShader->GetByteCode();
             bindablePtrs.push_back(std::move(vertexShader));
-            bindablePtrs.push_back(PixelShader::Resolve(gfx, shaderBasePath + "PhongPSNoTextures.cso"));
+            bindablePtrs.push_back(PixelShader::Resolve(gfx, shaderBasePath + "BlinnPhong_Solid_PS.cso"));
             bindablePtrs.push_back(InputLayout::Resolve(gfx, vertexBuffer.GetLayout(), vertexShaderByteCode));
             struct PixelShaderMaterialConstantBuffer
             {

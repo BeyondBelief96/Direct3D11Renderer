@@ -5,7 +5,9 @@
 // Used to render small spheres that show where point lights are positioned.
 // =============================================================================
 
-// Light visualization properties constant buffer
+#include "Common/CommonStructures.hlsli"
+
+// Light indicator properties constant buffer
 cbuffer LightIndicatorProperties : register(b1)
 {
     float4 lightIndicatorColor;    // RGBA color for the light indicator sphere

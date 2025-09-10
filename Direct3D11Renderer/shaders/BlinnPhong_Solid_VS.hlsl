@@ -5,25 +5,14 @@
 // Outputs view-space position and normal for lighting calculations.
 // =============================================================================
 
-// Transform matrices constant buffer
-cbuffer TransformMatrices : register(b0)
-{
-    matrix modelViewMatrix;       // Transform from model space to view (camera) space
-    matrix modelViewProjMatrix;   // Transform from model space to clip space for rasterization
-};
-
-// Vertex shader output structure
-struct VertexOutput
-{
-    float3 viewSpacePosition : Position;     // Fragment position in view space (for lighting calculations)
-    float3 viewSpaceNormal   : Normal;       // Surface normal in view space (for lighting calculations)
-    float4 clipSpacePosition : SV_Position;  // Final transformed position for rasterization
-};
+#include "Common/CommonStructures.hlsli"
 
 // Main vertex shader entry point
-VertexOutput main(float3 modelPosition : Position, float3 modelNormal : Normal)
+SolidVertexOutput main(
+    in float3 modelPosition : Position, 
+    in float3 modelNormal : Normal)
 {
-    VertexOutput output;
+    SolidVertexOutput output;
     
     // Transform vertex position from model space to view space
     // This is needed for per-pixel lighting calculations in the pixel shader

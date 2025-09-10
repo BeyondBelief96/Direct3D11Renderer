@@ -5,32 +5,17 @@
 // Outputs tangent-space basis vectors for normal mapping calculations.
 // =============================================================================
 
-// Transform matrices constant buffer
-cbuffer TransformMatrices : register(b0)
-{
-    matrix modelViewMatrix;       // Transform from model space to view (camera) space
-    matrix modelViewProjMatrix;   // Transform from model space to clip space for rasterization
-};
-
-// Vertex shader output structure
-struct VertexOutput
-{
-    float3 viewSpacePosition : Position;     // Fragment position in view space (for lighting calculations)
-    float3 viewSpaceNormal   : Normal;       // Surface normal in view space (for lighting calculations)
-    float3 viewSpaceTangent  : Tangent;      // Tangent vector in view space (for normal mapping)
-    float3 viewSpaceBitangent: Bitangent;    // Bitangent vector in view space (for normal mapping)
-    float2 textureCoords     : TexCoord;     // UV coordinates for texture sampling
-    float4 clipSpacePosition : SV_Position;  // Final transformed position for rasterization
-};
+#include "Common/CommonStructures.hlsli"
 
 // Main vertex shader entry point
-VertexOutput main(float3 modelPosition  : Position, 
-                  float3 modelNormal    : Normal, 
-                  float3 modelTangent   : Tangent, 
-                  float3 modelBitangent : Bitangent, 
-                  float2 texCoords      : TexCoord)
+NormalMappedVertexOutput main(
+    in float3 modelPosition  : Position, 
+    in float3 modelNormal    : Normal, 
+    in float3 modelTangent   : Tangent, 
+    in float3 modelBitangent : Bitangent, 
+    in float2 texCoords      : TexCoord)
 {
-    VertexOutput output;
+    NormalMappedVertexOutput output;
     
     // Transform vertex position from model space to view space
     // This is needed for per-pixel lighting calculations in the pixel shader

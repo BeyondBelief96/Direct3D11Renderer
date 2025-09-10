@@ -5,17 +5,12 @@
 // Only transforms vertex positions without any lighting calculations.
 // =============================================================================
 
-// Transform matrices constant buffer
-cbuffer TransformMatrices : register(b0)
-{
-    matrix modelViewMatrix;       // Transform from model space to view (camera) space
-    matrix modelViewProjMatrix;   // Transform from model space to clip space for rasterization
-};
+#include "Common/CommonStructures.hlsli"
 
 // Main vertex shader entry point
 // Input: vertex position in model space
 // Output: transformed position for rasterization
-float4 main(float3 modelPosition : Position) : SV_Position
+float4 main(in float3 modelPosition : Position) : SV_Position
 {
     // Transform vertex position directly from model space to clip space
     // No need for intermediate calculations since this is just a simple indicator geometry

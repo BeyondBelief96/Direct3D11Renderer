@@ -340,5 +340,14 @@
     <None Include="src\Exceptions\DxErr\DXTrace.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="shaders\Common\CommonStructures.hlsli">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="shaders\Common\LightingCommon.hlsli">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="shaders\Common\NormalMapping.hlsli">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -11,7 +11,7 @@ cbuffer PointLightBuffer : register(b0)
 
 cbuffer ModelBuffer : register(b1)
 {
-    float3 materialColor;
+    float4 materialColor;
     float specularIntensity;
     float specularPower;
     float padding[2];
@@ -27,10 +27,10 @@ float4 main(float3 viewPos : Position, float3 normal : Normal) : SV_TARGET
     const float attenuation = 1.0f / (attenuationConstant + attenuationLinear * distanceToLight + attenuationQuadratic * (distanceToLight * distanceToLight));
 
     // Ambient
-    const float3 ambient = attenuation * ambientColor * materialColor;
+    const float3 ambient = attenuation * ambientColor * materialColor.rgb;
     // Diffuse
     const float diff = max(dot(normal, lightDir), 0.0f);
-    const float3 diffuse = attenuation * diff * diffuseColor * diffuseIntensity * materialColor;
+    const float3 diffuse = attenuation * diff * diffuseColor * diffuseIntensity * materialColor.rgb;
     // Specular
     const float3 viewDir = normalize(-viewPos);
     const float3 reflectDir = reflect(-lightDir, normal);

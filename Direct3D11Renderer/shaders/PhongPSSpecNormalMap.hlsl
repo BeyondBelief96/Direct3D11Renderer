@@ -11,8 +11,12 @@ cbuffer LightCBuf
 
 cbuffer ObjectCBuf
 {
+    bool hasGlossChannel;
+    bool specularMapEnabled;
     bool normalMapEnabled;
-    float padding[3];
+    float specularPowerConstant;
+    float specularColor;
+    float specularMapWeight;
 };
 
 Texture2D diffuseMap : register(t0);
@@ -48,8 +52,24 @@ float4 main(float3 fragPosCamera : Position, float3 normal : Normal, float3 tang
     
     const float3 reflectDir = normalize(reflect(-directionToLight, normal));
     const float4 specularSample = specularMap.Sample(samplerState, texCoord);
-    const float3 specularReflectionColor = specularSample.rgb;
-    const float specularPower = pow(2.0f, specularSample.a * 13.0f);
+    const float3 specularReflectionColor;
+
+    float specularPower = specularPowerConstant;
+    if(specularMapEnabled)
+    {
+        const float4 specularSample = specularMap.Sample(samplerState, texCoord);
+        specularReflectionColor = specularSample.rgb * specularMapWeight;
+        if (hasGlossChannel)
+        {
+            specularPower = pow(2.0f, specularSample.a * 13.0f);
+        }
+    }
+   
+    else
+    {
+        specularPower = specularPowerConstant;
+    }
+    
     const float3 specular = (diffuseColor * diffuseIntensity) * attenuation * pow(max(0.0f, dot(reflectDir, -normalize(fragPosCamera))), specularPower);
     
     return float4(saturate((ambientColor + diffuse) * diffuseMap.Sample(samplerState, texCoord).rgb + specular * specularReflectionColor), 1.0f);

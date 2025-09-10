@@ -2,7 +2,7 @@
 #include "Exceptions/GraphicsExceptions.h"
 #include "Utilities/WICFactory.h"
 
-Texture::Texture(Graphics& gfx, const std::string& path, UINT slot = 0) : slot(slot)
+Texture::Texture(Graphics& gfx, const std::string& path, UINT slot, bool alphaLoaded) : slot(slot), path(path), alphaChannelLoaded(alphaLoaded)
 {
 	std::wstring widePath;
 	widePath.reserve(path.length());
@@ -21,6 +21,11 @@ std::shared_ptr<Texture> Texture::Resolve(Graphics& gfx, const std::string& path
 std::string Texture::GenerateUID(const std::string& path, UINT slot)
 {
 	return typeid(Texture).name() + std::string("#") + path + "#" + std::to_string(slot);
+}
+
+bool Texture::AlphaChannelLoaded() const noexcept
+{
+	return alphaChannelLoaded;
 }
 
 std::string Texture::GetUID() const noexcept
@@ -52,6 +57,18 @@ void Texture::LoadFromWideString(Graphics& gfx, const std::wstring& path)
 
 	WICPixelFormatGUID pixelFormat;
 	GFX_THROW_INFO(pFrame->GetPixelFormat(&pixelFormat));
+
+	// Check if source format has alpha channel
+	bool sourceHasAlpha = (pixelFormat == GUID_WICPixelFormat32bppRGBA ||
+	                      pixelFormat == GUID_WICPixelFormat32bppBGRA ||
+	                      pixelFormat == GUID_WICPixelFormat32bppPRGBA ||
+	                      pixelFormat == GUID_WICPixelFormat32bppPBGRA ||
+	                      pixelFormat == GUID_WICPixelFormat64bppRGBA ||
+	                      pixelFormat == GUID_WICPixelFormat64bppBGRA ||
+	                      pixelFormat == GUID_WICPixelFormat64bppPRGBA ||
+	                      pixelFormat == GUID_WICPixelFormat64bppPBGRA ||
+	                      pixelFormat == GUID_WICPixelFormat128bppRGBAFloat ||
+	                      pixelFormat == GUID_WICPixelFormat128bppPRGBAFloat);
 
 	// Determine the best target format based on source
 	WICPixelFormatGUID targetFormat;
@@ -111,6 +128,20 @@ void Texture::LoadFromWideString(Graphics& gfx, const std::wstring& path)
 			static_cast<UINT>(buffer.size()),
 			buffer.data()
 		));
+	}
+
+	// Detect if alpha channel is actually used (contains non-255 values)
+	if (sourceHasAlpha && !alphaChannelLoaded)
+	{
+		// Check if any alpha values are not fully opaque (255)
+		for (size_t i = 3; i < buffer.size(); i += 4) // Alpha is every 4th byte (RGBA/BGRA)
+		{
+			if (buffer[i] != 255)
+			{
+				alphaChannelLoaded = true;
+				break;
+			}
+		}
 	}
 
 	D3D11_TEXTURE2D_DESC textureDesc = {};

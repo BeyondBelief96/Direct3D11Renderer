@@ -231,6 +231,7 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
     bool hasSpecularMap = false;
     bool hasNormalMap = false;
     bool hasDiffuseMap = false;
+	bool hasAlphaChannel = false;
     float shininess = 35.0f;
 
     const std::string shaderBasePath = "shaders/Output/";
@@ -248,17 +249,21 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 
         if (material.GetTexture(aiTextureType_SPECULAR, 0, &textureFileName) == aiReturn_SUCCESS)
         {
-            bindablePtrs.push_back(Texture::Resolve(gfx, base + textureFileName.C_Str(), 1u));
+			auto specularTexture = Texture::Resolve(gfx, base + textureFileName.C_Str(), 1u);
+            hasAlphaChannel = specularTexture->AlphaChannelLoaded();
+            bindablePtrs.push_back(std::move(specularTexture));
             hasSpecularMap = true;
         }
-        else
+        if (!hasAlphaChannel)
         {
-			material.Get(AI_MATKEY_SHININESS, shininess);
+			material.Get(AI_MATKEY_SHININESS, hasAlphaChannel);
         }
 
         if(material.GetTexture(aiTextureType_NORMALS, 0, &textureFileName) == aiReturn_SUCCESS)
         {
-            bindablePtrs.push_back(Texture::Resolve(gfx, base + textureFileName.C_Str(), 2u));
+			auto normalMap = Texture::Resolve(gfx, base + textureFileName.C_Str(), 2u);
+			hasAlphaChannel = normalMap->AlphaChannelLoaded();
+            bindablePtrs.push_back(std::move(normalMap));
             hasNormalMap = true;
 		}
 
@@ -313,9 +318,16 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
 
             struct PixelShaderMaterialConstantBuffer
             {
-                BOOL normalMapEnabled;
-                float padding[3];
+                BOOL hasAlphaChannel = FALSE;
+                BOOL normalMapEnabled = TRUE;
+				BOOL specularMapEnabled = TRUE;
+                float specularPowerConstant = 0.0f;
+                XMFLOAT3 specularColor = { 1.0f, 1.0f, 1.0f };
+                float specularMapWeight = 1.0f;
             } pmc;
+
+            pmc.specularPowerConstant = shininess;
+			pmc.hasAlphaChannel = hasAlphaChannel ? TRUE : FALSE;
 
 			bindablePtrs.push_back(PixelConstantBuffer<PixelShaderMaterialConstantBuffer>::Resolve(gfx, pmc, 1u));
         }
@@ -365,7 +377,7 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
                 float specularIntensity = 0.18f;
                 float specularPower = 0.0f;
                 BOOL normalMapEnabled = TRUE;
-                float padding[1];
+                float padding[1] = { 0.0f };
             } pmc;
 
 			pmc.specularPower = shininess;
@@ -414,7 +426,7 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
                 float specularIntensity = 0.18f;
                 float specularPower = 0.0f;
                 BOOL normalMapEnabled = FALSE;
-                float padding[1];
+                float padding[1] = { 0.0f };
 			} pmc;
 
             pmc.specularPower = shininess;
@@ -455,7 +467,7 @@ std::unique_ptr<Mesh> Model::BuildMesh(Graphics& gfx, const aiMesh& mesh, const 
                 XMFLOAT4 materialColor = { 0.65f, 0.65f, 0.85f, 1.0f };
                 float specularIntensity = 0.18f;
                 float specularPower = 0.0f;
-                float padding[2];
+                float padding[2] = { 0.0f, 0.0f };
             } pmc;
             pmc.specularPower = shininess;
 			bindablePtrs.push_back(PixelConstantBuffer<PixelShaderMaterialConstantBuffer>::Resolve(gfx, pmc, 1u));

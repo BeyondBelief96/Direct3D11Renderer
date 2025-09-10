@@ -27,11 +27,10 @@ private:
 	float speed_factor = 1.0f;
 	PointLight light;
 	std::unique_ptr<Model> model;
-	TestPlane plane;
 	struct
 	{
 		float x = 2.6f;
-		float y = 13.5f;
+		float y = 0.5f;
 		float z = -3.5f;
 		float ambient[3] = { 0.05f, 0.05f, 0.05f };
 		float diffuse[3] = { 1.0f, 1.0f, 1.0f };

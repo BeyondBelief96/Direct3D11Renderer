@@ -27,7 +27,7 @@ TestPlane::TestPlane(Graphics& gfx, float size)
 
 	AddBindable(Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 
-	AddBindable(std::make_shared<TransformConstantBuffer>(gfx, *this));
+	AddBindable(std::make_shared<TransformConstantBuffer>(gfx, *this, TransformConstantBuffer::ShaderStage::Both, 0u, 2u));
 }
 
 void TestPlane::SetPos(DirectX::XMFLOAT3 pos) noexcept

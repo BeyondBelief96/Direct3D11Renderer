@@ -9,13 +9,12 @@
  Application::Application()
      : wnd(2560, 1440, L"D3DEngine"),
      freeCamera({ 0.0f, 0.0f, -30.0f }),
-     light(wnd.Gfx()),
-     plane(wnd.Gfx(), 3.0f)
+     light(wnd.Gfx())
  {
      std::mt19937 rng(std::random_device{}());
 
      // Load a single model (adjust path as needed)
-     model = std::make_unique<Model>(wnd.Gfx(), "assets/models/nano_textured/nanosuit.obj");
+     model = std::make_unique<Model>(wnd.Gfx(), "assets/models/gobber/GoblinX.obj");
 
      wnd.Gfx().SetProjection(CreateProjectionMatrix(freeCamera, 45.0f, 16.0f / 9.0f, 0.5f, 100.0f));
 	 
@@ -57,7 +56,6 @@ void Application::ProcessFrame()
     SpawnSimulationWindow();
 	RenderPointLightControlWindow();
     model->ShowModelControlWindow();
-	plane.SpawnControlWindow(wnd.Gfx());
 
     // Apply light controls
     light.SetPosition({ lightControls.x, lightControls.y, lightControls.z });
@@ -70,7 +68,6 @@ void Application::ProcessFrame()
     light.Bind(wnd.Gfx());
     model->Render(wnd.Gfx());
     light.Render(wnd.Gfx());
-	plane.Render(wnd.Gfx());
 
     wnd.Gfx().EndFrame();
 }

@@ -67,23 +67,83 @@ namespace Assimp {
     // support all the (vectype op float) combinations in vector maths.
     // Providing T(float) would open the way to endless implicit conversions.
     ///////////////////////////////////////////////////////////////////////////
+    
+    /** @brief Internal namespace containing template operators for heterogeneous arithmetic operations.
+     *  
+     *  This namespace provides template operator structs that extend beyond std::plus family
+     *  to support operations between different types (e.g., aiVector3D + ai_real).
+     *  Standard library operators require identical operand types, which doesn't work
+     *  for vector-scalar arithmetic common in graphics programming.
+     */
     namespace Intern {
+        /** @brief Template operator for addition between heterogeneous types.
+         *  @tparam T0 Type of the first operand
+         *  @tparam T1 Type of the second operand  
+         *  @tparam TRES Result type (defaults to T0)
+         *  
+         *  Enables operations like aiVector3D + ai_real where std::plus would fail
+         *  due to type mismatch. The result type can be explicitly specified if needed.
+         */
         template <typename T0, typename T1, typename TRES = T0> struct plus {
+            /** @brief Function call operator performing the addition.
+             *  @param t0 First operand of type T0
+             *  @param t1 Second operand of type T1
+             *  @return Result of t0 + t1 as type TRES
+             */
             TRES operator() (const T0& t0, const T1& t1) const {
                 return t0+t1;
             }
         };
+        /** @brief Template operator for subtraction between heterogeneous types.
+         *  @tparam T0 Type of the first operand
+         *  @tparam T1 Type of the second operand
+         *  @tparam TRES Result type (defaults to T0)
+         *  
+         *  Provides subtraction support for mixed-type operations in vertex arithmetic.
+         */
         template <typename T0, typename T1, typename TRES = T0> struct minus {
+            /** @brief Function call operator performing the subtraction.
+             *  @param t0 First operand of type T0
+             *  @param t1 Second operand of type T1  
+             *  @return Result of t0 - t1 as type TRES
+             */
             TRES operator() (const T0& t0, const T1& t1) const {
                 return t0-t1;
             }
         };
+        /** @brief Template operator for multiplication between heterogeneous types.
+         *  @tparam T0 Type of the first operand
+         *  @tparam T1 Type of the second operand
+         *  @tparam TRES Result type (defaults to T0)
+         *  
+         *  Essential for vector-scalar multiplication operations where operand types differ.
+         *  Most commonly used for scaling vectors by scalar values.
+         */
         template <typename T0, typename T1, typename TRES = T0> struct multiplies {
+            /** @brief Function call operator performing the multiplication.
+             *  @param t0 First operand of type T0
+             *  @param t1 Second operand of type T1
+             *  @return Result of t0 * t1 as type TRES
+             */
             TRES operator() (const T0& t0, const T1& t1) const {
                 return t0*t1;
             }
         };
+        /** @brief Template operator for division between heterogeneous types.
+         *  @tparam T0 Type of the first operand (dividend)
+         *  @tparam T1 Type of the second operand (divisor)
+         *  @tparam TRES Result type (defaults to T0)
+         *  
+         *  Supports vector-scalar division operations for scaling and normalization.
+         *  @warning No division by zero checking is performed.
+         */
         template <typename T0, typename T1, typename TRES = T0> struct divides {
+            /** @brief Function call operator performing the division.
+             *  @param t0 Dividend of type T0
+             *  @param t1 Divisor of type T1
+             *  @return Result of t0 / t1 as type TRES
+             *  @warning Undefined behavior if t1 is zero
+             */
             TRES operator() (const T0& t0, const T1& t1) const {
                 return t0/t1;
             }
@@ -91,10 +151,20 @@ namespace Assimp {
     }
 
 // ------------------------------------------------------------------------------------------------
-/** Intermediate description a vertex with all possible components. Defines a full set of
- *  operators, so you may use such a 'Vertex' in basic arithmetic. All operators are applied
- *  to *all* vertex components equally. This is useful for stuff like interpolation
- *  or subdivision, but won't work if special handling is required for some vertex components. */
+/** @brief Intermediate description a vertex with all possible components. 
+ *  
+ *  Defines a full set of operators, so you may use such a 'Vertex' in basic arithmetic. 
+ *  All operators are applied to *all* vertex components equally. This is useful for operations
+ *  like interpolation or subdivision, but won't work if special handling is required for 
+ *  some vertex components.
+ *  
+ *  The vertex uses an interleaved format where all attributes for a single vertex are stored
+ *  together, rather than in separate arrays. This can be beneficial for certain algorithms
+ *  but may not be optimal for GPU upload scenarios.
+ *  
+ *  @note All arithmetic operations create temporary objects and return by value.
+ *  For performance-critical code, consider using assignment operators (+=, -=, etc.).
+ */
 // ------------------------------------------------------------------------------------------------
 struct Vertex {
     friend Vertex operator + (const Vertex&,const Vertex&);
@@ -103,14 +173,36 @@ struct Vertex {
     friend Vertex operator / (const Vertex&,ai_real);
     friend Vertex operator * (ai_real, const Vertex&);
 
+    /** @brief 3D position in object/world space coordinates */
     aiVector3D position;
+    
+    /** @brief Surface normal vector (should be unit length) */
     aiVector3D normal;
+    
+    /** @brief Tangent space vectors for normal mapping and advanced shading.
+     *  @note tangent and bitangent form an orthogonal basis with normal for tangent space
+     */
     aiVector3D tangent, bitangent;
 
+    /** @brief Array of texture coordinate sets.
+     *  @note Size is fixed at AI_MAX_NUMBER_OF_TEXTURECOORDS regardless of actual usage.
+     *        Use mesh->HasTextureCoords(i) to check if a particular set is valid.
+     */
     aiVector3D texcoords[AI_MAX_NUMBER_OF_TEXTURECOORDS];
+    
+    /** @brief Array of vertex color sets.
+     *  @note Size is fixed at AI_MAX_NUMBER_OF_COLOR_SETS regardless of actual usage.
+     *        Use mesh->HasVertexColors(i) to check if a particular set is valid.
+     */
     aiColor4D colors[AI_MAX_NUMBER_OF_COLOR_SETS];
 
+    /** @brief Default constructor - leaves all members uninitialized.
+     *  @warning All member variables contain garbage values after default construction.
+     *           Use explicit constructors or manual initialization for defined behavior.
+     */
     Vertex() = default;
+    
+    /** @brief Default destructor */
     ~Vertex() = default;
 
     // ----------------------------------------------------------------------------

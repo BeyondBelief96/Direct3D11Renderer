@@ -11,14 +11,14 @@ cbuffer LightCBuf
 
 cbuffer ObjectCBuf
 {
-    float specularIntensity;
-    float specularPower;
     bool normalMapEnabled;
-    float padding[1];
+    float padding[3];
 };
 
 Texture2D diffuseMap : register(t0);
+Texture2D specularMap : register(t1);
 Texture2D normalMap : register(t2);
+
 SamplerState samplerState;
 
 float4 main(float3 fragPosCamera : Position, float3 normal : Normal, float3 tangent : Tangent, float3 bitangent : Bitangent, float2 texCoord : TexCoord) : SV_Target
@@ -27,12 +27,12 @@ float4 main(float3 fragPosCamera : Position, float3 normal : Normal, float3 tang
     {
         // Build the TBN matrix
         const float3x3 tangentToViewSpace = float3x3(normalize(tangent), normalize(bitangent), normalize(normal));
-        
         // Sample normal from normal map and transform to range [-1, 1]
         // Note: Invert Y component to account for different texture coordinate system
         const float3 normalSample = normalMap.Sample(samplerState, texCoord).xyz;
         normal = normalSample * 2.0f - 1.0f;
         normal.y = -normal.y; // Invert Y component
+
         
         // transform normal by modelView matrix (upper 3x3)
         normal = mul(normal, tangentToViewSpace);
@@ -47,7 +47,10 @@ float4 main(float3 fragPosCamera : Position, float3 normal : Normal, float3 tang
     const float3 diffuse = diffuseColor * diffuseIntensity * attenuation * max(0.0f, dot(directionToLight, normal));
     
     const float3 reflectDir = normalize(reflect(-directionToLight, normal));
-    const float3 specular = (diffuseColor * diffuseIntensity) * specularIntensity * attenuation * pow(max(0.0f, dot(reflectDir, -normalize(fragPosCamera))), specularPower);
+    const float4 specularSample = specularMap.Sample(samplerState, texCoord);
+    const float3 specularReflectionColor = specularSample.rgb;
+    const float specularPower = pow(2.0f, specularSample.a * 13.0f);
+    const float3 specular = (diffuseColor * diffuseIntensity) * attenuation * pow(max(0.0f, dot(reflectDir, -normalize(fragPosCamera))), specularPower);
     
-    return float4(saturate((ambientColor + diffuse) * diffuseMap.Sample(samplerState, texCoord).rgb + specular), 1.0f);
+    return float4(saturate((ambientColor + diffuse) * diffuseMap.Sample(samplerState, texCoord).rgb + specular * specularReflectionColor), 1.0f);
 };

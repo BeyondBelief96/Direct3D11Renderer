@@ -177,7 +177,7 @@ private:
     } modelPose;
 };
 
-Model::Model(Graphics& gfx, const std::string& modelPath) : pWindow(std::make_unique<ModelWindow>())
+Model::Model(Graphics& gfx, const std::string& modelPath, float scale) : pWindow(std::make_unique<ModelWindow>()), scale(scale)
 {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(
@@ -219,6 +219,11 @@ void Model::Render(Graphics& gfx) const noexcept
 void Model::ShowModelControlWindow(const char* windowName) noexcept
 {
     pWindow->Render(windowName, *root);
+}
+
+void Model::SetScale(float scale) noexcept
+{
+    this->scale = scale;
 }
 
 std::unique_ptr<Mesh> Model::BuildMesh(
@@ -288,7 +293,6 @@ std::unique_ptr<Mesh> Model::BuildMesh(
 		}
 
         const std::string meshTag = modelPath.string() + "%" + mesh.mName.C_Str();
-        const float scale = 6.0f;
 
         if (hasDiffuseMap && hasNormalMap && hasSpecularMap)
         {

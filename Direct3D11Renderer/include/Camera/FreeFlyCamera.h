@@ -149,6 +149,29 @@ public:
      */
     DirectX::XMFLOAT3 GetRight() const noexcept;
 
+    /// <summary>
+	/// Gets the near plane distance for projection
+    /// </summary>
+    /// <returns></returns>
+    float GetNearPlane() const noexcept;
+
+	/// <summary>
+	/// Retrieves the value of the far clipping plane.
+	/// </summary>
+	/// <returns>The distance to the far clipping plane as a float.</returns>
+	float GetFarPlane() const noexcept;
+
+	/// <summary>
+	/// Returns the aspect ratio as a floating-point value.
+	/// </summary>
+	/// <returns>The aspect ratio, typically defined as width divided by height.</returns>
+	float GetAspectRatio() const noexcept;
+
+	/// <summary>
+	/// Retrieves the field of view (FOV) in degrees.
+	/// </summary>
+	/// <returns>The field of view angle, measured in degrees.</returns>
+	float GetFovDegrees() const noexcept;
 private:
     /**
      * @brief Updates movement based on keyboard input
@@ -201,6 +224,12 @@ private:
     // === Input State ===
     bool isActive = false;              ///< Whether camera is capturing mouse
     bool previousRightMouseState = false; ///< Previous right mouse button state
+
+	// === Projection Parameters ===
+	float nearPlane = 0.1f; ///< Near clipping plane distance
+	float farPlane = 10000.0f;///< Far clipping plane 
+	float fovDegrees = 45.0f; ///< Base field of view in degrees
+	float aspectRatio = 16.0f / 9.0f; ///< Viewport aspect ratio
 };
 
 /**
@@ -218,8 +247,4 @@ private:
  * @return Perspective projection matrix
  */
 DirectX::XMMATRIX CreateProjectionMatrix(
-    const FreeFlyCamera& camera, 
-    float fovDegrees, 
-    float aspectRatio, 
-    float nearZ, 
-    float farZ) noexcept;
+    const FreeFlyCamera& camera) noexcept;

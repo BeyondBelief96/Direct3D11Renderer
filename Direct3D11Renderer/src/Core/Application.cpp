@@ -8,16 +8,17 @@
 
  Application::Application()
      : wnd(2560, 1440, L"D3DEngine"),
-     freeCamera({ 0.0f, 0.0f, -30.0f }),
+     camera({ 0.0f, 0.0f, -30.0f }),
      light(wnd.Gfx())
  {
      std::mt19937 rng(std::random_device{}());
 
      // Load a single model (adjust path as needed)
-     model = std::make_unique<Model>(wnd.Gfx(), "assets/models/gobber/GoblinX.obj");
+     model = std::make_unique<Model>(wnd.Gfx(), "assets/models/Sponza/sponza.obj");
 
-     wnd.Gfx().SetProjection(CreateProjectionMatrix(freeCamera, 45.0f, 16.0f / 9.0f, 0.5f, 100.0f));
-	 
+     camera.SetSpeed(200.0f);
+
+     wnd.Gfx().SetProjection(CreateProjectionMatrix(camera));
  }
 
 int Application::Run()
@@ -46,10 +47,10 @@ void Application::ProcessFrame()
 
     auto dt = timer.Mark();
 
-    freeCamera.ProcessInput(wnd, wnd.mouse, wnd.kbd, dt);
+    camera.ProcessInput(wnd, wnd.mouse, wnd.kbd, dt);
 
-    wnd.Gfx().SetProjection(CreateProjectionMatrix(freeCamera, 45.0f, 16.0f / 9.0f, 0.5f, 100.0f));
-    wnd.Gfx().SetView(freeCamera.GetViewMatrix());
+    wnd.Gfx().SetProjection(CreateProjectionMatrix(camera));
+    wnd.Gfx().SetView(camera.GetViewMatrix());
     wnd.Gfx().BeginFrame(0.07f, 0.0f, 0.12f);
 
     // UI

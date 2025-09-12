@@ -20,7 +20,7 @@ private:
 	void SpawnSimulationWindow() noexcept;
 	void RenderPointLightControlWindow() noexcept;
 
-	FreeFlyCamera freeCamera;
+	FreeFlyCamera camera;
 	Window wnd;
 	D3Timer timer;
 	static float ui_speed_factor;

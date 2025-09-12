@@ -46,14 +46,16 @@ private:
 class Model
 {
 public:
-    Model(Graphics& gfx, const std::string& filePath);
+    Model(Graphics& gfx, const std::string& filePath, float scale = 1.0f);
     ~Model() noexcept;
     void Render(Graphics& gfx) const noexcept;
     void ShowModelControlWindow(const char* windowName = nullptr) noexcept;
+    void SetScale(float scale) noexcept;
 private:
     std::unique_ptr<Mesh> BuildMesh(Graphics& gfx, const aiMesh& mesh, const aiMaterial* const* pMaterials, const std::filesystem::path& path);
     std::unique_ptr<Node> BuildNode(int& nextId, const aiNode& node) noexcept;
 private:
+    float scale;
     std::unique_ptr<Node> root;
     std::vector<std::unique_ptr<Mesh>> meshes;
     std::unique_ptr<class ModelWindow> pWindow;

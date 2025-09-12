@@ -162,6 +162,26 @@ DirectX::XMFLOAT3 FreeFlyCamera::GetRight() const noexcept
 	return right;
 }
 
+float FreeFlyCamera::GetNearPlane() const noexcept
+{
+	return nearPlane;
+}
+
+float FreeFlyCamera::GetFarPlane() const noexcept
+{
+	return farPlane;
+}
+
+float FreeFlyCamera::GetAspectRatio() const noexcept
+{
+	return aspectRatio;
+}
+
+float FreeFlyCamera::GetFovDegrees() const noexcept
+{
+	return fovDegrees;
+}
+
 // === Private Methods ===
 
 void FreeFlyCamera::UpdateMovement(CameraDirection direction, float deltaTime) noexcept
@@ -269,12 +289,8 @@ void FreeFlyCamera::UpdateCameraVectors() noexcept
 // === Global Utility Function ===
 
 DirectX::XMMATRIX CreateProjectionMatrix(
-	const FreeFlyCamera& camera, 
-	float fovDegrees, 
-	float aspectRatio, 
-	float nearZ, 
-	float farZ) noexcept
+	const FreeFlyCamera& camera) noexcept
 {
-	const float fovRadians = XMConvertToRadians(fovDegrees) / camera.GetZoom();
-	return XMMatrixPerspectiveFovLH(fovRadians, aspectRatio, nearZ, farZ);
+	const float fovRadians = XMConvertToRadians(camera.GetFovDegrees()) / camera.GetZoom();
+	return XMMatrixPerspectiveFovLH(fovRadians, camera.GetAspectRatio(), camera.GetNearPlane(), camera.GetFarPlane());
 }

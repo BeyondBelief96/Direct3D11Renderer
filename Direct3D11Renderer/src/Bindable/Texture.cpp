@@ -147,39 +147,39 @@ void Texture::LoadFromWideString(Graphics& gfx, const std::wstring& path)
 	D3D11_TEXTURE2D_DESC textureDesc = {};
 	textureDesc.Width = width;
 	textureDesc.Height = height;
-	textureDesc.MipLevels = 1;
+	textureDesc.MipLevels = 0;
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = dxgiFormat;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.SampleDesc.Quality = 0;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 	textureDesc.CPUAccessFlags = 0;
-	textureDesc.MiscFlags = 0;
-
-	D3D11_SUBRESOURCE_DATA subresourceData = {};
-	subresourceData.pSysMem = buffer.data();
-	subresourceData.SysMemPitch = width * 4;
-	subresourceData.SysMemSlicePitch = 0;
+	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pTexture;
 	GFX_THROW_INFO(GetDevice(gfx)->CreateTexture2D(
 		&textureDesc,
-		&subresourceData,
+		nullptr,
 		pTexture.ReleaseAndGetAddressOf()
 	));
+
+	// Write texture data into the top mip level.
+	GetContext(gfx)->UpdateSubresource(pTexture.Get(), 0u, nullptr, buffer.data(), width * 4, 0u);
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Format = textureDesc.Format;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
-	srvDesc.Texture2D.MipLevels = 1;
+	srvDesc.Texture2D.MipLevels = -1;
 
 	GFX_THROW_INFO(GetDevice(gfx)->CreateShaderResourceView(
 		pTexture.Get(),
 		&srvDesc,
 		pTextureView.GetAddressOf()
 	));
+
+	GetContext(gfx)->GenerateMips(pTextureView.Get());
 }
 
 void Texture::Bind(Graphics& gfx) noexcept

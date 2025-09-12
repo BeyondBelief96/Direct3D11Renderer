@@ -11,14 +11,10 @@
      camera({ 0.0f, 0.0f, -30.0f }),
      light(wnd.Gfx())
  {
-     std::mt19937 rng(std::random_device{}());
+     model = std::make_unique<Model>(wnd.Gfx(), "assets/models/Sponza/sponza.obj", 0.1f);
 
-     // Load a single model (adjust path as needed)
-     model = std::make_unique<Model>(wnd.Gfx(), "assets/models/Sponza/sponza.obj");
-
-     camera.SetSpeed(200.0f);
-
-     wnd.Gfx().SetProjection(CreateProjectionMatrix(camera));
+     camera.SetSpeed(50.0f);
+     camera.SetPosition({ 0.0f, 30.0f, 0.0f });
  }
 
 int Application::Run()
@@ -49,21 +45,15 @@ void Application::ProcessFrame()
 
     camera.ProcessInput(wnd, wnd.mouse, wnd.kbd, dt);
 
-    wnd.Gfx().SetProjection(CreateProjectionMatrix(camera));
+    wnd.Gfx().SetProjection(camera.GetProjectionMatrix(wnd.GetWidth(), wnd.GetHeight()));
     wnd.Gfx().SetView(camera.GetViewMatrix());
     wnd.Gfx().BeginFrame(0.07f, 0.0f, 0.12f);
 
     // UI
     SpawnSimulationWindow();
-	RenderPointLightControlWindow();
+    light.SpawnControlWindow();
     model->ShowModelControlWindow();
 
-    // Apply light controls
-    light.SetPosition({ lightControls.x, lightControls.y, lightControls.z });
-    light.SetAmbient({ lightControls.ambient[0], lightControls.ambient[1], lightControls.ambient[2] });
-    light.SetDiffuse({ lightControls.diffuse[0], lightControls.diffuse[1], lightControls.diffuse[2] });
-    light.SetDiffuseIntensity(lightControls.diffuseIntensity);
-    light.SetAttenuation(lightControls.attConstant, lightControls.attLinear, lightControls.attQuadratic);
 
     // Bind and render
     light.Bind(wnd.Gfx());
@@ -92,20 +82,6 @@ void Application::SpawnSimulationWindow() noexcept
     ImGui::End();
 }
 
-void Application::RenderPointLightControlWindow() noexcept
-{
-    if (ImGui::Begin("Point Light Controls"))
-    {
-        ImGui::SliderFloat3("Position", &lightControls.x, -50.0f, 50.0f);
-        ImGui::ColorEdit3("Ambient", lightControls.ambient);
-        ImGui::ColorEdit3("Diffuse", lightControls.diffuse);
-        ImGui::SliderFloat("Diffuse Intensity", &lightControls.diffuseIntensity, 0.0f, 5.0f);
-        ImGui::SliderFloat("Attenuation Constant", &lightControls.attConstant, 0.0f, 5.0f);
-        ImGui::SliderFloat("Attenuation Linear", &lightControls.attLinear, 0.0f, 1.0f);
-        ImGui::SliderFloat("Attenuation Quadratic", &lightControls.attQuadratic, 0.0f, 1.0f);
-    }
-	ImGui::End();
-}
 
 
 

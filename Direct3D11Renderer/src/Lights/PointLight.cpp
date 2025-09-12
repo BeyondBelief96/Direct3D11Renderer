@@ -20,9 +20,9 @@ void PointLight::SpawnControlWindow() noexcept
 void PointLight::DrawControlsInline() noexcept
 {
 	ImGui::Text("Position");
-	ImGui::SliderFloat("World X (+Right)", &lightConstantBuffer.lightPos.x, -60.0f, 60.0f, "%.1f");
-	ImGui::SliderFloat("World Y (+Up)", &lightConstantBuffer.lightPos.y, -60.0f, 60.0f, "%.1f");
-	ImGui::SliderFloat("World Z (+Forward)", &lightConstantBuffer.lightPos.z, -60.0f, 60.0f, "%.1f");
+	ImGui::SliderFloat("World X (+Right)", &lightConstantBuffer.lightPos.x, -300.0f, 300.0f, "%.1f");
+	ImGui::SliderFloat("World Y (+Up)", &lightConstantBuffer.lightPos.y, -300.0f, 300.0f, "%.1f");
+	ImGui::SliderFloat("World Z (+Forward)", &lightConstantBuffer.lightPos.z, -300.0f, 300.0f, "%.1f");
 
 	ImGui::Text("Intensity/Color");
 	ImGui::SliderFloat("Intensity", &lightConstantBuffer.diffuseIntensity, 0.01f, 2.0f, "%.2f");
@@ -45,7 +45,7 @@ void PointLight::Reset() noexcept
 	lightConstantBuffer =
 	{
 		{0.0f, 0.0f, 0.0f},
-		{0.4f, 0.4f, 0.4f},
+		{0.05f, 0.05f, 0.05f},
 		{1.0f, 1.0f, 1.0f},
 		1.0f,
 		1.0f,

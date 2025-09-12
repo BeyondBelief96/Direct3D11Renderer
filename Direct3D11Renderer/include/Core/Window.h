@@ -33,6 +33,8 @@ public:
 	Window& operator=(const Window&) = delete;
 	void SetTitle(const WCHAR* title);
 	static std::optional<int> ProcessMessages();
+	int GetWidth() const noexcept;
+	int GetHeight() const noexcept;
 
 	void CaptureMouse();
 	void ReleaseMouse();

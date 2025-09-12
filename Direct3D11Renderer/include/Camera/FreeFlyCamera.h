@@ -60,6 +60,14 @@ public:
      */
     DirectX::XMMATRIX GetViewMatrix() const noexcept;
 
+	/// <summary>
+	/// Returns the projection matrix for the specified viewport dimensions.
+	/// </summary>
+	/// <param name="viewportWidth">The width of the viewport in pixels.</param>
+	/// <param name="viewportHeight">The height of the viewport in pixels.</param>
+	/// <returns>A DirectX::XMMATRIX representing the projection matrix for the given viewport size.</returns>
+	DirectX::XMMATRIX GetProjectionMatrix(float viewportWidth, float viewportHeight) const noexcept;
+
     /**
      * @brief Processes all input and updates camera state
      * 
@@ -231,20 +239,3 @@ private:
 	float fovDegrees = 45.0f; ///< Base field of view in degrees
 	float aspectRatio = 16.0f / 9.0f; ///< Viewport aspect ratio
 };
-
-/**
- * @brief Creates a perspective projection matrix with camera's zoom
- * 
- * This is a utility function that creates a projection matrix using the camera's
- * current zoom level. The projection matrix should be managed separately from
- * the camera as it's typically constant across multiple cameras.
- * 
- * @param camera Camera to get zoom level from
- * @param fovDegrees Base field of view in degrees (before zoom)
- * @param aspectRatio Viewport aspect ratio (width/height)
- * @param nearZ Near clipping plane distance
- * @param farZ Far clipping plane distance
- * @return Perspective projection matrix
- */
-DirectX::XMMATRIX CreateProjectionMatrix(
-    const FreeFlyCamera& camera) noexcept;

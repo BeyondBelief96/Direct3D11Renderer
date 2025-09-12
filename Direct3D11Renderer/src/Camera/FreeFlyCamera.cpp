@@ -34,6 +34,12 @@ DirectX::XMMATRIX FreeFlyCamera::GetViewMatrix() const noexcept
 	return XMMatrixLookAtLH(pos, target, upDir);
 }
 
+XMMATRIX FreeFlyCamera::GetProjectionMatrix(float viewportWidth, float viewportHeight) const noexcept
+{
+	const float fovRadians = XMConvertToRadians(fovDegrees) / zoom;
+	return XMMatrixPerspectiveFovLH(fovRadians, viewportWidth / viewportHeight, nearPlane, farPlane);
+}
+
 void FreeFlyCamera::ProcessInput(Window& wnd, Mouse& mouse, const Keyboard& keyboard, float deltaTime) noexcept
 {
 	// Handle camera mode toggle
@@ -284,13 +290,4 @@ void FreeFlyCamera::UpdateCameraVectors() noexcept
 	// Calculate up vector (cross product of right and front)
 	XMVECTOR upVector = XMVector3Normalize(XMVector3Cross(rightVector, frontVector));
 	XMStoreFloat3(&up, upVector);
-}
-
-// === Global Utility Function ===
-
-DirectX::XMMATRIX CreateProjectionMatrix(
-	const FreeFlyCamera& camera) noexcept
-{
-	const float fovRadians = XMConvertToRadians(camera.GetFovDegrees()) / camera.GetZoom();
-	return XMMatrixPerspectiveFovLH(fovRadians, camera.GetAspectRatio(), camera.GetNearPlane(), camera.GetFarPlane());
 }

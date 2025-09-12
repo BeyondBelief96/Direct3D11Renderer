@@ -91,6 +91,16 @@ Window::~Window()
 	DestroyWindow(hwnd);
 }
 
+int Window::GetWidth() const noexcept
+{
+	return width;
+}
+
+int Window::GetHeight() const noexcept
+{
+	return height;
+}
+
 void Window::SetTitle(const WCHAR* title)
 {
 	if (SetWindowText(hwnd, title) == 0)
@@ -243,7 +253,8 @@ LRESULT Window::HandleMsgThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 LRESULT Window::HandleMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+	// Only allow ImGui to handle events when mouse is not captured for camera movement
+	if (!mouseCaptured && ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
 	{
 		return true;
 	}

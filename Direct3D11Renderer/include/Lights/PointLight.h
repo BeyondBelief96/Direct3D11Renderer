@@ -7,7 +7,7 @@
 class PointLight
 {
 public:
-	PointLight(Graphics& gfx, float radius = 0.5f);
+	PointLight(Graphics& gfx, float radius = 2.0f);
 	void SpawnControlWindow() noexcept;
 	// Draw controls inline in the current ImGui window (no Begin/End)
 	void DrawControlsInline() noexcept;

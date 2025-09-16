@@ -1,7 +1,7 @@
 #include "Bindable/Blender.h"
 #include "Bindable/BindableCache.h"
 
-Blender::Blender(Graphics& gfx, bool blendEnable) noexcept : blendEnable(blendEnable)
+Blender::Blender(Graphics& gfx, bool blendEnable) : blendEnable(blendEnable)
 {
 	DEBUGMANAGER(gfx);
 

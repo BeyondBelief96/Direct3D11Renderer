@@ -27,7 +27,7 @@ private:
 		HINSTANCE hInst;
 	};
 public:
-	Window(int width, int height, const WCHAR* name);
+	Window(float width, float height, const WCHAR* name);
 	~Window();
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;

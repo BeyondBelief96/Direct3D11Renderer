@@ -6,7 +6,7 @@
 class Blender : public Bindable
 {
 public:
-	Blender(Graphics& gfx, bool blendEnable) noexcept;
+	Blender(Graphics& gfx, bool blendEnable);
 	void Bind(Graphics& gfx) noexcept override;
 	static std::shared_ptr<Blender> Resolve(Graphics& gfx, bool blendEnable = true) noexcept;
 	static std::string GenerateUID(bool blendEnable) noexcept;

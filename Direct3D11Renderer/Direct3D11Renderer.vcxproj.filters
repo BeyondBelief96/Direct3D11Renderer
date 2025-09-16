@@ -135,6 +135,12 @@
     <ClCompile Include="src\Renderable\TestPlane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Bindable\Blender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bindable\Rasterizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Utilities\ChiliWin.h">
@@ -293,6 +299,12 @@
     <ClInclude Include="include\Renderable\TestPlane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Bindable\Blender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Bindable\Rasterizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Direct3D11Renderer.rc">
@@ -320,6 +332,7 @@
     <FxCompile Include="shaders\BlinnPhong_NormalMapped_PS.hlsl" />
     <FxCompile Include="shaders\BlinnPhong_Solid_VS.hlsl" />
     <FxCompile Include="shaders\BlinnPhong_Solid_PS.hlsl" />
+    <FxCompile Include="shaders\BlinnPhong_SpecularNormalMapMasked_PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\Downloads\DXTrace.inl">

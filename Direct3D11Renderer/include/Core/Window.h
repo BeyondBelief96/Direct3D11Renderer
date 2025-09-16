@@ -33,8 +33,8 @@ public:
 	Window& operator=(const Window&) = delete;
 	void SetTitle(const WCHAR* title);
 	static std::optional<int> ProcessMessages();
-	int GetWidth() const noexcept;
-	int GetHeight() const noexcept;
+	float GetWidth() const noexcept;
+	float GetHeight() const noexcept;
 
 	void CaptureMouse();
 	void ReleaseMouse();
@@ -50,8 +50,8 @@ private:
 	static LRESULT CALLBACK HandleMsgThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	LRESULT HandleMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 
-	int width;
-	int height;
+	float width;
+	float height;
 	HWND hwnd;
 	bool mouseCaptured = false;
 	bool rawInputRegistered = false;

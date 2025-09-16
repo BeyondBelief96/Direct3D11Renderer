@@ -238,10 +238,11 @@ std::unique_ptr<Mesh> Model::BuildMesh(
 
     const auto rootPath = modelPath.parent_path().string() + "\\";
 
-    bool hasSpecularMap = false;
-    bool hasNormalMap = false;
-    bool hasDiffuseMap = false;
-	bool hasAlphaChannel = false;
+    bool hasSpecularTexture = false;
+    bool hasNormalTexture = false;
+    bool hasDiffuseTexture = false;
+	bool hasGlossMapInSpecularAlpha = false;
+    bool hasAlphaChannelInDiffuse = false;
     float shininess = 35.0f;
     XMFLOAT4 meshSpecularColor = { 0.18f, 0.18f, 0.18f, 1.0f };
 	XMFLOAT4 meshDiffuseColor = { 0.45f, 0.45f, 0.45f, 1.0f };
@@ -255,8 +256,10 @@ std::unique_ptr<Mesh> Model::BuildMesh(
 
         if(material.GetTexture(aiTextureType_DIFFUSE, 0, &textureFileName) == aiReturn_SUCCESS)
         {
-            bindablePtrs.push_back(Texture::Resolve(gfx, rootPath + textureFileName.C_Str(), 0u));
-			hasDiffuseMap = true;
+            auto texture = Texture::Resolve(gfx, rootPath + textureFileName.C_Str(), 0u);
+            hasAlphaChannelInDiffuse = texture->AlphaChannelLoaded();
+			bindablePtrs.push_back(std::move(texture));
+			hasDiffuseTexture = true;
         }
         else
         {
@@ -266,35 +269,35 @@ std::unique_ptr<Mesh> Model::BuildMesh(
         if (material.GetTexture(aiTextureType_SPECULAR, 0, &textureFileName) == aiReturn_SUCCESS)
         {
 			auto specularTexture = Texture::Resolve(gfx, rootPath + textureFileName.C_Str(), 1u);
-            hasAlphaChannel = specularTexture->AlphaChannelLoaded();
+            hasGlossMapInSpecularAlpha = specularTexture->AlphaChannelLoaded();
             bindablePtrs.push_back(std::move(specularTexture));
-            hasSpecularMap = true;
+            hasSpecularTexture = true;
         }
         else
         {
 			material.Get(AI_MATKEY_COLOR_SPECULAR, reinterpret_cast<aiColor3D&>(meshSpecularColor));
         }
-        if (!hasAlphaChannel)
+        if (!hasGlossMapInSpecularAlpha)
         {
-			material.Get(AI_MATKEY_SHININESS, hasAlphaChannel);
+			material.Get(AI_MATKEY_SHININESS, hasGlossMapInSpecularAlpha);
         }
 
         if(material.GetTexture(aiTextureType_NORMALS, 0, &textureFileName) == aiReturn_SUCCESS)
         {
 			auto normalMap = Texture::Resolve(gfx, rootPath + textureFileName.C_Str(), 2u);
-			hasAlphaChannel = normalMap->AlphaChannelLoaded();
+			hasGlossMapInSpecularAlpha = normalMap->AlphaChannelLoaded();
             bindablePtrs.push_back(std::move(normalMap));
-            hasNormalMap = true;
+            hasNormalTexture = true;
 		}
 
-        if(hasDiffuseMap || hasSpecularMap || hasNormalMap)
+        if(hasDiffuseTexture || hasSpecularTexture || hasNormalTexture)
         {
             bindablePtrs.push_back(Sampler::Resolve(gfx));
 		}
 
         const std::string meshTag = modelPath.string() + "%" + mesh.mName.C_Str();
 
-        if (hasDiffuseMap && hasNormalMap && hasSpecularMap)
+        if (hasDiffuseTexture && hasNormalTexture && hasSpecularTexture)
         {
             D3::VertexLayout layout;
             layout.Append(D3::VertexLayout::Position3D)
@@ -332,7 +335,8 @@ std::unique_ptr<Mesh> Model::BuildMesh(
 			auto vertexShader = VertexShader::Resolve(gfx, shaderBasePath + "BlinnPhong_NormalMapped_VS.cso");
             auto vertexShaderByteCode = vertexShader->GetByteCode();
             bindablePtrs.push_back(std::move(vertexShader));
-			bindablePtrs.push_back(PixelShader::Resolve(gfx, shaderBasePath + "BlinnPhong_SpecularNormalMapped_PS.cso"));
+			bindablePtrs.push_back(PixelShader::Resolve(gfx, hasAlphaChannelInDiffuse ? 
+                shaderBasePath + "BlinnPhong_SpecularNormalMapMasked_PS.cso" : shaderBasePath + "BlinnPhong_SpecularNormalMapped_PS.cso"));
 			bindablePtrs.push_back(InputLayout::Resolve(gfx, vertexBuffer.GetLayout(), vertexShaderByteCode));
 
             struct PixelShaderMaterialConstantBuffer
@@ -344,11 +348,11 @@ std::unique_ptr<Mesh> Model::BuildMesh(
             } pmc;
 
             pmc.specularPowerConstant = shininess;
-			pmc.hasAlphaChannel = hasAlphaChannel ? TRUE : FALSE;
+			pmc.hasAlphaChannel = hasGlossMapInSpecularAlpha ? TRUE : FALSE;
 
 			bindablePtrs.push_back(PixelConstantBuffer<PixelShaderMaterialConstantBuffer>::Resolve(gfx, pmc, 1u));
         }
-        else if (hasDiffuseMap && hasNormalMap)
+        else if (hasDiffuseTexture && hasNormalTexture)
         {
             D3::VertexLayout layout;
             layout.Append(D3::VertexLayout::Position3D)
@@ -402,7 +406,7 @@ std::unique_ptr<Mesh> Model::BuildMesh(
 
             bindablePtrs.push_back(PixelConstantBuffer<PixelShaderMaterialConstantBuffer>::Resolve(gfx, pmc, 1u));
         }
-        else if (hasDiffuseMap)
+        else if (hasDiffuseTexture)
         {
 			D3::VertexLayout layout;
 			layout.Append(D3::VertexLayout::Position3D)
@@ -450,7 +454,7 @@ std::unique_ptr<Mesh> Model::BuildMesh(
 			pmc.specularIntensity = (meshSpecularColor.x + meshSpecularColor.y + meshSpecularColor.z) / 3.0f;
 			bindablePtrs.push_back(PixelConstantBuffer<PixelShaderMaterialConstantBuffer>::Resolve(gfx, pmc, 1u));
         }
-        else if (!hasDiffuseMap && !hasNormalMap && !hasSpecularMap)
+        else if (!hasDiffuseTexture && !hasNormalTexture && !hasSpecularTexture)
         {
             D3::VertexLayout layout;
             layout.Append(D3::VertexLayout::Position3D)
@@ -492,6 +496,10 @@ std::unique_ptr<Mesh> Model::BuildMesh(
             pmc.materialColor = meshDiffuseColor;
 			bindablePtrs.push_back(PixelConstantBuffer<PixelShaderMaterialConstantBuffer>::Resolve(gfx, pmc, 1u));
         }
+
+		// Setup Rasterizer based on if there's alpha in diffuse map
+		// If there's alpha, disable backface culling to avoid visual artifacts when viewing the model from certain angles
+		bindablePtrs.push_back(Rasterizer::Resolve(gfx, hasAlphaChannelInDiffuse));
 
 		bindablePtrs.push_back(Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
     }

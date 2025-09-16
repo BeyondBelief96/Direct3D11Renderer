@@ -32,8 +32,21 @@ float4 main(
     in float3 viewSpaceBitangent: Bitangent, 
     in float2 textureCoords     : TexCoord) : SV_Target
 {
+#ifdef ALPHA_MASK
+    // === Alpha Testing ===
+    // Sample the diffuse texture to get alpha value for alpha testing
+    float4 diffTexture = diffuseTexture.Sample(textureSampler, textureCoords);
+    clip(diffTexture.a < 0.1f ? -1 : 1); // Discard pixel if alpha is below threshold
+    
+    // Flip normals when backface culling is disabled
+    if (dot(viewSpaceNormal, viewSpacePosition) > 0.0f)
+    {
+        viewSpaceNormal = -viewSpaceNormal;
+    }
+#endif
+    
     // === NORMAL CALCULATION (WITH NORMAL MAPPING) ===
-    float3 surfaceNormal = viewSpaceNormal;
+        float3 surfaceNormal = viewSpaceNormal;
     
     if (normalMappingEnabled)
     {
@@ -116,5 +129,6 @@ float4 main(
     // - Specular uses the specular map color (represents different material reflectance)
     const float3 finalColor = saturate((ambientComponent + diffuseComponent) * textureColor.rgb + specularComponent);
     
-    return float4(finalColor, 1.0f);
+    // Output final color with original texture alpha channel
+    return float4(finalColor, textureColor.a);
 }

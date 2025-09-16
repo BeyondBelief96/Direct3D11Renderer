@@ -91,12 +91,12 @@ Window::~Window()
 	DestroyWindow(hwnd);
 }
 
-int Window::GetWidth() const noexcept
+float Window::GetWidth() const noexcept
 {
 	return width;
 }
 
-int Window::GetHeight() const noexcept
+float Window::GetHeight() const noexcept
 {
 	return height;
 }

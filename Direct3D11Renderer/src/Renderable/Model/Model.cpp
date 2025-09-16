@@ -3,7 +3,7 @@
 #include "Exceptions/ModelException.h"
 #include "Geometry/Vertex.h"
 #include <cassert>
-#include <imgui/imgui.h>
+#include <imgui.h>
 #include <unordered_map>
 #include <filesystem>
 

@@ -1,7 +1,7 @@
 #include "Renderable/TestPlane.h"
 #include "Geometry/Plane.h"
 #include "Bindable/BindableCommon.h"
-#include "imgui/imgui.h"
+#include "imgui.h"
 
 TestPlane::TestPlane(Graphics& gfx, float size)
 {

@@ -37,9 +37,9 @@
 //  2018-02-06: Misc: Removed call to ImGui::Shutdown() which is not available from 1.60 WIP, user needs to call CreateContext/DestroyContext themselves.
 //  2016-05-07: DirectX11: Disabling depth-write.
 
-#include "imgui/imgui.h"
+#include "imgui.h"
 #ifndef IMGUI_DISABLE
-#include "imgui/imgui_impl_dx11.h"
+#include "imgui_impl_dx11.h"
 
 // DirectX
 #include <stdio.h>

@@ -71,12 +71,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)include/**;$(ProjectDir)include;$(ProjectDir)third_party/imgui/include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include/**;$(ProjectDir)include;$(ProjectDir)third_party/imgui/include;$(ProjectDir)third_party/directXTex/include;$(ProjectDir)third_party/assimp/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)lib;$(LibraryPath);$(ProjectDir)third_party\directXTex\lib\x64\$(Configuration)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)include/**;$(ProjectDir)include;$(ProjectDir)third_party/imgui/include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\brand\source\repos\Direct3D11Renderer\Direct3D11Renderer\lib;$(ProjectDir)lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include/**;$(ProjectDir)include;$(ProjectDir)third_party/imgui/include;$(ProjectDir)third_party/directXTex/include;$(ProjectDir)third_party/assimp/include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\brand\source\repos\Direct3D11Renderer\Direct3D11Renderer\lib;$(ProjectDir)lib;$(LibraryPath);$(ProjectDir)third_party\directXTex\lib\x64\$(Configuration)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -169,6 +169,7 @@
     <ClCompile Include="src\Exceptions\BindableLookupException.cpp" />
     <ClCompile Include="src\Exceptions\D3Exception.cpp" />
     <ClCompile Include="src\Utilities\D3Utils.cpp" />
+    <ClCompile Include="src\Utilities\TextureLoader.cpp" />
     <ClCompile Include="src\Exceptions\DxgiDebugManager.cpp" />
     <ClCompile Include="src\Exceptions\HrException.cpp" />
     <ClCompile Include="src\Exceptions\WindowExceptions.cpp" />
@@ -234,6 +235,7 @@
     <ClInclude Include="include\resource.h" />
     <ClInclude Include="include\Utilities\MathUtils.h" />
     <ClInclude Include="include\Utilities\WICFactory.h" />
+    <ClInclude Include="include\Utilities\TextureLoader.h" />
     <ClInclude Include="include\Core\Window.h" />
   </ItemGroup>
   <ItemGroup>

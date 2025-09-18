@@ -26,7 +26,8 @@
       "Bash(Remove-Item \"Direct3D11Renderer\\shaders\\PhongVSNoTextures.hlsl\")",
       "Bash(del:*)",
       "Bash(\"/c/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/MSBuild.exe\" Direct3D11Renderer.sln /p:Configuration=Debug /p:Platform=x64)",
-      "Bash(Get-Location)"
+      "Bash(Get-Location)",
+      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"Direct3D11Renderer\\Direct3D11Renderer.vcxproj\" \"/p:Configuration=Debug\" \"/p:Platform=x64\")"
     ],
     "deny": [],
     "ask": []

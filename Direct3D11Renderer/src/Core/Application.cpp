@@ -12,7 +12,6 @@
      light(wnd.Gfx())
  {
      model = std::make_unique<Model>(wnd.Gfx(), "assets/models/Sponza/sponza.obj", 0.1f);
-
      camera.SetSpeed(50.0f);
      camera.SetPosition({ 0.0f, 30.0f, 0.0f });
  }

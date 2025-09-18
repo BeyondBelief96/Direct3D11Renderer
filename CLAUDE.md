@@ -10,9 +10,23 @@ Remember that you are on a windows 11 machine and you are running in powershell,
 This is a Visual Studio 2022 C++ project using MSBuild. The main solution file is `Direct3D11Renderer.sln`.
 
 ### Common Build Commands
-- **Build Debug**: Open in Visual Studio and build, or use: `msbuild Direct3D11Renderer.sln /p:Configuration=Debug /p:Platform=x64`
-- **Build Release**: `msbuild Direct3D11Renderer.sln /p:Configuration=Release /p:Platform=x64`
-- **Clean**: `msbuild Direct3D11Renderer.sln /t:Clean`
+
+**IMPORTANT: After making any code changes, ALWAYS run the build using these exact commands to verify the build succeeds:**
+
+Use the full path to MSBuild to ensure it's found correctly:
+- **Build Debug**: `& "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" "Direct3D11Renderer.sln" /p:Configuration=Debug /p:Platform=x64`
+- **Build Release**: `& "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" "Direct3D11Renderer.sln" /p:Configuration=Release /p:Platform=x64`
+- **Clean**: `& "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" "Direct3D11Renderer.sln" /t:Clean`
+
+**Alternative shorter commands (if MSBuild is in PATH):**
+- **Build Debug**: `MSBuild "Direct3D11Renderer.sln" /p:Configuration=Debug /p:Platform=x64`
+- **Build Release**: `MSBuild "Direct3D11Renderer.sln" /p:Configuration=Release /p:Platform=x64`
+- **Clean**: `MSBuild "Direct3D11Renderer.sln" /t:Clean`
+
+**Build Verification:**
+- Always run a build after making code changes to ensure compilation succeeds
+- Check for any build errors or warnings and address them before proceeding
+- The build output will be in `x64/Debug/` or `x64/Release/` directories
 
 ### Project Configuration
 - **Language Standard**: C++20

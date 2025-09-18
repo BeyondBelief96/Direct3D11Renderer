@@ -1,12 +1,14 @@
 #pragma once
 
 #include "BindableCommon.h"
+#include "Utilities/TextureLoader.h"
 #include <wrl.h>
 #include <string>
+#include <memory>
 
 /** @brief Texture bindable resource for D3D11 rendering.
- *  
- *  Loads texture images using WIC (Windows Imaging Component) and creates
+ *
+ *  Loads texture images using DirectXTex library and creates
  *  D3D11 shader resource views for use in pixel shaders. Supports automatic
  *  alpha channel detection by examining both pixel format and actual alpha values.
  */
@@ -53,16 +55,17 @@ public:
 	 */
 	bool AlphaChannelLoaded() const noexcept;
 private:
-	/** @brief Internal method to load texture from wide string path.
+	/** @brief Internal method to load texture from file path.
 	 *  @param gfx Graphics context
-	 *  @param path Wide string file path
-	 *  @note Handles WIC decoding, format conversion, and alpha detection
+	 *  @param path File path to texture
+	 *  @note Handles texture loading, format conversion, and alpha detection using DirectXTex
 	 */
-	void LoadFromWideString(Graphics& gfx, const std::wstring& path);
+	void LoadFromFile(Graphics& gfx, const std::string& path);
 	
 	unsigned int slot;                    /**< Shader resource slot index */
 	std::string path;                     /**< Original file path */
 	bool alphaChannelLoaded = false;      /**< True if alpha channel is actively used */
+	std::unique_ptr<ITextureLoader> textureLoader;  /**< Texture loading abstraction */
 	
 protected:
 	/** @brief D3D11 shader resource view for the texture */

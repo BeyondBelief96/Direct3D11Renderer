@@ -33,7 +33,6 @@ void Texture::LoadFromFile(Graphics& gfx, const std::string& path)
 {
 	DEBUGMANAGER(gfx);
 
-	// Load texture data using the abstraction
 	TextureData textureData = textureLoader->LoadTexture(path);
 
 	// Update alpha channel status if not explicitly set in constructor

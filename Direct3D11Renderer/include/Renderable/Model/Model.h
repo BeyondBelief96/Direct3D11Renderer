@@ -3,9 +3,9 @@
 #include "Renderable/Model/Mesh.h"
 #include "Core/Graphics.h"
 #include <DirectXMath.h>
-#include <assimp/scene.h>
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
+#include <scene.h>
+#include <Importer.hpp>
+#include <postprocess.h>
 #include <memory>
 #include <vector>
 #include <string>

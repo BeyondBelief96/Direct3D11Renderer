@@ -1,5 +1,7 @@
 #include "Renderable/Model/Model.h"
 #include "Bindable/BindableCommon.h"
+#include "Bindable/DynamicConstantBufferBindable.h"
+#include "DynamicConstantBuffer/LayoutCache.h"
 #include "Exceptions/ModelException.h"
 #include "Geometry/Vertex.h"
 #include <cassert>
@@ -339,18 +341,19 @@ std::unique_ptr<Mesh> Model::BuildMesh(
                 shaderBasePath + "BlinnPhong_SpecularNormalMapMasked_PS.cso" : shaderBasePath + "BlinnPhong_SpecularNormalMapped_PS.cso"));
 			bindablePtrs.push_back(InputLayout::Resolve(gfx, vertexBuffer.GetLayout(), vertexShaderByteCode));
 
-            struct PixelShaderMaterialConstantBuffer
-            {
-                BOOL hasAlphaChannel = FALSE;
-				BOOL specularMapEnabled = TRUE;
-                float specularPowerConstant = 3.1f;
-				float padding[1] = { 0.0f };
-            } pmc;
+            D3::LayoutBuilder cbLayoutBuilder;
+            cbLayoutBuilder.Add<D3::ElementType::Bool>("hasAlphaChannel");
+            cbLayoutBuilder.Add<D3::ElementType::Bool>("specularMapEnabled");
+            cbLayoutBuilder.Add<D3::ElementType::Float>("specularPowerConstant");
 
-            pmc.specularPowerConstant = shininess;
-			pmc.hasAlphaChannel = hasGlossMapInSpecularAlpha ? TRUE : FALSE;
+            auto cbLayout = D3::LayoutCache::Resolve(std::move(cbLayoutBuilder));
+            D3::ConstantBufferData constantBuffer(cbLayout);
 
-			bindablePtrs.push_back(PixelConstantBuffer<PixelShaderMaterialConstantBuffer>::Resolve(gfx, pmc, 1u));
+            constantBuffer["hasAlphaChannel"] = hasGlossMapInSpecularAlpha;
+            constantBuffer["specularMapEnabled"] = true;
+            constantBuffer["specularPowerConstant"] = shininess;
+
+            bindablePtrs.push_back(CachingDynamicPixelConstantBufferBindable::Resolve(gfx, constantBuffer, 1u));
         }
         else if (hasDiffuseTexture && hasNormalTexture)
         {
@@ -393,18 +396,19 @@ std::unique_ptr<Mesh> Model::BuildMesh(
             bindablePtrs.push_back(PixelShader::Resolve(gfx, shaderBasePath + "BlinnPhong_NormalMapped_PS.cso"));
             bindablePtrs.push_back(InputLayout::Resolve(gfx, vertexBuffer.GetLayout(), vertexShaderByteCode));
 
-            struct PixelShaderMaterialConstantBuffer
-            {
-                float specularIntensity = 0.18f;
-                float specularPower = 0.0f;
-                BOOL normalMapEnabled = TRUE;
-                float padding[1] = { 0.0f };
-            } pmc;
+            D3::LayoutBuilder cbLayoutBuilder;
+            cbLayoutBuilder.Add<D3::ElementType::Float>("specularIntensity");
+            cbLayoutBuilder.Add<D3::ElementType::Float>("specularPower");
+            cbLayoutBuilder.Add<D3::ElementType::Bool>("normalMapEnabled");
 
-			pmc.specularPower = shininess;
-			pmc.specularIntensity = (meshSpecularColor.x + meshSpecularColor.y + meshSpecularColor.z) / 3.0f;
+            auto cbLayout = D3::LayoutCache::Resolve(std::move(cbLayoutBuilder));
+            D3::ConstantBufferData constantBuffer(cbLayout);
 
-            bindablePtrs.push_back(PixelConstantBuffer<PixelShaderMaterialConstantBuffer>::Resolve(gfx, pmc, 1u));
+            constantBuffer["specularPower"] = shininess;
+            constantBuffer["specularIntensity"] = (meshSpecularColor.x + meshSpecularColor.y + meshSpecularColor.z) / 3.0f;
+            constantBuffer["normalMapEnabled"] = true;
+
+            bindablePtrs.push_back(CachingDynamicPixelConstantBufferBindable::Resolve(gfx, constantBuffer, 1u));
         }
         else if (hasDiffuseTexture)
         {
@@ -443,16 +447,17 @@ std::unique_ptr<Mesh> Model::BuildMesh(
 			bindablePtrs.push_back(std::move(vertexShader));
 			bindablePtrs.push_back(PixelShader::Resolve(gfx, shaderBasePath + "BlinnPhong_Diffuse_PS.cso"));
             bindablePtrs.push_back(InputLayout::Resolve(gfx, vertexBuffer.GetLayout(), vertexShaderByteCode));
-            struct PixelShaderMaterialConstantBuffer
-            {
-                float specularIntensity = 0.18f;
-                float specularPower = 0.0f;
-                float padding[2] = { 0.0f };
-			} pmc;
+            D3::LayoutBuilder cbLayoutBuilder;
+            cbLayoutBuilder.Add<D3::ElementType::Float>("specularIntensity");
+            cbLayoutBuilder.Add<D3::ElementType::Float>("specularPower");
 
-            pmc.specularPower = shininess;
-			pmc.specularIntensity = (meshSpecularColor.x + meshSpecularColor.y + meshSpecularColor.z) / 3.0f;
-			bindablePtrs.push_back(PixelConstantBuffer<PixelShaderMaterialConstantBuffer>::Resolve(gfx, pmc, 1u));
+            auto cbLayout = D3::LayoutCache::Resolve(std::move(cbLayoutBuilder));
+            D3::ConstantBufferData constantBuffer(cbLayout);
+
+            constantBuffer["specularPower"] = shininess;
+            constantBuffer["specularIntensity"] = (meshSpecularColor.x + meshSpecularColor.y + meshSpecularColor.z) / 3.0f;
+
+            bindablePtrs.push_back(CachingDynamicPixelConstantBufferBindable::Resolve(gfx, constantBuffer, 1u));
         }
         else if (!hasDiffuseTexture && !hasNormalTexture && !hasSpecularTexture)
         {
@@ -484,17 +489,19 @@ std::unique_ptr<Mesh> Model::BuildMesh(
             bindablePtrs.push_back(std::move(vertexShader));
             bindablePtrs.push_back(PixelShader::Resolve(gfx, shaderBasePath + "BlinnPhong_Solid_PS.cso"));
             bindablePtrs.push_back(InputLayout::Resolve(gfx, vertexBuffer.GetLayout(), vertexShaderByteCode));
-            struct PixelShaderMaterialConstantBuffer
-            {
-                XMFLOAT4 materialColor = { 0.65f, 0.65f, 0.85f, 1.0f };
-                float specularIntensity = 0.18f;
-                float specularPower = 0.0f;
-                float padding[2] = { 0.0f, 0.0f };
-            } pmc;
-            pmc.specularPower = shininess;
-			pmc.specularIntensity = (meshSpecularColor.x + meshSpecularColor.y + meshSpecularColor.z) / 3.0f;
-            pmc.materialColor = meshDiffuseColor;
-			bindablePtrs.push_back(PixelConstantBuffer<PixelShaderMaterialConstantBuffer>::Resolve(gfx, pmc, 1u));
+            D3::LayoutBuilder cbLayoutBuilder;
+            cbLayoutBuilder.Add<D3::ElementType::Float4>("materialColor");
+            cbLayoutBuilder.Add<D3::ElementType::Float>("specularIntensity");
+            cbLayoutBuilder.Add<D3::ElementType::Float>("specularPower");
+
+            auto cbLayout = D3::LayoutCache::Resolve(std::move(cbLayoutBuilder));
+            D3::ConstantBufferData constantBuffer(cbLayout);
+
+            constantBuffer["specularPower"] = shininess;
+            constantBuffer["specularIntensity"] = (meshSpecularColor.x + meshSpecularColor.y + meshSpecularColor.z) / 3.0f;
+            constantBuffer["materialColor"] = meshDiffuseColor;
+
+            bindablePtrs.push_back(CachingDynamicPixelConstantBufferBindable::Resolve(gfx, constantBuffer, 1u));
         }
 
 		// Setup Rasterizer based on if there's alpha in diffuse map
@@ -502,6 +509,8 @@ std::unique_ptr<Mesh> Model::BuildMesh(
 		bindablePtrs.push_back(Rasterizer::Resolve(gfx, hasAlphaChannelInDiffuse));
 
 		bindablePtrs.push_back(Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+
+        bindablePtrs.push_back(std::make_shared<Stencil>(gfx, Stencil::Mode::Off));
     }
     else
     {

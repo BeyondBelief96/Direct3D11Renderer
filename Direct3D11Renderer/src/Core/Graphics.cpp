@@ -62,17 +62,6 @@ Graphics::Graphics(HWND hwnd, int width, int height)
     GFX_THROW_INFO(pSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), &pBackBuffer));
     GFX_THROW_INFO(pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, pTarget.GetAddressOf()));
 
-    // Setup the depth/stencil state
-	D3D11_DEPTH_STENCIL_DESC depthStencilDesc = {};
-	depthStencilDesc.DepthEnable = TRUE;
-	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> pDepthStencilState;
-	GFX_THROW_INFO(pDevice->CreateDepthStencilState(&depthStencilDesc, pDepthStencilState.ReleaseAndGetAddressOf()));
-
-	// Bind the depth stencil state to the pipeline
-	pContext->OMSetDepthStencilState(pDepthStencilState.Get(), 1u);
-
     // create depth stencil texture
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pDepthStencilBuffer;
 	D3D11_TEXTURE2D_DESC depthStencilBufferDesc = {};
@@ -80,7 +69,7 @@ Graphics::Graphics(HWND hwnd, int width, int height)
 	depthStencilBufferDesc.Height = viewportHeight;
 	depthStencilBufferDesc.MipLevels = 1u;
 	depthStencilBufferDesc.ArraySize = 1u;
-    depthStencilBufferDesc.Format = DXGI_FORMAT_D32_FLOAT;
+    depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	depthStencilBufferDesc.SampleDesc.Count = 1u;
 	depthStencilBufferDesc.SampleDesc.Quality = 0u;
 	depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -89,7 +78,7 @@ Graphics::Graphics(HWND hwnd, int width, int height)
 
 	// create depth stencil view
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
-	depthStencilViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	depthStencilViewDesc.Texture2D.MipSlice = 0u;
     GFX_THROW_INFO(pDevice->CreateDepthStencilView(pDepthStencilBuffer.Get(), &depthStencilViewDesc, pDepthStencilView.GetAddressOf()));
@@ -133,7 +122,7 @@ void Graphics::BeginFrame(float red, float green, float blue)
 
     const float color[] = { red, green, blue, 1.0f };
 	pContext->ClearRenderTargetView(pTarget.Get(), color);
-	pContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
+	pContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 }
 
 void Graphics::EndFrame()

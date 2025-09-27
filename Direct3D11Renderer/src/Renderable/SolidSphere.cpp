@@ -43,6 +43,8 @@ SolidSphere::SolidSphere(Graphics& gfx, float radius)
 	AddBindable(Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 
 	AddBindable(std::make_shared<TransformConstantBuffer>(gfx, *this));
+
+	AddBindable(Stencil::Resolve(gfx, Stencil::Mode::Off));
 }
 
 void SolidSphere::SetPosition(DirectX::XMFLOAT3 pos) noexcept

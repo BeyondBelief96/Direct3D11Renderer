@@ -146,6 +146,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Bindable\Blender.cpp" />
+    <ClCompile Include="src\Bindable\DynamicConstantBufferBindable.cpp" />
+    <ClCompile Include="src\DynamicConstantBuffer\DynamicConstantBuffer.cpp" />
+    <ClCompile Include="src\DynamicConstantBuffer\LayoutCache.cpp" />
     <ClCompile Include="src\Bindable\Rasterizer.cpp" />
     <ClCompile Include="src\Exceptions\DxErr\dxerr.cpp" />
     <ClCompile Include="src\Core\Application.cpp" />
@@ -159,12 +162,14 @@
     <ClCompile Include="src\Bindable\TransformConstantBuffer.cpp" />
     <ClCompile Include="src\Bindable\VertexBuffer.cpp" />
     <ClCompile Include="src\Bindable\VertexShader.cpp" />
+    <ClCompile Include="src\Bindable\Stencil.cpp" />
     <ClCompile Include="src\Camera\FreeFlyCamera.cpp" />
     <ClCompile Include="src\Exceptions\ModelException.cpp" />
     <ClCompile Include="src\Renderable\Model\Mesh.cpp" />
     <ClCompile Include="src\Renderable\Model\Model.cpp" />
     <ClCompile Include="src\Renderable\SolidSphere.cpp" />
     <ClCompile Include="src\Renderable\TestPlane.cpp" />
+    <ClCompile Include="src\Renderable\TestCube.cpp" />
     <ClCompile Include="src\Utilities\D3Timer.cpp" />
     <ClCompile Include="src\Exceptions\BindableLookupException.cpp" />
     <ClCompile Include="src\Exceptions\D3Exception.cpp" />
@@ -191,6 +196,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Bindable\Blender.h" />
+    <ClInclude Include="include\Bindable\DynamicConstantBufferBindable.h" />
+    <ClInclude Include="include\DynamicConstantBuffer\DynamicConstantBuffer.h" />
+    <ClInclude Include="include\DynamicConstantBuffer\LayoutCache.h" />
     <ClInclude Include="include\Bindable\Rasterizer.h" />
     <ClInclude Include="include\Core\Application.h" />
     <ClInclude Include="include\Bindable\Bindable.h" />
@@ -206,16 +214,19 @@
     <ClInclude Include="include\Bindable\TransformConstantBuffer.h" />
     <ClInclude Include="include\Bindable\VertexBuffer.h" />
     <ClInclude Include="include\Bindable\VertexShader.h" />
+    <ClInclude Include="include\Bindable\Stencil.h" />
     <ClInclude Include="include\Camera\FreeFlyCamera.h" />
     <ClInclude Include="include\Exceptions\dxerr.h" />
     <ClInclude Include="include\Exceptions\ModelException.h" />
     <ClInclude Include="include\Geometry\IndexedTriangleList.h" />
     <ClInclude Include="include\Geometry\Plane.h" />
+    <ClInclude Include="include\Geometry\Cube.h" />
     <ClInclude Include="include\Geometry\Vertex.h" />
     <ClInclude Include="include\Renderable\Model\Mesh.h" />
     <ClInclude Include="include\Renderable\Model\Model.h" />
     <ClInclude Include="include\Renderable\SolidSphere.h" />
     <ClInclude Include="include\Renderable\TestPlane.h" />
+    <ClInclude Include="include\Renderable\TestCube.h" />
     <ClInclude Include="include\Utilities\D3Timer.h" />
     <ClInclude Include="include\Utilities\ChiliWin.h" />
     <ClInclude Include="include\Exceptions\BindableLookupException.h" />
@@ -330,6 +341,22 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)/shaders/Output/%(Filename).cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\PointLightIndicator_VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/shaders/Output/%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)/shaders/Output/%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="shaders\SolidColor_PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/shaders/Output/%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)/shaders/Output/%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="shaders\SolidColor_VS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>

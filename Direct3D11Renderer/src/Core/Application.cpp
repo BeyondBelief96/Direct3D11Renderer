@@ -12,6 +12,7 @@
      light(wnd.Gfx())
  {
      model = std::make_unique<Model>(wnd.Gfx(), "assets/models/Sponza/sponza.obj", 0.1f);
+	 testCube = std::make_unique<TestCube>(wnd.Gfx(), 10.0f);
      camera.SetSpeed(50.0f);
      camera.SetPosition({ 0.0f, 30.0f, 0.0f });
  }
@@ -52,12 +53,15 @@ void Application::ProcessFrame()
     SpawnSimulationWindow();
     light.SpawnControlWindow();
     model->ShowModelControlWindow();
+	testCube->SpawnControlWindow(wnd.Gfx(), "Test Outline Cube");
 
 
     // Bind and render
     light.Bind(wnd.Gfx());
     model->Render(wnd.Gfx());
     light.Render(wnd.Gfx());
+    testCube->Render(wnd.Gfx());
+    testCube->RenderOutline(wnd.Gfx());
 
     wnd.Gfx().EndFrame();
 }

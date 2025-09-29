@@ -13,6 +13,7 @@ public:
 	VertexBuffer(Graphics& gfx, const D3::VertexBuffer& vbuf) noexcept(!_DEBUG);
 	void Bind(Graphics& gfx) noexcept override;
 	std::string GetUID() const noexcept override;
+	const D3::VertexLayout& GetLayout() const noexcept;
 
 	static std::shared_ptr<VertexBuffer> Resolve(Graphics& gfx, const std::string& tag, const D3::VertexBuffer& vbuf);
 
@@ -25,6 +26,7 @@ protected:
 	UINT stride;
 	std::string tag;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> pVertexBuffer;
+	D3::VertexLayout layout;
 private:
 	static std::string GenerateUID_(const std::string& tag);
 };

@@ -86,7 +86,7 @@ namespace D3
 		{
 			using SysType = DirectX::XMFLOAT2;  /**< DirectX 2-component float vector for UV coords */
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32_FLOAT;  /**< 32-bit float RG format */
-			static constexpr const char* semantic = "Texcoord";  /**< HLSL semantic name */
+			static constexpr const char* semantic = "TexCoord";  /**< HLSL semantic name */
 		};
 		/** @brief Specialization for tangent vectors (used in normal mapping) */
 		template<> struct Map<Tangent>
@@ -391,21 +391,9 @@ namespace D3
 				assert(!"Bad element type");
 			}
 		}
-	protected:
-		/** @brief Protected constructor - only VertexBuffer can create Vertex instances.
-		 *  @param pData Pointer to the raw vertex data (must not be null)
-		 *  @param layout Reference to the vertex layout describing the data structure
-		 *  @note Asserts if pData is null to catch programming errors early
-		 */
-		Vertex(char* pData, const VertexLayout& layout)
-			: pData(pData), layout(layout)
-		{
-			assert(pData != nullptr);
-		}
-	private:
 		/** @brief Variadic template helper to set multiple attributes by index.
 		 *  @tparam First Type of the first attribute value
-		 *  @tparam Rest Types of remaining attribute values  
+		 *  @tparam Rest Types of remaining attribute values
 		 *  @param i Starting index for attribute assignment
 		 *  @param first First attribute value to assign
 		 *  @param rest Remaining attribute values to assign sequentially
@@ -417,6 +405,18 @@ namespace D3
 			SetAttributeByIndex(i, std::forward<First>(first));
 			SetAttributeByIndex(i + 1, std::forward<Rest>(rest)...);
 		}
+	public:
+		/** @brief Constructor - creates a Vertex instance.
+		 *  @param pData Pointer to the raw vertex data (must not be null)
+		 *  @param layout Reference to the vertex layout describing the data structure
+		 *  @note Asserts if pData is null to catch programming errors early
+		 */
+		Vertex(char* pData, const VertexLayout& layout)
+			: pData(pData), layout(layout)
+		{
+			assert(pData != nullptr);
+		}
+	private:
 		/** @brief Template helper to set an attribute with compile-time type checking.
 		 *  @tparam DestLayoutType The target ElementType for the attribute
 		 *  @tparam SrcType The source type of the value being assigned
@@ -540,7 +540,7 @@ namespace D3
 		Vertex Back()
 		{
 			assert(buffer.size() != 0u);
-			return Vertex{ buffer.data() + buffer.size() - layout.Size(), layout };
+			return Vertex(buffer.data() + buffer.size() - layout.Size(), layout);
 		}
 		/** @brief Gets a mutable reference to the first vertex in the buffer.
 		 *  @return Vertex wrapper for the first vertex
@@ -549,7 +549,7 @@ namespace D3
 		Vertex Front()
 		{
 			assert(buffer.size() != 0u);
-			return Vertex{ buffer.data(), layout };
+			return Vertex(buffer.data(), layout);
 		}
 		/** @brief Gets a mutable reference to the vertex at the specified index.
 		 *  @param i Index of the vertex (0-based)
@@ -559,7 +559,7 @@ namespace D3
 		Vertex operator[](size_t i)
 		{
 			assert(i < Size());
-			return Vertex{ buffer.data() + layout.Size() * i, layout };
+			return Vertex(buffer.data() + layout.Size() * i, layout);
 		}
 		/** @brief Gets a const reference to the last vertex in the buffer.
 		 *  @return ConstVertex wrapper for the last vertex

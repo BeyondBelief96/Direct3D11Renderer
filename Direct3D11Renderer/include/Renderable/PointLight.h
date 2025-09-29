@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Graphics.h"
-#include "Renderable/SolidSphere.h"
+#include "SolidSphere.h"
 #include "Bindable/ConstantBuffer.h"
 
 class PointLight
@@ -12,7 +12,7 @@ public:
 	// Draw controls inline in the current ImGui window (no Begin/End)
 	void DrawControlsInline() noexcept;
 	void Reset() noexcept;
-	void Render(Graphics& gfx) const noexcept (!_DEBUG);
+	void Submit(class FrameManager& frameManager) const noexcept (!_DEBUG);
 	void Bind(Graphics& gfx) const noexcept;
 	// Setters used by Application UI
 	void SetPosition(const DirectX::XMFLOAT3& pos) noexcept { lightConstantBuffer.lightPos = pos; }

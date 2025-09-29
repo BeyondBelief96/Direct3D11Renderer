@@ -1,25 +1,32 @@
 #include "Renderable/Renderable.h"
+#include "Bindable/BindableCommon.h"
+#include "Bindable/BindableCache.h"
 #include "Exceptions/GraphicsExceptions.h"
 #include <cassert>
 #include <typeinfo>
 
-void Renderable::Render(Graphics& gfx) const noexcept(!_DEBUG)
+void Renderable::Submit(FrameManager& frameManager) const noexcept
 {
-    for (auto& b : bindables)
-    {
-        b->Bind(gfx);
-    }
-
-    gfx.DrawIndexed(pIndexBuffer->GetCount());
+	for (const auto& technique : techniques)
+	{
+		technique.Submit(frameManager, *this);
+	}
 }
 
-void Renderable::AddBindable(std::shared_ptr<Bindable> bindable)
+void Renderable::AddTechnique(Technique technique) noexcept
 {
-    if (typeid(*bindable) == typeid(IndexBuffer))
-    {
-        assert("Binding multiple index buffers not allowed" && pIndexBuffer == nullptr);
-        pIndexBuffer = &static_cast<IndexBuffer&>(*bindable);
-    }
+	technique.InitializeParentReferences(*this);
+	techniques.push_back(std::move(technique));
+}
 
-	bindables.push_back(std::move(bindable));
+void Renderable::Bind(Graphics& gfx) const noexcept
+{
+	pVertices->Bind(gfx);
+	pIndices->Bind(gfx);
+	pTopology->Bind(gfx);
+}
+
+UINT Renderable::GetIndexCount() const noexcept
+{
+	return pIndices->GetCount();
 }

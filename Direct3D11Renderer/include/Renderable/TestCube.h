@@ -12,8 +12,6 @@ public:
 	void SetRotation(float roll, float pitch, float yaw) noexcept;
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
 	void SpawnControlWindow(Graphics& gfx, const char* name) noexcept;
-	void RenderOutline(Graphics& gfx) const noexcept(!_DEBUG);
-	void RenderWithOutline(Graphics& gfx) const noexcept(!_DEBUG);
 
 private:
 	struct PSMaterialConstant
@@ -29,8 +27,6 @@ private:
 	float roll = 0.0f;
 	float pitch = 0.0f;
 	float yaw = 0.0f;
-
-	mutable bool renderingOutline = false;  // Flag to indicate if we're rendering the outline
 
 	// Separate bindables for outline effect
 	std::vector<std::shared_ptr<Bindable>> outlineEffect;

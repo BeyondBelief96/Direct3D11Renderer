@@ -9,10 +9,11 @@ class TransformConstantBuffer : public Bindable
 public:
 	enum class ShaderStage { Vertex = 1, Pixel = 2, Both = 3 };
 	
-	TransformConstantBuffer(Graphics& gfx, const Renderable& parent, UINT slot = 0u);
-	TransformConstantBuffer(Graphics& gfx, const Renderable& parent, ShaderStage stages, 
+	TransformConstantBuffer(Graphics& gfx, UINT slot = 0u);
+	TransformConstantBuffer(Graphics& gfx, ShaderStage stages, 
 						   UINT vertexSlot = 0u, UINT pixelSlot = 0u);
 	void Bind(Graphics& gfx) noexcept override;
+	void InitializeParentReference(const Renderable& parent) noexcept override;
 	
 protected:
 	struct TransformBuffer
@@ -32,5 +33,5 @@ private:
 	static std::unique_ptr<VertexConstantBuffer<TransformBuffer>> pVertexConstantBuffer;
 	static std::unique_ptr<PixelConstantBuffer<TransformBuffer>> pPixelConstantBuffer;
 	
-	const Renderable& parent;
+	const Renderable* parent = nullptr;
 };

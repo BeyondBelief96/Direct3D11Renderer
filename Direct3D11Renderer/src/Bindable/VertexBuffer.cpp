@@ -1,7 +1,7 @@
 #include "Bindable/VertexBuffer.h"
 
 VertexBuffer::VertexBuffer(Graphics& gfx, std::string tag, const D3::VertexBuffer& vbuf) 
-	: stride(UINT(vbuf.GetLayout().Size())), tag(tag)
+	: stride(UINT(vbuf.GetLayout().Size())), tag(tag), layout(vbuf.GetLayout())
 	
 {
 	DEBUGMANAGER(gfx);
@@ -42,3 +42,9 @@ std::string VertexBuffer::GenerateUID_(const std::string& tag)
 {
 	return typeid(VertexBuffer).name() + std::string("#") + tag;
 }
+
+const D3::VertexLayout& VertexBuffer::GetLayout() const noexcept
+{
+	return layout;
+}
+

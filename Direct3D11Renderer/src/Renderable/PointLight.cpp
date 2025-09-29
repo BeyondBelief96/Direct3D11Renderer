@@ -1,4 +1,5 @@
-#include "Lights/PointLight.h"
+#include "Renderable/PointLight.h"
+#include "RenderPass/FrameManager.h"
 #include "imgui.h"
 
 PointLight::PointLight(Graphics& gfx, float radius) :
@@ -69,8 +70,8 @@ void PointLight::Bind(Graphics& gfx) const noexcept
 	lightPosCBuf.Bind(gfx);
 }
 
-void PointLight::Render(Graphics& gfx) const noexcept(!_DEBUG)
+void PointLight::Submit(FrameManager& frameManager) const noexcept(!_DEBUG)
 {
 	mesh.SetPosition(lightConstantBuffer.lightPos);
-	mesh.Render(gfx);
+	mesh.Submit(frameManager);
 }

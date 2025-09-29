@@ -11,10 +11,29 @@
      camera({ 0.0f, 0.0f, -30.0f }),
      light(wnd.Gfx())
  {
-     model = std::make_unique<Model>(wnd.Gfx(), "assets/models/Sponza/sponza.obj", 0.1f);
-	 testCube = std::make_unique<TestCube>(wnd.Gfx(), 10.0f);
+     //model = std::make_unique<Model>(wnd.Gfx(), "assets/models/Sponza/sponza.obj", 0.1f);
+
+	 // Create multiple test cubes for better testing
+	 testCubes.reserve(3);
+	 testCubes.emplace_back(std::make_unique<TestCube>(wnd.Gfx(), 8.0f));
+	 testCubes.emplace_back(std::make_unique<TestCube>(wnd.Gfx(), 6.0f));
+	 testCubes.emplace_back(std::make_unique<TestCube>(wnd.Gfx(), 4.0f));
+
+	 // Position the cubes
+	 testCubes[0]->SetPos({ -15.0f, 0.0f, 0.0f });
+	 testCubes[1]->SetPos({ 0.0f, 0.0f, 0.0f });
+	 testCubes[2]->SetPos({ 15.0f, 0.0f, 0.0f });
+
+	 // Setup camera for better scene viewing
      camera.SetSpeed(50.0f);
-     camera.SetPosition({ 0.0f, 30.0f, 0.0f });
+     camera.SetPosition({ 0.0f, 20.0f, -40.0f });
+
+	 // Setup light for better illumination - TEMPORARY: Very bright ambient for debugging
+	 light.SetPosition({ 0.0f, 25.0f, -20.0f });
+	 light.SetDiffuseIntensity(2.0f);
+	 light.SetAmbient({ 0.5f, 0.5f, 0.5f }); // Much brighter ambient to see if texture is there
+	 light.SetDiffuse({ 1.0f, 1.0f, 1.0f });
+	 light.SetAttenuation(1.0f, 0.01f, 0.0001f); // Reduced attenuation
  }
 
 int Application::Run()
@@ -52,18 +71,30 @@ void Application::ProcessFrame()
     // UI
     SpawnSimulationWindow();
     light.SpawnControlWindow();
-    model->ShowModelControlWindow();
-	testCube->SpawnControlWindow(wnd.Gfx(), "Test Outline Cube");
+    //model->ShowModelControlWindow();
 
+	// Show UI for each cube
+	for (size_t i = 0; i < testCubes.size(); ++i)
+	{
+		std::string windowName = "Test Cube " + std::to_string(i + 1);
+		testCubes[i]->SpawnControlWindow(wnd.Gfx(), windowName.c_str());
+	}
 
     // Bind and render
-    light.Bind(wnd.Gfx());
-    model->Render(wnd.Gfx());
-    light.Render(wnd.Gfx());
-    testCube->Render(wnd.Gfx());
-    testCube->RenderOutline(wnd.Gfx());
+	light.Bind(wnd.Gfx());  // Bind light constants globally for all pixel shaders
+	light.Submit(frameManager);
+
+	// Submit all cubes for rendering
+	for (auto& cube : testCubes)
+	{
+		cube->Bind(wnd.Gfx());
+		cube->Submit(frameManager);
+	}
+
+    frameManager.Excecute(wnd.Gfx());
 
     wnd.Gfx().EndFrame();
+    frameManager.Reset();
 }
 
 void Application::SpawnSimulationWindow() noexcept

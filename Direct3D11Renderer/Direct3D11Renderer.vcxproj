@@ -71,12 +71,20 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)include/**;$(ProjectDir)include;$(ProjectDir)third_party/imgui/include;$(ProjectDir)third_party/directXTex/include;$(ProjectDir)third_party/assimp/include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)lib;$(LibraryPath);$(ProjectDir)third_party\directXTex\lib\x64\$(Configuration)</LibraryPath>
+    <IncludePath>$(ProjectDir)include\**;$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(ProjectDir)\third_party\imgui\include;$(ProjectDir)\third_party\directXTex\include;$(ProjectDir)\third_party\assimp\include;$(ProjectDir)include;$(ProjectDir)include\**;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)include/**;$(ProjectDir)include;$(ProjectDir)third_party/imgui/include;$(ProjectDir)third_party/directXTex/include;$(ProjectDir)third_party/assimp/include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\brand\source\repos\Direct3D11Renderer\Direct3D11Renderer\lib;$(ProjectDir)lib;$(LibraryPath);$(ProjectDir)third_party\directXTex\lib\x64\$(Configuration)</LibraryPath>
+    <IncludePath>$(ProjectDir)include\**;$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(ProjectDir)\third_party\imgui\include;$(ProjectDir)\third_party\directXTex\include;$(ProjectDir)\third_party\assimp\include;$(ProjectDir)include;$(ProjectDir)include\**;$(ExternalIncludePath)</ExternalIncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ExternalIncludePath>$(ProjectDir)\third_party\imgui\include;$(ProjectDir)\third_party\directXTex\include;$(ProjectDir)\third_party\assimp\include;$(ProjectDir)include;$(ProjectDir)include\**;$(ExternalIncludePath)</ExternalIncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ExternalIncludePath>$(ProjectDir)\third_party\imgui\include;$(ProjectDir)\third_party\directXTex\include;$(ProjectDir)\third_party\assimp\include;$(ProjectDir)include;$(ProjectDir)include\**;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -84,6 +92,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -98,6 +107,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -115,7 +125,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -134,7 +144,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -147,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="src\Bindable\Blender.cpp" />
     <ClCompile Include="src\Bindable\DynamicConstantBufferBindable.cpp" />
+    <ClCompile Include="src\Bindable\NullPixelShader.cpp" />
     <ClCompile Include="src\DynamicConstantBuffer\DynamicConstantBuffer.cpp" />
     <ClCompile Include="src\DynamicConstantBuffer\LayoutCache.cpp" />
     <ClCompile Include="src\Bindable\Rasterizer.cpp" />
@@ -168,8 +179,12 @@
     <ClCompile Include="src\Renderable\Model\Mesh.cpp" />
     <ClCompile Include="src\Renderable\Model\Model.cpp" />
     <ClCompile Include="src\Renderable\SolidSphere.cpp" />
-    <ClCompile Include="src\Renderable\TestPlane.cpp" />
     <ClCompile Include="src\Renderable\TestCube.cpp" />
+    <ClCompile Include="src\RenderPass\FrameManager.cpp" />
+    <ClCompile Include="src\RenderPass\Job.cpp" />
+    <ClCompile Include="src\RenderPass\Pass.cpp" />
+    <ClCompile Include="src\RenderPass\Step.cpp" />
+    <ClCompile Include="src\RenderPass\Technique.cpp" />
     <ClCompile Include="src\Utilities\D3Timer.cpp" />
     <ClCompile Include="src\Exceptions\BindableLookupException.cpp" />
     <ClCompile Include="src\Exceptions\D3Exception.cpp" />
@@ -181,7 +196,7 @@
     <ClCompile Include="src\Core\Graphics.cpp" />
     <ClCompile Include="src\Exceptions\GraphicsExceptions.cpp" />
     <ClCompile Include="src\Input\Keyboard.cpp" />
-    <ClCompile Include="src\Lights\PointLight.cpp" />
+    <ClCompile Include="src\Renderable\PointLight.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Input\Mouse.cpp" />
     <ClCompile Include="src\Renderable\Renderable.cpp" />
@@ -197,6 +212,7 @@
   <ItemGroup>
     <ClInclude Include="include\Bindable\Blender.h" />
     <ClInclude Include="include\Bindable\DynamicConstantBufferBindable.h" />
+    <ClInclude Include="include\Bindable\NullPixelShader.h" />
     <ClInclude Include="include\DynamicConstantBuffer\DynamicConstantBuffer.h" />
     <ClInclude Include="include\DynamicConstantBuffer\LayoutCache.h" />
     <ClInclude Include="include\Bindable\Rasterizer.h" />
@@ -225,8 +241,12 @@
     <ClInclude Include="include\Renderable\Model\Mesh.h" />
     <ClInclude Include="include\Renderable\Model\Model.h" />
     <ClInclude Include="include\Renderable\SolidSphere.h" />
-    <ClInclude Include="include\Renderable\TestPlane.h" />
     <ClInclude Include="include\Renderable\TestCube.h" />
+    <ClInclude Include="include\RenderPass\FrameManager.h" />
+    <ClInclude Include="include\RenderPass\Job.h" />
+    <ClInclude Include="include\RenderPass\Pass.h" />
+    <ClInclude Include="include\RenderPass\Step.h" />
+    <ClInclude Include="include\RenderPass\Technique.h" />
     <ClInclude Include="include\Utilities\D3Timer.h" />
     <ClInclude Include="include\Utilities\ChiliWin.h" />
     <ClInclude Include="include\Exceptions\BindableLookupException.h" />
@@ -240,7 +260,7 @@
     <ClInclude Include="include\Core\Graphics.h" />
     <ClInclude Include="include\Exceptions\GraphicsExceptions.h" />
     <ClInclude Include="include\Input\Keyboard.h" />
-    <ClInclude Include="include\Lights\PointLight.h" />
+    <ClInclude Include="include\Renderable\PointLight.h" />
     <ClInclude Include="include\Input\Mouse.h" />
     <ClInclude Include="include\Renderable\Renderable.h" />
     <ClInclude Include="include\resource.h" />
@@ -366,9 +386,9 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\Downloads\DXGetErrorDescription.inl" />
-    <None Include="..\..\..\..\Downloads\DXGetErrorString.inl" />
-    <None Include="..\..\..\..\Downloads\DXTrace.inl" />
+    <None Include="DXGetErrorDescription.inl" />
+    <None Include="DXGetErrorString.inl" />
+    <None Include="DXTrace.inl" />
     <None Include="src\Exceptions\DxErr\DXGetErrorDescription.inl" />
     <None Include="src\Exceptions\DxErr\DXGetErrorString.inl" />
     <None Include="src\Exceptions\DxErr\DXTrace.inl" />

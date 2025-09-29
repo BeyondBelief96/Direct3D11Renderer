@@ -1,7 +1,8 @@
 #include "Bindable/TransformConstantBuffer.h"
+#include <cassert>
 
-TransformConstantBuffer::TransformConstantBuffer(Graphics& gfx, const Renderable& parent, UINT slot)
-	: parent(parent), targetStages(ShaderStage::Vertex), vertexSlot(slot), pixelSlot(0u)
+TransformConstantBuffer::TransformConstantBuffer(Graphics& gfx, UINT slot)
+	: targetStages(ShaderStage::Vertex), vertexSlot(slot), pixelSlot(0u)
 {
 	if (!pVertexConstantBuffer)
 	{
@@ -9,9 +10,9 @@ TransformConstantBuffer::TransformConstantBuffer(Graphics& gfx, const Renderable
 	}
 }
 
-TransformConstantBuffer::TransformConstantBuffer(Graphics& gfx, const Renderable& parent, 
+TransformConstantBuffer::TransformConstantBuffer(Graphics& gfx, 
 												 ShaderStage stages, UINT vertexSlot, UINT pixelSlot)
-	: parent(parent), targetStages(stages), vertexSlot(vertexSlot), pixelSlot(pixelSlot)
+	: targetStages(stages), vertexSlot(vertexSlot), pixelSlot(pixelSlot)
 {
 	if ((static_cast<int>(stages) & static_cast<int>(ShaderStage::Vertex)) && !pVertexConstantBuffer)
 	{
@@ -33,12 +34,14 @@ void TransformConstantBuffer::UpdateBindImpl(Graphics& gfx, const TransformBuffe
 {
 	if (static_cast<int>(targetStages) & static_cast<int>(ShaderStage::Vertex))
 	{
+		assert(parent != nullptr);
 		pVertexConstantBuffer->Update(gfx, tf);
 		pVertexConstantBuffer->Bind(gfx);
 	}
 	
 	if (static_cast<int>(targetStages) & static_cast<int>(ShaderStage::Pixel))
 	{
+		assert(parent != nullptr);
 		pPixelConstantBuffer->Update(gfx, tf);
 		pPixelConstantBuffer->Bind(gfx);
 	}
@@ -46,7 +49,8 @@ void TransformConstantBuffer::UpdateBindImpl(Graphics& gfx, const TransformBuffe
 
 TransformConstantBuffer::TransformBuffer TransformConstantBuffer::GetTransformBuffer(Graphics & gfx) noexcept
 {
-	DirectX::XMMATRIX modelView = parent.GetTransformXM() * gfx.GetView();
+	assert(parent != nullptr);
+	DirectX::XMMATRIX modelView = parent->GetTransformXM() * gfx.GetView();
 
 	const TransformBuffer transformBuffer
 	{
@@ -55,6 +59,11 @@ TransformConstantBuffer::TransformBuffer TransformConstantBuffer::GetTransformBu
 	};
 
 	return transformBuffer;
+}
+
+void TransformConstantBuffer::InitializeParentReference(const Renderable& parent) noexcept
+{
+	this->parent = &parent;
 }
 
 std::unique_ptr<VertexConstantBuffer<TransformConstantBuffer::TransformBuffer>>

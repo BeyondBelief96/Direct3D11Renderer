@@ -7,19 +7,10 @@
 #include <memory>
 #include <vector>
 
-/// <summary>
-/// A mesh represents a single renderable object that the graphics pipeline will draw in the scene. A mesh can be re-used across 
-/// many nodes throughout the scene graph. The mesh takes in all of the graphics pipeline bindables it needs to render.
-/// </summary>
 class Mesh : public Renderable
 {
 public:
-    // Construct mesh with a prepared set of bindables (VB, IB, shaders, layout, constants, etc.)
-    Mesh(Graphics& gfx, std::vector<std::shared_ptr<Bindable>> bindables);
-
-    // Draw with an externally-supplied transform (typically from a scene graph node)
-    void Draw(Graphics& gfx, DirectX::FXMMATRIX accumulatedTransform) const noexcept;
-
+	void Submit(FrameManager& frameManager, DirectX::FXMMATRIX accumulatedTransform) const noexcept;
     DirectX::XMMATRIX GetTransformXM() const noexcept override;
 
 private:

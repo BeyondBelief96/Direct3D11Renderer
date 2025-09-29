@@ -3,10 +3,9 @@
 #include "Utilities/D3Timer.h"
 #include "Renderable/Renderable.h"
 #include "Renderable/Model/Model.h"
-#include "Renderable/TestPlane.h"
 #include "Renderable/TestCube.h"
 #include "Camera/FreeFlyCamera.h"
-#include "Lights/PointLight.h"
+#include "Renderable/PointLight.h"
 #include <vector>
 #include <memory>
 #include <set>
@@ -23,9 +22,10 @@ private:
 	FreeFlyCamera camera;
 	Window wnd;
 	D3Timer timer;
+	FrameManager frameManager;
 	static float ui_speed_factor;
 	float speed_factor = 1.0f;
 	PointLight light;
-	std::unique_ptr<Model> model;
-	std::unique_ptr<TestCube> testCube;
+	//std::unique_ptr<Model> model;
+	std::vector<std::unique_ptr<TestCube>> testCubes;
 };

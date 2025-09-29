@@ -96,7 +96,7 @@
     <ClCompile Include="src\Camera\FreeFlyCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Lights\PointLight.cpp">
+    <ClCompile Include="src\Renderable\PointLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Exceptions\DxErr\dxerr.cpp">
@@ -112,9 +112,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Exceptions\ModelException.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderable\TestPlane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Bindable\Blender.cpp">
@@ -145,6 +142,36 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Bindable\DynamicConstantBufferBindable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DynamicConstantBuffer\DynamicConstantBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DynamicConstantBuffer\LayoutCache.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bindable\Stencil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderable\TestCube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderPass\Step.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderPass\Job.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderPass\Technique.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderPass\Pass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderPass\FrameManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bindable\NullPixelShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -251,7 +278,7 @@
     <ClInclude Include="include\Camera\FreeFlyCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Lights\PointLight.h">
+    <ClInclude Include="include\Renderable\PointLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Utilities\MathUtils.h">
@@ -281,9 +308,6 @@
     <ClInclude Include="include\Geometry\IndexedTriangleList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderable\TestPlane.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Bindable\Blender.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -291,6 +315,39 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Bindable\DynamicConstantBufferBindable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DynamicConstantBuffer\DynamicConstantBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DynamicConstantBuffer\LayoutCache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Bindable\Stencil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Geometry\Cube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderable\TestCube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderPass\Job.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderPass\Step.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderPass\Technique.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderPass\FrameManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderPass\Pass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Bindable\NullPixelShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -321,17 +378,10 @@
     <FxCompile Include="shaders\BlinnPhong_Solid_VS.hlsl" />
     <FxCompile Include="shaders\BlinnPhong_Solid_PS.hlsl" />
     <FxCompile Include="shaders\BlinnPhong_SpecularNormalMapMasked_PS.hlsl" />
+    <FxCompile Include="shaders\SolidColor_PS.hlsl" />
+    <FxCompile Include="shaders\SolidColor_VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\Downloads\DXTrace.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="..\..\..\..\Downloads\DXGetErrorString.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="..\..\..\..\Downloads\DXGetErrorDescription.inl">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="src\Exceptions\DxErr\DXGetErrorDescription.inl">
       <Filter>Header Files</Filter>
     </None>
@@ -348,6 +398,15 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="shaders\Common\NormalMapping.hlsli">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="DXGetErrorDescription.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="DXGetErrorString.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="DXTrace.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

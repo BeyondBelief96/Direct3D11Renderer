@@ -37,3 +37,8 @@ std::string InputLayout::GenerateUID(const D3::VertexLayout& layout, ID3DBlob* p
 {
 	return typeid(InputLayout).name() + std::string("#") + layout.GetCode();
 }
+
+const D3::VertexLayout InputLayout::GetLayout() const noexcept
+{
+	return layout;
+}

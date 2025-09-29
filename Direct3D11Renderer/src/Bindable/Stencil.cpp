@@ -9,6 +9,8 @@ Stencil::Stencil(Graphics& gfx, Mode mode)
 	if (mode == Mode::Write)
 	{
 		// Write the stencil buffer with 1's wherever we draw in the render target.
+		dsDesc.DepthEnable = FALSE;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 		dsDesc.StencilEnable = TRUE;
 		dsDesc.StencilWriteMask = 0xFF;
 		dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
@@ -20,6 +22,7 @@ Stencil::Stencil(Graphics& gfx, Mode mode)
 		// This will allow us to draw everywhere except where we previously drew with the Write mode.
 		// Giving us a masking effect.
 		dsDesc.DepthEnable = FALSE;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 		dsDesc.StencilEnable = TRUE;
 		dsDesc.StencilReadMask = 0xFF;
 		dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_NOT_EQUAL;

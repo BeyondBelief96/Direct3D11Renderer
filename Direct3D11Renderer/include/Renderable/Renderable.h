@@ -3,10 +3,16 @@
 #include "Bindable/Bindable.h"
 #include "Bindable/IndexBuffer.h"
 #include "Bindable/BindableCache.h"
+#include "RenderPass/Technique.h"
 #include <memory>
 #include <vector>
 #include <DirectXMath.h>
 #include <typeinfo>
+
+class IndexBuffer;
+class VertexBuffer;
+class Topology;
+class InputLayout;
 
 class Renderable
 {
@@ -14,26 +20,15 @@ public:
     Renderable() = default;
     Renderable(const Renderable&) = delete;
     virtual ~Renderable() = default;
-
-    void Render(Graphics& gfx) const noexcept(!_DEBUG);
-    void AddBindable(std::shared_ptr<Bindable> bindable);
-
-	template<class T>
-	T* QueryBindable() noexcept
-	{
-		for (auto& pb : bindables)
-		{
-			if (auto pt = dynamic_cast<T*>(pb.get()))
-			{
-				return pt;
-			}
-		}
-		return nullptr;
-	}
-
+	void AddTechnique(Technique technique) noexcept;
+    void Submit(class FrameManager& frameManager) const noexcept;
     virtual DirectX::XMMATRIX GetTransformXM() const noexcept = 0;
+    UINT GetIndexCount() const noexcept;
+    void Bind(Graphics& gfx) const noexcept;
+protected:
 
-private:
-    const IndexBuffer* pIndexBuffer = nullptr;
-    std::vector<std::shared_ptr<Bindable>> bindables;
+    std::shared_ptr<IndexBuffer> pIndices;
+    std::shared_ptr<VertexBuffer> pVertices;
+    std::shared_ptr<Topology> pTopology;
+    std::vector<Technique> techniques;
 };

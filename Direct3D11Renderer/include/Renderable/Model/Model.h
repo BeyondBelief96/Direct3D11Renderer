@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Renderable/Model/Mesh.h"
+#include "RenderPass/FrameManager.h"
 #include "Core/Graphics.h"
 #include <DirectXMath.h>
 #include <scene.h>
@@ -24,7 +25,7 @@ class Node
 {
 public:
     Node(int id, const std::string& name, std::vector<Mesh*> meshes, const DirectX::XMMATRIX& transform);
-    void Render(Graphics& gfx, DirectX::FXMMATRIX parentTransform) const noexcept;
+	void Submit(FrameManager& frameManager, DirectX::FXMMATRIX accumulatedTransform) const noexcept;
     void RenderTree(Node*& pSelectedNode) const noexcept;
     void AddChild(std::unique_ptr<Node> child) noexcept;
     void SetAppliedTransform(DirectX::FXMMATRIX transform) noexcept;
@@ -48,7 +49,7 @@ class Model
 public:
     Model(Graphics& gfx, const std::string& filePath, float scale = 1.0f);
     ~Model() noexcept;
-    void Render(Graphics& gfx) const noexcept;
+    void Submit(FrameManager& frameManager) const noexcept;
     void ShowModelControlWindow(const char* windowName = nullptr) noexcept;
     void SetScale(float scale) noexcept;
 private:

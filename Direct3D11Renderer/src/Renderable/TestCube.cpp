@@ -28,7 +28,7 @@ TestCube::TestCube(Graphics& gfx, float size)
 		auto pvsbc = pvs->GetByteCode();
 		only.AddBindable(std::move(pvs));
 		only.AddBindable(PixelShader::Resolve(gfx, "shaders\\Output\\BlinnPhong_Diffuse_PS.cso"));
-		only.AddBindable(PixelConstantBuffer<PSMaterialConstant>::Resolve(gfx, pmc, 1u));
+		D3::LayoutBuilder layout;
 		only.AddBindable(InputLayout::Resolve(gfx, model.vertices.GetLayout(), pvsbc));
 		only.AddBindable(std::make_shared<TransformConstantBuffer>(gfx));
 		standard.AddStep(only);

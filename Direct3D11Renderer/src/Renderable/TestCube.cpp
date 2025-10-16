@@ -1,8 +1,11 @@
 #include "Renderable/TestCube.h"
 #include "Geometry/Cube.h"
+#include "DynamicConstantBuffer/DynamicConstantBuffer.h"
+#include "Bindable/DynamicConstantBufferBindable.h"
 #include "Bindable/BindableCommon.h"
 #include "Bindable/Stencil.h"
 #include "imgui.h"
+
 
 TestCube::TestCube(Graphics& gfx, float size)
 {
@@ -19,7 +22,7 @@ TestCube::TestCube(Graphics& gfx, float size)
 	pIndices = IndexBuffer::Resolve(gfx, geometryTag, model.indices);
 	pTopology = Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	Technique standard;
+	Technique shade("Shade");
 	{
 		Step only(0);
 		only.AddBindable(Texture::Resolve(gfx, "assets\\models\\brick_wall\\brick_wall_diffuse.jpg", 0u));
@@ -29,13 +32,19 @@ TestCube::TestCube(Graphics& gfx, float size)
 		only.AddBindable(std::move(pvs));
 		only.AddBindable(PixelShader::Resolve(gfx, "shaders\\Output\\BlinnPhong_Diffuse_PS.cso"));
 		D3::LayoutBuilder layout;
+		layout.Add<D3::ElementType::Float>("specularIntensity");
+		layout.Add<D3::ElementType::Float>("specularPower");
+		auto buffer = D3::ConstantBufferData(std::move(layout));
+		buffer["specularIntensity"] = 0.6f; 
+		buffer["specularPower"] = 30.0f; 
+		only.AddBindable(std::make_shared<CachingDynamicPixelConstantBufferBindable>(gfx, buffer, 1u));
 		only.AddBindable(InputLayout::Resolve(gfx, model.vertices.GetLayout(), pvsbc));
 		only.AddBindable(std::make_shared<TransformConstantBuffer>(gfx));
-		standard.AddStep(only);
+		shade.AddStep(std::move(only));
 	}
-	AddTechnique(standard);
+	AddTechnique(std::move(shade));
 
-	Technique outline;
+	Technique outline("Outline");
 	{
 		Step mask(1);
 		auto pvs = VertexShader::Resolve(gfx, "shaders\\Output\\SolidColor_VS.cso");
@@ -52,21 +61,45 @@ TestCube::TestCube(Graphics& gfx, float size)
 		auto pvsbc = pvs->GetByteCode();
 		draw.AddBindable(std::move(pvs));
 		draw.AddBindable(PixelShader::Resolve(gfx, "shaders\\Output\\SolidColor_PS.cso"));
+
+		D3::LayoutBuilder layout;
+		layout.Add<D3::ElementType::Float4>("color");
+		auto buffer = D3::ConstantBufferData(std::move(layout));
+		buffer["color"] = DirectX::XMFLOAT4{ 1.0f, 0.4f, 1.0f, 1.0f };
+		draw.AddBindable(std::make_shared<CachingDynamicPixelConstantBufferBindable>(gfx, buffer, 1u));
 		draw.AddBindable(InputLayout::Resolve(gfx, model.vertices.GetLayout(), pvsbc));
 		class TransformConstantBufferScaling : public TransformConstantBuffer
 		{
 		public:
-			using TransformConstantBuffer::TransformConstantBuffer;
+			TransformConstantBufferScaling(Graphics& gfx, float scale = 1.04f)
+				: TransformConstantBuffer(gfx), buffer(MakeLayout()) 
+			{
+				buffer["scale"] = scale;
+			}
+
+			void Accept(TechniqueProbe& probe) override
+			{
+				probe.VisitBuffer(buffer);
+			}
+
 			void Bind(Graphics& gfx) noexcept override
 			{
-
-
-				const auto scale = dx::XMMatrixScaling(1.04f, 1.04f, 1.04f);
+				const auto scale = buffer["scale"];
+				const auto scaleMatrix = DirectX::XMMatrixScaling(scale, scale, scale);
 				auto xf = GetTransformBuffer(gfx);
-				xf.modelView = xf.modelView * scale;
-				xf.modelViewProj = xf.modelViewProj * scale;
+				xf.modelView = xf.modelView * scaleMatrix;
+				xf.modelViewProj = xf.modelViewProj * scaleMatrix;
 				UpdateBindImpl(gfx, xf);
 			}
+
+		private:
+			static D3::LayoutBuilder MakeLayout()
+			{
+				D3::LayoutBuilder layout;
+				layout.Add<D3::ElementType::Float>("scale");
+				return layout;
+			}
+			D3::ConstantBufferData buffer;
 		};
 		draw.AddBindable(std::make_shared<TransformConstantBufferScaling>(gfx));
 		outline.AddStep(draw);
@@ -104,13 +137,54 @@ void TestCube::SpawnControlWindow(Graphics& gfx, const char* name) noexcept
 		ImGui::SliderAngle("Roll", &roll, -180.0f, 180.0f);
 		ImGui::SliderAngle("Pitch", &pitch, -180.0f, 180.0f);
 		ImGui::SliderAngle("Yaw", &yaw, -180.0f, 180.0f);
-		//ImGui::Text("Shading");
-		/*bool changed0 = ImGui::SliderFloat("Spec. Reflectance", &pmc.specularReflectance, 0.0f, 1.0f);
-		bool changed1 = ImGui::SliderFloat("Spec. Shininess", &pmc.specularShininess, 0.0f, 100.0f);
-		if (changed0 || changed1)
+
+		class Probe : public TechniqueProbe
 		{
-			QueryBindable<PixelConstantBuffer<PSMaterialConstant>>()->Update(gfx, pmc);
-		}*/
+		public:
+			void OnSetTechnique() override
+			{
+				ImGui::TextColored({ 0.4f, 1.0f, 0.6f, 1.0f }, pTechnique->GetName().c_str());
+				bool active = pTechnique->IsActive();
+				ImGui::Checkbox((std::string("Technique Active") + pTechnique->GetName()).c_str(), &active);
+				pTechnique->SetActiveState(active);
+			}
+
+			bool VisitBuffer(D3::ConstantBufferData& buffer) override
+			{
+				bool dirty = false;
+				const auto dCheck = [&dirty](bool changed) {dirty = dirty || changed; };
+
+				if (auto v = buffer["scale"]; v.Exists())
+				{
+					float scaleValue = v;  
+					dCheck(ImGui::SliderFloat("Scale", &scaleValue, 1.0f, 2.0f, "%.3f"));
+					v = scaleValue; 
+				}
+				if(auto v = buffer["color"]; v.Exists())
+				{
+					DirectX::XMFLOAT4 colorValue = v; 
+					dCheck(ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&colorValue)));
+					v = colorValue; 
+				}
+				if(auto v = buffer["specularIntensity"]; v.Exists())
+				{
+					float specularIntensityValue = v; 
+					dCheck(ImGui::SliderFloat("Specular Intensity", &specularIntensityValue, 0.0f, 1.0f));
+					v = specularIntensityValue; 
+				}
+				if(auto v = buffer["specularPower"]; v.Exists())
+				{
+					float specularPowerValue = v; 
+					dCheck(ImGui::SliderFloat("Glossiness", &specularPowerValue, 1.0f, 100.0f, "%.1f", 1.5f));
+					v = specularPowerValue; 
+				}
+
+				return dirty;
+			}
+		};
+
+		static Probe probe;
+		Accept(probe);
 	}
 	ImGui::End();
 }

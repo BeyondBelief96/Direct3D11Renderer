@@ -159,6 +159,14 @@ void CachingDynamicPixelConstantBufferBindable::Bind(Graphics& gfx) noexcept
     DynamicPixelConstantBufferBindable::Bind(gfx);  // Bind buffer to pipeline
 }
 
+void CachingDynamicPixelConstantBufferBindable::Accept(TechniqueProbe& probe)
+{
+    if (probe.VisitBuffer(buffer))
+    {
+        isDirty = true;
+    }
+}
+
 /// <summary>
 /// Creates or retrieves a cached instance from the BindableCache based on layout and slot.
 /// Enables sharing of identical bindables across multiple objects for memory efficiency.

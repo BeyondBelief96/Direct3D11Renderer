@@ -1,18 +1,25 @@
 #pragma once
 
 #include "Step.h"
+#include "TechniqueProbe.h"
 #include <vector>
 
 class Technique
 {
 public:
+	Technique() = default;
+	Technique(std::string name) noexcept;
 	void Submit(class FrameManager& frameManager, const class Renderable& renderable) const noexcept;
 	void AddStep(Step step) noexcept;
-	void Activate() noexcept;
-	void Deactivate() noexcept;
+	void SetActiveState(bool state) noexcept;
+	bool IsActive() const noexcept;
+	void Accept(TechniqueProbe& probe);
+	const std::string& GetName() const noexcept;
 	void InitializeParentReferences(const class Renderable& renderable) const;
+
 private:
 	bool active = true;
 	std::vector<Step> steps;
+	std::string name;
 
 };

@@ -1,7 +1,9 @@
 #pragma once
 #include "Core/Graphics.h"
+#include <string>
 
 class Renderable;
+class TechniqueProbe;
 
 class Bindable
 {
@@ -13,6 +15,7 @@ public:
 		return "";
 	}
 	virtual ~Bindable() = default;
+	virtual void Accept(TechniqueProbe& probe) {};
 	virtual void InitializeParentReference(const Renderable&) noexcept {};
 protected:
 	static ID3D11DeviceContext* const GetContext(Graphics& gfx) noexcept;

@@ -185,6 +185,7 @@
     <ClCompile Include="src\RenderPass\Pass.cpp" />
     <ClCompile Include="src\RenderPass\Step.cpp" />
     <ClCompile Include="src\RenderPass\Technique.cpp" />
+    <ClCompile Include="src\RenderPass\TechniqueProbe.cpp" />
     <ClCompile Include="src\Utilities\D3Timer.cpp" />
     <ClCompile Include="src\Exceptions\BindableLookupException.cpp" />
     <ClCompile Include="src\Exceptions\D3Exception.cpp" />
@@ -247,6 +248,7 @@
     <ClInclude Include="include\RenderPass\Pass.h" />
     <ClInclude Include="include\RenderPass\Step.h" />
     <ClInclude Include="include\RenderPass\Technique.h" />
+    <ClInclude Include="include\RenderPass\TechniqueProbe.h" />
     <ClInclude Include="include\Utilities\D3Timer.h" />
     <ClInclude Include="include\Utilities\ChiliWin.h" />
     <ClInclude Include="include\Exceptions\BindableLookupException.h" />

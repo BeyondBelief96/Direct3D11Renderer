@@ -26,6 +26,14 @@ void Step::Bind(Graphics& gfx) const
 	}
 }
 
+void Step::Accept(TechniqueProbe& probe)
+{
+	for (const auto& b : bindables)
+	{
+		b->Accept(probe);
+	}
+}
+
 void Step::InitializeParentReferences(const class Renderable& parent) const
 {
 	for (const auto& b : bindables)

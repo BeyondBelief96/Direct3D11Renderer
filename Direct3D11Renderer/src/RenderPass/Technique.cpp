@@ -1,5 +1,9 @@
 #include "RenderPass/Technique.h"
 
+Technique::Technique(std::string name) noexcept : name(name)
+{
+}
+
 void Technique::Submit(class FrameManager& frameManager, const class Renderable& renderable) const noexcept
 {
 	if (active)
@@ -16,14 +20,28 @@ void Technique::AddStep(Step step) noexcept
 	steps.push_back(std::move(step));
 }
 
-void Technique::Activate() noexcept
+bool Technique::IsActive() const noexcept
 {
-	active = true;
+	return active;
 }
 
-void Technique::Deactivate() noexcept
+void Technique::Accept(TechniqueProbe& probe)
 {
-	active = false;
+	probe.SetTechnique(this);
+	for (auto& step : steps)
+	{
+		step.Accept(probe);
+	}
+}
+
+const std::string& Technique::GetName() const noexcept
+{
+	return name;
+}
+
+void Technique::SetActiveState(bool state) noexcept
+{
+	active = state;
 }
 
 void Technique::InitializeParentReferences(const class Renderable& parent) const

@@ -174,6 +174,9 @@
     <ClCompile Include="src\Bindable\NullPixelShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\RenderPass\TechniqueProbe.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Utilities\ChiliWin.h">
@@ -348,6 +351,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Bindable\NullPixelShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderPass\TechniqueProbe.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

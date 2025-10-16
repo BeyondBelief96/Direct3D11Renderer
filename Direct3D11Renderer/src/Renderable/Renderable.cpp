@@ -26,6 +26,14 @@ void Renderable::Bind(Graphics& gfx) const noexcept
 	pTopology->Bind(gfx);
 }
 
+void Renderable::Accept(TechniqueProbe& probe)
+{
+	for (auto& technique : techniques)
+	{
+		technique.Accept(probe);
+	}
+}
+
 UINT Renderable::GetIndexCount() const noexcept
 {
 	return pIndices->GetCount();

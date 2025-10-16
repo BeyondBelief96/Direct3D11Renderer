@@ -8,11 +8,11 @@
 // Material properties constant buffer
 cbuffer SolidColorMaterial : register(b1)
 {
-    float4 solidColor;  // RGBA color to output
+    float4 color;  // RGBA color to output
 };
 
 // Main pixel shader entry point
 float4 main() : SV_TARGET
 {
-    return solidColor;
+    return color;
 }

@@ -5,6 +5,7 @@
 #include "Exceptions/GraphicsExceptions.h"
 #include "DynamicConstantBuffer/DynamicConstantBuffer.h"
 #include "DynamicConstantBuffer/LayoutCache.h"
+#include "RenderPass/TechniqueProbe.h"
 #include <wrl.h>
 #include <memory>
 
@@ -133,6 +134,12 @@ public:
     /// </summary>
     /// <param name="gfx">Graphics context for operations</param>
     void Bind(Graphics& gfx) noexcept override;
+
+    /// <summary>
+    /// Accepts a TechniqueProbe object, typically for visitor pattern operations.
+    /// </summary>
+    /// <param name="probe">A reference to a TechniqueProbe object to be accepted.</param>
+    void Accept(TechniqueProbe& probe) override;
 
     /// <summary>Creates or retrieves a cached bindable from the BindableCache using a layout</summary>
     static std::shared_ptr<CachingDynamicPixelConstantBufferBindable> Resolve(Graphics& gfx, const D3::FinalizedLayout& layout, UINT slot = 1);

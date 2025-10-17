@@ -145,45 +145,49 @@ void TestCube::SpawnControlWindow(Graphics& gfx, const char* name) noexcept
 			{
 				ImGui::TextColored({ 0.4f, 1.0f, 0.6f, 1.0f }, pTechnique->GetName().c_str());
 				bool active = pTechnique->IsActive();
-				ImGui::Checkbox((std::string("Technique Active") + pTechnique->GetName()).c_str(), &active);
+				ImGui::Checkbox((std::string("Technique Active") + std::to_string(techniqueIdx)).c_str(), &active);
 				pTechnique->SetActiveState(active);
 			}
 
-			bool VisitBuffer(D3::ConstantBufferData& buffer) override
+			bool OnVisitBuffer(D3::ConstantBufferData& buffer) override
 			{
 				bool dirty = false;
 				const auto dCheck = [&dirty](bool changed) {dirty = dirty || changed; };
+				auto tag = [tagScratch = std::string{}, tagString = "##" + std::to_string(bufferIdx)](const char* label) mutable
+				{
+					tagScratch = std::string(label) + tagString;
+					return tagScratch.c_str();
+				};
 
 				if (auto v = buffer["scale"]; v.Exists())
 				{
 					float scaleValue = v;  
-					dCheck(ImGui::SliderFloat("Scale", &scaleValue, 1.0f, 2.0f, "%.3f"));
+					dCheck(ImGui::SliderFloat(tag("Scale"), &scaleValue, 1.0f, 2.0f, "%.3f"));
 					v = scaleValue; 
 				}
 				if(auto v = buffer["color"]; v.Exists())
 				{
 					DirectX::XMFLOAT4 colorValue = v; 
-					dCheck(ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&colorValue)));
+					dCheck(ImGui::ColorPicker4(tag("Color"), reinterpret_cast<float*>(&colorValue)));
 					v = colorValue; 
 				}
 				if(auto v = buffer["specularIntensity"]; v.Exists())
 				{
 					float specularIntensityValue = v; 
-					dCheck(ImGui::SliderFloat("Specular Intensity", &specularIntensityValue, 0.0f, 1.0f));
+					dCheck(ImGui::SliderFloat(tag("Specular Intensity"), &specularIntensityValue, 0.0f, 1.0f));
 					v = specularIntensityValue; 
 				}
 				if(auto v = buffer["specularPower"]; v.Exists())
 				{
 					float specularPowerValue = v; 
-					dCheck(ImGui::SliderFloat("Glossiness", &specularPowerValue, 1.0f, 100.0f, "%.1f", 1.5f));
+					dCheck(ImGui::SliderFloat(tag("Glossiness"), &specularPowerValue, 1.0f, 100.0f, "%.1f", 1.5f));
 					v = specularPowerValue; 
 				}
 
 				return dirty;
 			}
-		};
+		} probe;
 
-		static Probe probe;
 		Accept(probe);
 	}
 	ImGui::End();

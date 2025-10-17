@@ -7,15 +7,16 @@
 #include <string>
 #include <d3d11.h>
 #include <DirectXMath.h>
+#include <scene.h>
 
 /** @brief Direct3D11 vertex system namespace containing all vertex-related classes and utilities */
 namespace D3
 {
 	/** @brief 8-bit per channel BGRA color representation.
-	 *  
+	 *
 	 *  Uses BGRA byte ordering which matches DirectX's preferred DXGI_FORMAT_R8G8B8A8_UNORM format.
 	 *  Each component is an unsigned 8-bit value (0-255 range).
-	 *  
+	 *
 	 *  @note The memory layout is: [B][G][R][A] when viewed as bytes
 	 */
 	struct BGRAColor
@@ -31,7 +32,7 @@ namespace D3
 	};
 
 	/** @brief Defines the layout and structure of vertex data for D3D11 input layouts.
-	 *  
+	 *
 	 *  This class manages vertex element types, their memory layout, and provides
 	 *  compile-time mapping to DirectX types and formats. It supports flexible
 	 *  vertex configurations and automatic D3D11_INPUT_ELEMENT_DESC generation.
@@ -40,7 +41,7 @@ namespace D3
 	{
 	public:
 		/** @brief Enumeration of supported vertex element types.
-		 *  
+		 *
 		 *  Each type corresponds to a specific DirectX data format and semantic.
 		 *  The order matters for vertex buffer layout calculations.
 		 */
@@ -58,12 +59,13 @@ namespace D3
 			Count,         /**< Total number of element types - used for iteration */
 		};
 		/** @brief Template struct for mapping ElementType to DirectX types and formats.
-		 *  
+		 *
 		 *  This template is specialized for each ElementType to provide:
 		 *  - SysType: The corresponding DirectX math type (e.g., XMFLOAT3)
 		 *  - dxgiFormat: The DXGI format for the D3D11 input layout
 		 *  - semantic: The HLSL semantic name for shaders
-		 *  
+		 *  - code: Short string code for layout identification
+		 *
 		 *  @tparam ElementType The vertex element type to map
 		 */
 		template<ElementType> struct Map;
@@ -73,6 +75,7 @@ namespace D3
 			using SysType = DirectX::XMFLOAT2;  /**< DirectX 2-component float vector */
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32_FLOAT;  /**< 32-bit float RG format */
 			static constexpr const char* semantic = "Position";  /**< HLSL semantic name */
+			static constexpr const char* code = "P2";  /**< Short code for layout identification */
 		};
 		/** @brief Specialization for 3D position coordinates */
 		template<> struct Map<Position3D>
@@ -80,6 +83,7 @@ namespace D3
 			using SysType = DirectX::XMFLOAT3;  /**< DirectX 3-component float vector */
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;  /**< 32-bit float RGB format */
 			static constexpr const char* semantic = "Position";  /**< HLSL semantic name */
+			static constexpr const char* code = "P3";  /**< Short code for layout identification */
 		};
 		/** @brief Specialization for 2D texture coordinates (UV mapping) */
 		template<> struct Map<Texture2D>
@@ -87,6 +91,7 @@ namespace D3
 			using SysType = DirectX::XMFLOAT2;  /**< DirectX 2-component float vector for UV coords */
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32_FLOAT;  /**< 32-bit float RG format */
 			static constexpr const char* semantic = "TexCoord";  /**< HLSL semantic name */
+			static constexpr const char* code = "T2";  /**< Short code for layout identification */
 		};
 		/** @brief Specialization for tangent vectors (used in normal mapping) */
 		template<> struct Map<Tangent>
@@ -94,6 +99,7 @@ namespace D3
 			using SysType = DirectX::XMFLOAT3;  /**< DirectX 3-component float vector */
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;  /**< 32-bit float RGB format */
 			static constexpr const char* semantic = "Tangent";  /**< HLSL semantic name */
+			static constexpr const char* code = "Nt";  /**< Short code for layout identification */
 		};
 		/** @brief Specialization for bitangent vectors (used in normal mapping) */
 		template<> struct Map<Bitangent>
@@ -101,6 +107,7 @@ namespace D3
 			using SysType = DirectX::XMFLOAT3;  /**< DirectX 3-component float vector */
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;  /**< 32-bit float RGB format */
 			static constexpr const char* semantic = "Bitangent";  /**< HLSL semantic name */
+			static constexpr const char* code = "Nb";  /**< Short code for layout identification */
 		};
 		/** @brief Specialization for surface normal vectors */
 		template<> struct Map<Normal>
@@ -108,6 +115,7 @@ namespace D3
 			using SysType = DirectX::XMFLOAT3;  /**< DirectX 3-component float vector */
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;  /**< 32-bit float RGB format */
 			static constexpr const char* semantic = "Normal";  /**< HLSL semantic name */
+			static constexpr const char* code = "N";  /**< Short code for layout identification */
 		};
 		/** @brief Specialization for RGB color as 3 floating-point components */
 		template<> struct Map<Float3Color>
@@ -115,6 +123,7 @@ namespace D3
 			using SysType = DirectX::XMFLOAT3;  /**< DirectX 3-component float vector for RGB */
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;  /**< 32-bit float RGB format */
 			static constexpr const char* semantic = "Color";  /**< HLSL semantic name */
+			static constexpr const char* code = "C3";  /**< Short code for layout identification */
 		};
 		/** @brief Specialization for RGBA color as 4 floating-point components */
 		template<> struct Map<Float4Color>
@@ -122,6 +131,7 @@ namespace D3
 			using SysType = DirectX::XMFLOAT4;  /**< DirectX 4-component float vector for RGBA */
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;  /**< 32-bit float RGBA format */
 			static constexpr const char* semantic = "Color";  /**< HLSL semantic name */
+			static constexpr const char* code = "C4";  /**< Short code for layout identification */
 		};
 		/** @brief Specialization for BGRA color as packed 8-bit components */
 		template<> struct Map<BGRAColor>
@@ -129,10 +139,78 @@ namespace D3
 			using SysType = D3::BGRAColor;  /**< Custom BGRA color struct */
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;  /**< 8-bit normalized RGBA format */
 			static constexpr const char* semantic = "Color";  /**< HLSL semantic name */
+			static constexpr const char* code = "CB";  /**< Short code for layout identification */
+		};
+		/** @brief Specialization for Count (used as sentinel/fallback) */
+		template<> struct Map<Count>
+		{
+			using SysType = long double;  /**< Dummy type */
+			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_UNKNOWN;  /**< Unknown format */
+			static constexpr const char* semantic = "!INVALID!";  /**< Invalid semantic */
+			static constexpr const char* code = "!INV!";  /**< Invalid code */
 		};
 
+		/** @brief Bridge template to dispatch calls based on ElementType at runtime.
+		 *
+		 *  This template function allows calling template functions with the ElementType
+		 *  determined at runtime rather than compile-time. It works by switching on the
+		 *  type and invoking the templated Functor::Exec() method with the appropriate
+		 *  type parameter.
+		 *
+		 *  @tparam Functor A template struct with a static Exec() method
+		 *  @tparam Args Types of additional arguments to forward to Exec()
+		 *  @param type The runtime ElementType to dispatch on
+		 *  @param args Additional arguments to forward to the Exec() method
+		 *  @return The return value from Functor<type>::Exec()
+		 *
+		 *  Example usage:
+		 *  @code
+		 *  template<VertexLayout::ElementType type>
+		 *  struct SizeGetter {
+		 *      static constexpr auto Exec() { return sizeof(VertexLayout::Map<type>::SysType); }
+		 *  };
+		 *  size_t size = VertexLayout::Bridge<SizeGetter>(elementType);
+		 *  @endcode
+		 */
+		template<template<VertexLayout::ElementType> class Functor, typename... Args>
+		static constexpr auto Bridge(VertexLayout::ElementType type, Args&&... args)
+		{
+			switch (type)
+			{
+			case VertexLayout::Position2D: return Functor<VertexLayout::Position2D>::Exec(std::forward<Args>(args)...);
+			case VertexLayout::Position3D: return Functor<VertexLayout::Position3D>::Exec(std::forward<Args>(args)...);
+			case VertexLayout::Texture2D: return Functor<VertexLayout::Texture2D>::Exec(std::forward<Args>(args)...);
+			case VertexLayout::Tangent: return Functor<VertexLayout::Tangent>::Exec(std::forward<Args>(args)...);
+			case VertexLayout::Bitangent: return Functor<VertexLayout::Bitangent>::Exec(std::forward<Args>(args)...);
+			case VertexLayout::Normal: return Functor<VertexLayout::Normal>::Exec(std::forward<Args>(args)...);
+			case VertexLayout::Float3Color: return Functor<VertexLayout::Float3Color>::Exec(std::forward<Args>(args)...);
+			case VertexLayout::Float4Color: return Functor<VertexLayout::Float4Color>::Exec(std::forward<Args>(args)...);
+			case VertexLayout::BGRAColor: return Functor<VertexLayout::BGRAColor>::Exec(std::forward<Args>(args)...);
+			}
+			assert(!"Invalid element type");
+			return Functor<VertexLayout::Count>::Exec(std::forward<Args>(args)...);
+		}
+
+		/** @brief Checks if the layout contains an element of the specified type.
+		 *  @tparam Type The ElementType to check for
+		 *  @return True if the element type is present, false otherwise
+		*/
+		template<ElementType Type>
+		bool Has() const noexcept
+		{
+			for (auto& e : elements)
+			{
+				if (e.GetType() == Type)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		/** @brief Represents a single element within a vertex layout.
-		 *  
+		 *
 		 *  Each element describes one attribute of a vertex (position, normal, etc.)
 		 *  including its type, memory offset, and size. Used to build D3D11 input layouts.
 		 */
@@ -168,58 +246,59 @@ namespace D3
 			 */
 			static constexpr size_t SizeOf(ElementType type)
 			{
-				switch (type)
-				{
-				case Position2D: return sizeof(Map<Position2D>::SysType);
-				case Position3D: return sizeof(Map<Position3D>::SysType);
-				case Texture2D: return sizeof(Map<Texture2D>::SysType);
-				case Tangent: return sizeof(Map<Tangent>::SysType);
-				case Bitangent: return sizeof(Map<Bitangent>::SysType);
-				case Normal: return sizeof(Map<Normal>::SysType);
-				case Float3Color: return sizeof(Map<Float3Color>::SysType);
-				case Float4Color: return sizeof(Map<Float4Color>::SysType);
-				case BGRAColor: return sizeof(Map<BGRAColor>::SysType);
-				}
-				assert(!"Invalid element type");
-				return 0u;
+				return Bridge<SysSizeLookup>(type);
 			}
 			/** @brief Gets the ElementType of this element.
 			 *  @return The ElementType enum value
 			 */
 			ElementType GetType() const { return type; }
+			/** @brief Gets the short code string for this element type.
+			 *  @return Short code string (e.g., "P3", "N", "T2")
+			 */
+			const char* GetCode() const
+			{
+				return Bridge<CodeLookup>(type);
+			}
 			/** @brief Generates a D3D11_INPUT_ELEMENT_DESC for this element.
 			 *  @return Complete D3D11 input element descriptor ready for input layout creation
 			 *  @note Uses template Map specializations to get format and semantic information
 			 */
 			D3D11_INPUT_ELEMENT_DESC GetDesc() const
 			{
-				switch (type)
-				{
-				case Position2D: return GenerateDesc<Position2D>(GetOffset());
-				case Position3D: return GenerateDesc<Position3D>(GetOffset());
-				case Texture2D: return GenerateDesc<Texture2D>(GetOffset());
-				case Tangent: return GenerateDesc<Tangent>(GetOffset());
-				case Bitangent: return GenerateDesc<Bitangent>(GetOffset());
-				case Normal: return GenerateDesc<Normal>(GetOffset());
-				case Float3Color: return GenerateDesc<Float3Color>(GetOffset());
-				case Float4Color: return GenerateDesc<Float4Color>(GetOffset());
-				case BGRAColor: return GenerateDesc<BGRAColor>(GetOffset());
-				}
-				assert(!"Invalid element type");
-				return { "INVALID",0,DXGI_FORMAT_UNKNOWN,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 };
+				return Bridge<DescGenerate>(type, GetOffset());
 			}
 		private:
-			/** @brief Template function to generate D3D11_INPUT_ELEMENT_DESC.
-			 *  @tparam type The ElementType to generate descriptor for
-			 *  @param offset Byte offset of this element in vertex data
-			 *  @return Complete D3D11 input element descriptor
-			 *  @note Uses Map<type> specialization to get semantic and format
-			 */
+			/** @brief Functor for Bridge pattern to get sizeof(SysType) */
 			template<ElementType type>
-			static constexpr D3D11_INPUT_ELEMENT_DESC GenerateDesc(size_t offset)
+			struct SysSizeLookup
 			{
-				return { Map<type>::semantic,0,Map<type>::dxgiFormat,0,(UINT)offset,D3D11_INPUT_PER_VERTEX_DATA,0 };
-			}
+				static constexpr auto Exec()
+				{
+					return sizeof(VertexLayout::Map<type>::SysType);
+				}
+			};
+			/** @brief Functor for Bridge pattern to get element code string */
+			template<ElementType type>
+			struct CodeLookup
+			{
+				static constexpr auto Exec()
+				{
+					return VertexLayout::Map<type>::code;
+				}
+			};
+			/** @brief Functor for Bridge pattern to generate D3D11_INPUT_ELEMENT_DESC */
+			template<ElementType type>
+			struct DescGenerate
+			{
+				static constexpr D3D11_INPUT_ELEMENT_DESC Exec(size_t offset)
+				{
+					return {
+						VertexLayout::Map<type>::semantic, 0,
+						VertexLayout::Map<type>::dxgiFormat,
+						0, (UINT)offset, D3D11_INPUT_PER_VERTEX_DATA, 0
+					};
+				}
+			};
 		private:
 			ElementType type;  /**< The type of this vertex element */
 			size_t offset;     /**< Byte offset from start of vertex data */
@@ -285,11 +364,11 @@ namespace D3
 		/** @brief Generates a compact string code representing this layout.
 		 *  @return String with abbreviated codes for each element (e.g., "P3NT2" for Position3D+Normal+Texture2D)
 		 *  @note Useful for layout identification, caching, and debugging
-		 *  
+		 *
 		 *  Element codes:
 		 *  - P2: Position2D, P3: Position3D
 		 *  - T2: Texture2D, N: Normal
-		 *  - Nt: Tangent, Nb: Bitangent  
+		 *  - Nt: Tangent, Nb: Bitangent
 		 *  - C3: Float3Color, C4: Float4Color, CB: BGRAColor
 		 */
 		std::string GetCode() const
@@ -297,18 +376,7 @@ namespace D3
 			std::string code;
 			for (const auto& e : elements)
 			{
-				switch (e.GetType())
-				{
-				case Position2D: code += "P2"; break;
-				case Position3D: code += "P3"; break;
-				case Texture2D: code += "T2"; break;
-				case Normal: code += "N"; break;
-				case Tangent: code += "Nt"; break;
-				case Bitangent: code += "Nb"; break;
-				case Float3Color: code += "C3"; break;
-				case Float4Color: code += "C4"; break;
-				case BGRAColor: code += "CB"; break;
-				}
+				code += e.GetCode();
 			}
 			return code;
 		}
@@ -317,23 +385,34 @@ namespace D3
 	};
 
 	/** @brief Represents a single vertex with dynamic attribute access.
-	 *  
+	 *
 	 *  Provides type-safe access to vertex attributes based on a VertexLayout.
 	 *  Acts as a view into raw vertex data, allowing both reading and writing
 	 *  of vertex components. The vertex data is not owned by this class.
-	 *  
+	 *
 	 *  @note This is a lightweight wrapper around a char* pointer and layout reference
 	 */
 	class Vertex
 	{
 		friend class VertexBuffer;
+	private:
+		/** @brief Functor for Bridge pattern to set attributes with type checking */
+		template<VertexLayout::ElementType type>
+		struct AttributeSetting
+		{
+			template<typename T>
+			static constexpr auto Exec(Vertex* pVertex, char* pAttribute, T&& val)
+			{
+				return pVertex->SetAttribute<type>(pAttribute, std::forward<T>(val));
+			}
+		};
 	public:
 		/** @brief Gets a reference to a vertex attribute of the specified type.
 		 *  @tparam Type The ElementType of the attribute to access
 		 *  @return Mutable reference to the attribute data cast to appropriate type
 		 *  @note Uses template Map specialization to determine the return type
 		 *  @warning Asserts if the element type is not present in the layout
-		 *  
+		 *
 		 *  Example usage:
 		 *  @code
 		 *  auto& pos = vertex.Attr<VertexLayout::Position3D>();
@@ -358,38 +437,9 @@ namespace D3
 		{
 			const auto& element = layout.ResolveByIndex(i);
 			auto pAttribute = pData + element.GetOffset();
-			switch (element.GetType())
-			{
-			case VertexLayout::Position2D:
-				SetAttribute<VertexLayout::Position2D>(pAttribute, std::forward<T>(val));
-				break;
-			case VertexLayout::Position3D:
-				SetAttribute<VertexLayout::Position3D>(pAttribute, std::forward<T>(val));
-				break;
-			case VertexLayout::Texture2D:
-				SetAttribute<VertexLayout::Texture2D>(pAttribute, std::forward<T>(val));
-				break;
-			case VertexLayout::Tangent:
-				SetAttribute<VertexLayout::Tangent>(pAttribute, std::forward<T>(val));
-				break;
-			case VertexLayout::Bitangent:
-				SetAttribute<VertexLayout::Bitangent>(pAttribute, std::forward<T>(val));
-				break;
-			case VertexLayout::Normal:
-				SetAttribute<VertexLayout::Normal>(pAttribute, std::forward<T>(val));
-				break;
-			case VertexLayout::Float3Color:
-				SetAttribute<VertexLayout::Float3Color>(pAttribute, std::forward<T>(val));
-				break;
-			case VertexLayout::Float4Color:
-				SetAttribute<VertexLayout::Float4Color>(pAttribute, std::forward<T>(val));
-				break;
-			case VertexLayout::BGRAColor:
-				SetAttribute<VertexLayout::BGRAColor>(pAttribute, std::forward<T>(val));
-				break;
-			default:
-				assert(!"Bad element type");
-			}
+			VertexLayout::Bridge<AttributeSetting>(
+				element.GetType(), this, pAttribute, std::forward<T>(val)
+			);
 		}
 		/** @brief Variadic template helper to set multiple attributes by index.
 		 *  @tparam First Type of the first attribute value
@@ -420,7 +470,7 @@ namespace D3
 		/** @brief Template helper to set an attribute with compile-time type checking.
 		 *  @tparam DestLayoutType The target ElementType for the attribute
 		 *  @tparam SrcType The source type of the value being assigned
-		 *  @param pAttribute Pointer to the attribute location in vertex data  
+		 *  @param pAttribute Pointer to the attribute location in vertex data
 		 *  @param val The value to assign (forwarded to preserve value category)
 		 *  @note Uses SFINAE with std::is_assignable to ensure type compatibility
 		 *  @warning Asserts at runtime if types are incompatible (should never happen with proper usage)
@@ -444,10 +494,10 @@ namespace D3
 	};
 
 	/** @brief Read-only wrapper for Vertex providing const access to attributes.
-	 *  
+	 *
 	 *  Provides the same attribute access interface as Vertex but prevents modification.
 	 *  Useful when you want to pass vertex data around without allowing changes.
-	 *  
+	 *
 	 *  @note This class stores a copy of the Vertex, not a reference
 	 */
 	class ConstVertex
@@ -475,13 +525,13 @@ namespace D3
 	};
 
 	/** @brief Dynamic vertex buffer with flexible layout support.
-	 *  
+	 *
 	 *  Manages a collection of vertices in a contiguous memory buffer.
 	 *  Supports adding vertices, accessing individual vertices, and provides
 	 *  methods for integration with D3D11 vertex buffers.
-	 *  
+	 *
 	 *  The buffer owns its data and manages memory automatically as vertices are added.
-	 *  
+	 *
 	 *  @note All vertices in a buffer share the same layout
 	 */
 	class VertexBuffer
@@ -491,9 +541,11 @@ namespace D3
 		 *  @param layout The vertex layout describing the structure of each vertex
 		 *  @note The layout is moved into the buffer for efficiency
 		 */
-		VertexBuffer(VertexLayout layout)
+		VertexBuffer(VertexLayout layout, size_t size = 0u)
 			: layout(std::move(layout))
-		{}
+		{
+			Resize(size);
+		}
 		/** @brief Gets a pointer to the raw vertex buffer data.
 		 *  @return Const pointer to the buffer data, suitable for D3D11 vertex buffer creation
 		 */
@@ -506,22 +558,33 @@ namespace D3
 		 *  @return Number of complete vertices stored in the buffer
 		 */
 		size_t Size() const { return buffer.size() / layout.Size(); }
+
+		/** @brief Resizes the buffer to the specified size.*/
+		void Resize(size_t newSize) noexcept
+		{
+			const auto size = Size();
+			if (size < newSize)
+			{
+				buffer.resize(buffer.size() + layout.Size() * (newSize - size));
+			}
+		}
+
 		/** @brief Gets the total size of the buffer in bytes.
-		 *  @return Total buffer size in bytes
-		 */
+		*  @return Total buffer size in bytes
+		*/
 		size_t SizeBytes() const { return buffer.size(); }
 		/** @brief Adds a new vertex to the buffer using perfect forwarding.
 		 *  @tparam Params Types of the vertex attribute values (automatically deduced)
 		 *  @param params Vertex attribute values in layout order
 		 *  @note Parameter count must exactly match the number of elements in the layout
 		 *  @warning Asserts if parameter count doesn't match layout element count
-		 *  
+		 *
 		 *  Example usage:
 		 *  @code
 		 *  // For layout with Position3D + Normal + Texture2D:
 		 *  buffer.EmplaceBack(
 		 *      DirectX::XMFLOAT3{1.0f, 2.0f, 3.0f},  // position
-		 *      DirectX::XMFLOAT3{0.0f, 1.0f, 0.0f},  // normal  
+		 *      DirectX::XMFLOAT3{0.0f, 1.0f, 0.0f},  // normal
 		 *      DirectX::XMFLOAT2{0.5f, 0.5f}         // texture coords
 		 *  );
 		 *  @endcode

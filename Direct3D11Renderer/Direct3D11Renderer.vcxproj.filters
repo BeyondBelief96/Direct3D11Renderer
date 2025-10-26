@@ -380,8 +380,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders\BlinnPhong_Diffuse_VS.hlsl" />
-    <FxCompile Include="shaders\BlinnPhong_Diffuse_PS.hlsl" />
     <FxCompile Include="shaders\PointLightIndicator_PS.hlsl" />
     <FxCompile Include="shaders\PointLightIndicator_VS.hlsl" />
     <FxCompile Include="shaders\BlinnPhong_SpecularNormalMapped_PS.hlsl" />
@@ -392,6 +390,10 @@
     <FxCompile Include="shaders\BlinnPhong_SpecularNormalMapMasked_PS.hlsl" />
     <FxCompile Include="shaders\SolidColor_PS.hlsl" />
     <FxCompile Include="shaders\SolidColor_VS.hlsl" />
+    <FxCompile Include="shaders\PhongDiffNrmVS.hlsl" />
+    <FxCompile Include="shaders\PhongDiffNrmPS.hlsl" />
+    <FxCompile Include="shaders\BlinnPhong_Diffuse_PS.hlsl" />
+    <FxCompile Include="shaders\BlinnPhong_Diffuse_VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Exceptions\DxErr\DXGetErrorDescription.inl">

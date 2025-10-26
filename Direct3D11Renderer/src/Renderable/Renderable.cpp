@@ -2,8 +2,22 @@
 #include "Bindable/BindableCommon.h"
 #include "Bindable/BindableCache.h"
 #include "Exceptions/GraphicsExceptions.h"
+#include "Renderable/Material/Material.h"
 #include <cassert>
 #include <typeinfo>
+#include <scene.h>
+
+Renderable::Renderable(Graphics& gfx, const D3::Material& material, const aiMesh& mesh) noexcept
+{
+	pVertices = material.MakeVertexBufferBindable(gfx, mesh);
+	pIndices = material.MakeIndexBufferBindable(gfx, mesh);
+	pTopology = Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	for (auto& technique : material.GetTechniques())
+	{
+		AddTechnique(std::move(technique));
+	}
+}
 
 void Renderable::Submit(FrameManager& frameManager) const noexcept
 {

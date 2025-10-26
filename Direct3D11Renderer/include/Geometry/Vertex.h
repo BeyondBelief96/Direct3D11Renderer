@@ -9,6 +9,8 @@
 #include <DirectXMath.h>
 #include <scene.h>
 
+#define DVTX_ELEMENT_AI_EXTRACTOR(member) static SysType Extract( const aiMesh& mesh,size_t i ) noexcept {return *reinterpret_cast<const SysType*>(&mesh.member[i]);}
+
 /** @brief Direct3D11 vertex system namespace containing all vertex-related classes and utilities */
 namespace D3
 {
@@ -76,6 +78,7 @@ namespace D3
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32_FLOAT;  /**< 32-bit float RG format */
 			static constexpr const char* semantic = "Position";  /**< HLSL semantic name */
 			static constexpr const char* code = "P2";  /**< Short code for layout identification */
+			DVTX_ELEMENT_AI_EXTRACTOR(mVertices);
 		};
 		/** @brief Specialization for 3D position coordinates */
 		template<> struct Map<Position3D>
@@ -84,6 +87,7 @@ namespace D3
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;  /**< 32-bit float RGB format */
 			static constexpr const char* semantic = "Position";  /**< HLSL semantic name */
 			static constexpr const char* code = "P3";  /**< Short code for layout identification */
+			DVTX_ELEMENT_AI_EXTRACTOR(mVertices);
 		};
 		/** @brief Specialization for 2D texture coordinates (UV mapping) */
 		template<> struct Map<Texture2D>
@@ -92,6 +96,7 @@ namespace D3
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32_FLOAT;  /**< 32-bit float RG format */
 			static constexpr const char* semantic = "TexCoord";  /**< HLSL semantic name */
 			static constexpr const char* code = "T2";  /**< Short code for layout identification */
+			DVTX_ELEMENT_AI_EXTRACTOR(mTextureCoords[0]);
 		};
 		/** @brief Specialization for tangent vectors (used in normal mapping) */
 		template<> struct Map<Tangent>
@@ -100,6 +105,7 @@ namespace D3
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;  /**< 32-bit float RGB format */
 			static constexpr const char* semantic = "Tangent";  /**< HLSL semantic name */
 			static constexpr const char* code = "Nt";  /**< Short code for layout identification */
+			DVTX_ELEMENT_AI_EXTRACTOR(mTangents);
 		};
 		/** @brief Specialization for bitangent vectors (used in normal mapping) */
 		template<> struct Map<Bitangent>
@@ -108,6 +114,7 @@ namespace D3
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;  /**< 32-bit float RGB format */
 			static constexpr const char* semantic = "Bitangent";  /**< HLSL semantic name */
 			static constexpr const char* code = "Nb";  /**< Short code for layout identification */
+			DVTX_ELEMENT_AI_EXTRACTOR(mBitangents);
 		};
 		/** @brief Specialization for surface normal vectors */
 		template<> struct Map<Normal>
@@ -116,6 +123,7 @@ namespace D3
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;  /**< 32-bit float RGB format */
 			static constexpr const char* semantic = "Normal";  /**< HLSL semantic name */
 			static constexpr const char* code = "N";  /**< Short code for layout identification */
+			DVTX_ELEMENT_AI_EXTRACTOR(mNormals);
 		};
 		/** @brief Specialization for RGB color as 3 floating-point components */
 		template<> struct Map<Float3Color>
@@ -124,6 +132,7 @@ namespace D3
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;  /**< 32-bit float RGB format */
 			static constexpr const char* semantic = "Color";  /**< HLSL semantic name */
 			static constexpr const char* code = "C3";  /**< Short code for layout identification */
+			DVTX_ELEMENT_AI_EXTRACTOR(mColors[0]);
 		};
 		/** @brief Specialization for RGBA color as 4 floating-point components */
 		template<> struct Map<Float4Color>
@@ -132,6 +141,7 @@ namespace D3
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;  /**< 32-bit float RGBA format */
 			static constexpr const char* semantic = "Color";  /**< HLSL semantic name */
 			static constexpr const char* code = "C4";  /**< Short code for layout identification */
+			DVTX_ELEMENT_AI_EXTRACTOR(mColors[0]);
 		};
 		/** @brief Specialization for BGRA color as packed 8-bit components */
 		template<> struct Map<BGRAColor>
@@ -140,6 +150,7 @@ namespace D3
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;  /**< 8-bit normalized RGBA format */
 			static constexpr const char* semantic = "Color";  /**< HLSL semantic name */
 			static constexpr const char* code = "CB";  /**< Short code for layout identification */
+			DVTX_ELEMENT_AI_EXTRACTOR(mColors[0]);
 		};
 		/** @brief Specialization for Count (used as sentinel/fallback) */
 		template<> struct Map<Count>
@@ -148,6 +159,7 @@ namespace D3
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_UNKNOWN;  /**< Unknown format */
 			static constexpr const char* semantic = "!INVALID!";  /**< Invalid semantic */
 			static constexpr const char* code = "!INV!";  /**< Invalid code */
+			DVTX_ELEMENT_AI_EXTRACTOR(mFaces);
 		};
 
 		/** @brief Bridge template to dispatch calls based on ElementType at runtime.
@@ -537,6 +549,19 @@ namespace D3
 	class VertexBuffer
 	{
 	public:
+
+		template<VertexLayout::ElementType type>
+		struct AttributeAiMeshFill
+		{
+			static constexpr void Exec(VertexBuffer* pBuffer, const aiMesh& mesh) noexcept
+			{
+				for (auto end = mesh.mNumVertices, i = 0u; i < end; i++)
+				{
+					(*pBuffer)[i].Attr<type>() = VertexLayout::Map<type>::Extract(mesh, i);
+				}
+			}
+		};
+
 		/** @brief Constructs a vertex buffer with the specified layout.
 		 *  @param layout The vertex layout describing the structure of each vertex
 		 *  @note The layout is moved into the buffer for efficiency
@@ -546,6 +571,15 @@ namespace D3
 		{
 			Resize(size);
 		}
+
+		VertexBuffer(VertexLayout layout_in, const aiMesh& mesh) : layout(std::move(layout_in))
+		{
+			Resize(mesh.mNumVertices);
+			for (size_t i = 0, end = layout.GetElementCount(); i < end; i++)
+			{
+				VertexLayout::Bridge<AttributeAiMeshFill>(layout.ResolveByIndex(i).GetType(), this, mesh);
+			}
+		}
 		/** @brief Gets a pointer to the raw vertex buffer data.
 		 *  @return Const pointer to the buffer data, suitable for D3D11 vertex buffer creation
 		 */
@@ -553,6 +587,7 @@ namespace D3
 		/** @brief Gets the vertex layout used by this buffer.
 		 *  @return Const reference to the vertex layout
 		 */
+
 		const VertexLayout& GetLayout() const { return layout; }
 		/** @brief Gets the number of vertices in the buffer.
 		 *  @return Number of complete vertices stored in the buffer
